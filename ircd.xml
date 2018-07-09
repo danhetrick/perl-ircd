@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<import>operators.xml</import>
+<import>auth.xml</import>
+
 <config>
+
+	<verbose>1</verbose>
 
 	<!-- Listen on ports 6667-6669 -->
 	<port>6667</port>
@@ -15,43 +21,3 @@
 	<info>My IRC Server</info>
 
 </config>
-
-<operator>
-
-	<username>bob</username>
-	<password>changeme</password>
-	<ipmask>*@*</ipmask>
-
-</operator>
-
-<operator>
-
-	<username>joe</username>
-	<password>changeme</password>
-	<ipmask>*@*</ipmask>
-
-</operator>
-
-<auth>
-
-	<mask>*@*</mask>
-	<!--
-		Uncomment to add options to auth
-
-	<password>changeme</password>
-	<spoof>google.com</spoof>
-	<no_tilde>1</no_tilde>
-
-	-->
-
-
-</auth>
-
-<auth>
-
-	<mask>*@google.com</mask>
-	<password>changeme</password>
-	<spoof>devil.com</spoof>
-	<tilde>1</tilde>
-
-</auth>

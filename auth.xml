@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<auth>
+
+	<mask>*@*</mask>
+	<!--
+		Uncomment to add options to auth
+
+	<password>changeme</password>
+	<spoof>google.com</spoof>
+	<no_tilde>1</no_tilde>
+
+	-->
+
+
+</auth>
+
+<auth>
+
+	<mask>*@google.com</mask>
+	<password>changeme</password>
+	<spoof>devil.com</spoof>
+	<no_tilde>1</no_tilde>
+
+</auth>
