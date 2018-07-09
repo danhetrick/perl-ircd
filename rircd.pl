@@ -46,6 +46,7 @@ use constant OPERATOR_IPMASK => 2;
 # | SCALARS |
 # -----------
 
+# Default server settings
 my $SERVER_NAME = "perl.irc.server";
 my $NICKNAME_LENGTH = 15;
 my $SERVER_NETWORK = "PerlNet";
@@ -54,8 +55,11 @@ my $MAX_CHANNELS = 15;
 my $SERVER_INFO = "";
 my $DEFAULT_PORT = 6667;
 my $DEFAULT_AUTH = '*@*';
-my $CONFIGURATION_FILE = $RealBin."/ircd.xml";
 my $VERBOSE = 1;
+
+# Configuration file settings
+my $CONFIGURATION_FILE = "ircd.xml";
+my $CONFIGURATION_DIRECTORY_NAME = "config";
 
 # ----------
 # | ARRAYS |
@@ -76,18 +80,21 @@ my @OPERATORS = ();
 # See if a config file is passed to the program in an argument
 if($#ARGV>=0){ $CONFIGURATION_FILE=$ARGV[0]; }
 
+# Look for the configuration file in the local directory or the config/ directory
+my $found_configuration_file = find_configuration_file($CONFIGURATION_FILE);
+
 # If no config is found, display error and exit.
-if((-e $CONFIGURATION_FILE) && (-f $CONFIGURATION_FILE)){} else {
+if($found_configuration_file){} else {
 	print "Configuration file '$CONFIGURATION_FILE' not found.\n";
 	exit 1;
 }
 
 # Load our config file
-load_xml_configuration_file($CONFIGURATION_FILE);
+load_xml_configuration_file($found_configuration_file);
 
 # Display banner to those with verbosity turned on
 verbose(logo());
-verbose("Using configuration file '$CONFIGURATION_FILE'");
+verbose("Using configuration file '$found_configuration_file'");
 
 # Make sure we've got enough settings to run
 # If not, make sure the default port and auth
@@ -147,6 +154,7 @@ $poe_kernel->run();
 # | Configuration File Handling |
 # -------------------------------
 
+# find_configuration_file()
 # check_config_and_apply_defaults()
 # load_xml_configuration_file()
 # XML::TreePP
@@ -274,6 +282,31 @@ sub display_warning {
 	}
 }
 
+# find_configuration_file()
+# Arguments: 1 (scalar, filename)
+# Returns: Scalar (filename)
+# Description: Looks for a given configuration file in the several directories
+sub find_configuration_file {
+	my $filename = shift;
+
+	# If the filename is found, return it
+	if((-e $filename)&&(-f $filename)){ return $filename; }
+
+	# Look for the file in $RealBin/filename
+	my $f = $RealBin."/".$filename;
+	if((-e $f)&&(-f $f)){ return $f; }
+
+	# Look for the file in $CONFIGURATION_DIRECTORY_NAME/filename
+	$f = $CONFIGURATION_DIRECTORY_NAME."/".$filename;
+	if((-e $f)&&(-f $f)){ return $f; }
+
+	# Look for the file in $Realbin/$CONFIGURATION_DIRECTORY_NAME/filename
+	$f = $RealBin."/".$CONFIGURATION_DIRECTORY_NAME."/".$filename;
+	if((-e $f)&&(-f $f)){ return $f; }
+
+	return undef;
+}
+
 # load_xml_configuration_file()
 # Arguments: 1 (scalar, filename)
 # Returns: Nothing
@@ -286,6 +319,11 @@ sub load_xml_configuration_file {
 	my $tpp = XML::TreePP->new();
 	my $tree = $tpp->parsefile( $filename );
 
+	$filename = find_configuration_file($filename);
+	if(!$filename){
+		display_error_and_exit("Configuration file '$filename' not found");
+	}
+
 	# ------------------
 	# | IMPORT ELEMENT |
 	# ------------------
@@ -294,10 +332,18 @@ sub load_xml_configuration_file {
 	# Allows importing of config files.
 	if(ref($tree->{import}) eq 'ARRAY'){
 		foreach my $i (@{$tree->{import}}) {
+			$i = find_configuration_file($i);
+			if(!$i){
+				display_error_and_exit("Configuration file '$filename' not found");
+			}
 			load_xml_configuration_file($i);
 		}
 	} elsif($tree->{import}){
-		load_xml_configuration_file($tree->{import});
+		my $f = find_configuration_file($tree->{import});
+		if(!$f){
+			display_error_and_exit("Configuration file '$filename' not found");
+		}
+		load_xml_configuration_file($f);
 	}
 
 	# --------------------
