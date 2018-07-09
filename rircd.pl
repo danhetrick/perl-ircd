@@ -85,8 +85,7 @@ my $found_configuration_file = find_configuration_file($CONFIGURATION_FILE);
 
 # If no config is found, display error and exit.
 if($found_configuration_file){} else {
-	print "Configuration file '$CONFIGURATION_FILE' not found.\n";
-	exit 1;
+	display_error_and_exit("Configuration file '$CONFIGURATION_FILE' not found");
 }
 
 # Load our config file
