@@ -10,6 +10,10 @@
 	<nicklength>15</nicklength>
 	<network>PerlNet</network>
 
+	<max_targets>4</max_targets>
+	<max_channels>15</max_channels>
+	<info>My IRC Server</info>
+
 </config>
 
 <operator>

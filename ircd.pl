@@ -22,6 +22,10 @@ my $SERVER_NETWORK = "PerlNet";
 my @AUTHS = ();
 my @OPERATORS = ();
 
+my $MAX_TARGETS = 4;
+my $MAX_CHANNELS = 15;
+my $SERVER_INFO = "";
+
 # Load our config file
 load_config("ircd.xml");
 
@@ -30,7 +34,10 @@ print Dumper(@AUTHS,@OPERATORS);
 my %config = (
     servername => $SERVER_NAME, 
     nicklen    => $NICKNAME_LENGTH,
-    network    => $SERVER_NETWORK
+    network    => $SERVER_NETWORK,
+    maxtargets => $MAX_TARGETS,
+    maxchannels => $MAX_CHANNELS,
+    info => $SERVER_INFO
 );
  
 my $pocosi = POE::Component::Server::IRC->spawn( config => \%config );
@@ -249,6 +256,18 @@ sub load_config {
 		exit 1;
 	}
 
+	# only one config element
+	if(ref($tree->{config}) eq 'ARRAY'){
+		print "Only one config element\n";
+		exit 1;
+	}
+
+	# config element is mandatory
+	if($tree->{config}){}else{
+		print "Missing config element\n";
+		exit 1;
+	}
+
 
 	# handles multiple ports
 	if(ref($tree->{config}->{port}) eq 'ARRAY'){
@@ -278,6 +297,28 @@ sub load_config {
 		exit 1;
 	} elsif($tree->{config}->{network}){
 		$SERVER_NETWORK = $tree->{config}->{network};
+	}
+
+
+	if(ref($tree->{config}->{max_targets}) eq 'ARRAY'){
+		print "Only one max_targets element\n";
+		exit 1;
+	} elsif($tree->{config}->{max_targets}){
+		$MAX_TARGETS = $tree->{config}->{max_targets};
+	}
+
+	if(ref($tree->{config}->{max_channels}) eq 'ARRAY'){
+		print "Only one max_channels element\n";
+		exit 1;
+	} elsif($tree->{config}->{max_channels}){
+		$MAX_CHANNELS = $tree->{config}->{max_channels};
+	}
+
+	if(ref($tree->{config}->{info}) eq 'ARRAY'){
+		print "Only one info element\n";
+		exit 1;
+	} elsif($tree->{config}->{info}){
+		$SERVER_INFO = $tree->{config}->{info};
 	}
 
 }
