@@ -20,6 +20,7 @@ use strict;
 use warnings;
 use POE qw(Component::Server::IRC);
 use FindBin qw($RealBin);
+use File::Spec;
 
 # ===============
 # | MODULES END |
@@ -292,15 +293,15 @@ sub find_configuration_file {
 	if((-e $filename)&&(-f $filename)){ return $filename; }
 
 	# Look for the file in $RealBin/filename
-	my $f = $RealBin."/".$filename;
+	my $f = File::Spec->catfile($RealBin,$filename);
 	if((-e $f)&&(-f $f)){ return $f; }
 
 	# Look for the file in $CONFIGURATION_DIRECTORY_NAME/filename
-	$f = $CONFIGURATION_DIRECTORY_NAME."/".$filename;
+	$f = File::Spec->catfile($CONFIGURATION_DIRECTORY_NAME,$filename);
 	if((-e $f)&&(-f $f)){ return $f; }
 
 	# Look for the file in $Realbin/$CONFIGURATION_DIRECTORY_NAME/filename
-	$f = $RealBin."/".$CONFIGURATION_DIRECTORY_NAME."/".$filename;
+	$f = File::Spec->catfile($RealBin,$CONFIGURATION_DIRECTORY_NAME,$filename);
 	if((-e $f)&&(-f $f)){ return $f; }
 
 	return undef;
