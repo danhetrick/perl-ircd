@@ -1,3 +1,3 @@
-# perl-ircd
+# Raven IRCD
 
 A work in progress.
