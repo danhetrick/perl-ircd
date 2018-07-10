@@ -146,7 +146,6 @@ $poe_kernel->run();
 # ----------------------
 
 #	_start()
-#	_default()
 
 # --------------------
 # | User Interaction |

@@ -16,7 +16,7 @@ use base qw(POE::Component::Server::IRC);
 
 sub _load_our_plugins {
     my $self = shift;
-    # $self->SUPER::_load_our_plugins();
+    $self->SUPER::_load_our_plugins();
     # $self->yield(
     #     'add_spoofed_nick',
     #     {
