@@ -145,7 +145,7 @@ All users connected with the given `mask` will have their host spoofed with the 
 
 ### `no_tilde`
 
-Removes the tilde (~) from reported hostmaks.
+Removes the tilde (~) from reported hostmaks.  Set to 1 to remove the tilde, and set to 0 to leave the tilde in place.
 
 ## `operator` element
 
