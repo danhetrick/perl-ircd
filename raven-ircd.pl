@@ -95,16 +95,14 @@ my @OPERATORS		= ();
 # | MAIN PROGRAM BEGIN |
 # ======================
 
-# See if a config file is passed to the program in an argument
+# See if a config file is passed to the program in an argument.
 if($#ARGV>=0){ $CONFIGURATION_FILE=$ARGV[0]; }
 
-# Look for the configuration file in the local directory or the config/ directory
+# Look for the configuration file in the local directory or the config/ directory.
 my $found_configuration_file = find_configuration_file($CONFIGURATION_FILE);
 
-# If no config is found, display error and exit.
-# if($found_configuration_file){} else {
-# 	display_error_and_exit("Configuration file '$CONFIGURATION_FILE' not found");
-# }
+# If configuration file is found, load it. If the configure file is *not* found,
+# use default settings and warn the user.
 if($found_configuration_file){
 	load_xml_configuration_file($found_configuration_file);
 	verbose(logo());
@@ -113,12 +111,6 @@ if($found_configuration_file){
 	verbose(logo());
 	display_warning("No configuration file found; starting server with default settings");
 }
-
-# Make sure we've got enough settings to run
-# If not, make sure the default port and auth
-# are set; we'll let the user know this happened if
-# verbosity is turned on.
-#check_config_and_apply_defaults();
 
 # Set our server configuration 
 my %config = (
