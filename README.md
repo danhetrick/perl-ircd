@@ -28,6 +28,7 @@ Raven IRCd (or rIRCd) is an IRC server written in Perl, with POE.  It is still v
 		* [password](#password)
 		* [ipmask](#ipmask)
 	* [Example configuration file](#example-configuration-file)
+* [License](#license)
 
 # Usage
 
@@ -133,7 +134,7 @@ If no `auth` element is set, Raven IRCd will assume that anyone is allowed to co
 
 ### `mask`
 
-Sets who's allowed to connect to the server.  `*@*` (the default) will let anyone connect.  For example, to let only clients on the `google.com` host connect, you would set `mask` to `*@google.com`.
+Sets who's allowed to connect to the server.  `*@*` (the default) will let anyone connect.  For example, to let only clients on the `google.com` host connect, you would set `mask` to `*@google.com`.  Required.
 
 ### `password`
 
@@ -141,11 +142,11 @@ Sets the password required to connect with the given `mask`.  Not required.
 
 ### `spoof`
 
-All users connected with the given `mask` will have their host spoofed with the host noted here.  For example, to make it appear if all clients on `@*@` were connected from `facebook.com`, you'd set `spoof` to `facebook.com`.
+All users connected with the given `mask` will have their host spoofed with the host noted here.  For example, to make it appear if all clients on `@*@` were connected from `facebook.com`, you'd set `spoof` to `facebook.com`.  Not required.
 
 ### `no_tilde`
 
-Removes the tilde (~) from reported hostmaks.  Set to 1 to remove the tilde, and set to 0 to leave the tilde in place.
+Removes the tilde (~) from reported hostmaks.  Set to 1 to remove the tilde, and set to 0 to leave the tilde in place.  Not required.
 
 ## `operator` element
 
@@ -197,4 +198,20 @@ Here's an example configuration file.  It'll set up listening ports on ports 666
 		<password>thematrix</password>
 	</operator>
 
-Blah
+# License
+
+Raven IRCd - An open-source IRC server written in Perl
+Copyright (C) 2018  Daniel Hetrick
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
