@@ -27,13 +27,13 @@ Raven IRCd (or rIRCd) is an IRC server written in Perl, with POE.  It is still v
 		* [username](#username)
 		* [password](#password)
 		* [ipmask](#ipmask)
-	* [Example configuration](#example-configuration)
+	* [Example configuration file](#example-configuration-file)
 
 # Usage
 
 	perl rircd.pl <CONFIGURATION FILE>
 
-By default, Raven IRCd will load a file named `ircd.xml` located either in the directory where `rircd.pl` is located, or in the `config/` directory, in the same directory as `rircd.pl`.  The directory where `rircd.pl` is located will be called the **home directory** in the rest of this document;  the `/config` directory located in the home directory will be called the **config directory**.
+By default, Raven IRCd will load a file named `ircd.xml` located either in the directory where `rircd.pl` is located, or in the `/config` directory, in the same directory as `rircd.pl`.  The directory where `rircd.pl` is located will be called the **home directory** in the rest of this document;  the `/config` directory located in the home directory will be called the **config directory**.
 
 # Configuration
 
@@ -41,24 +41,46 @@ Raven IRCd configuration files are written in XML, and have several useful featu
 
 ## `import` element
 
-The `import` element is used to load configuration data from external files, much like C's `#include` preprocesser directive.  Raven IRCd will look for `import`'ed files first in the home directory, then in the config directory.  The `import` element has no children elements.
+The `import` element is used to load configuration data from external files, much like C's `#include` preprocesser directive.  Raven IRCd will look for `import`'ed files first in the **home** directory, then in the **config** directory.  The `import` element has no children elements.  Multiple `import` elements can be set.
 
 ## `config` element
 
-The `config` element is where all the main server settings are.  They are all optional; the server will use a listening port of `6667` and let anyone connect to it.  `config` has a number of children elements.  Here's an example of a basic `config` entry, with all default settings:
+The `config` element is where all the main server settings are.  They are all optional; the server will use a listening port of `6667` and let anyone connect to it.  `config` has a number of children elements, all optional.  Here's an example of a basic `config` entry, with all default settings:
 
 	<config>
 		<verbose>1</verbose>
 		<port>6667</port>
-		<name>Perl.IRC.Server</name>
+		<name>raven.irc.server</name>
 		<nicklength>15</nicklength>
-		<network>PerlNet</network>
+		<network>RavenNet</network>
 		<max_targets>4</max_targets>
 		<max_channels>15</max_channels>
-		<info>My IRC Server</info>
+		<info>Raven IRCd</info>
 	</config>
 
 In the default set of configuration files, `config`, `operator`, and `auth` elements are contained in seperate files;  `config` is in the default config file, `ircd.xml`, and the two other elements are `import`'ed (in `operators.xml` and `auth.xml`, respectively).
+
+Multiple `config` elements can be set, though it may confuse the server (and you!). Configuration files are processed in order;  for example, if a file is imported with the `import` element, it will be loaded before any other elements following the `import` element are loaded.  As an example, let's say that you have two configuration files that you want to use, `mysettings.xml` and `othersettings.xml`.
+
+	<!-- mysettings.xml -->
+	<?xml version="1.0" encoding="UTF-8"?>
+	<config>
+		<port>6667</port>
+		<nicklength>1000000</nicklength>
+		<network>ScoobyDooNet</network>
+	</config>
+
+	<import>othersettings.xml</import>
+
+As you can see, this file sets the listening port to 6667, the nick length to a generous 1,000,000 characters, the network name to "ScoobyDooNet", and `import`s another configuration file, "othersettings.xml":
+
+	<!-- othersettings.xml -->
+	<?xml version="1.0" encoding="UTF-8"?>
+	<config>
+		<nicklength>2</nicklength>
+	</config>
+
+When all the configuration files are loaded, our users lose the generous nick length of 1,000,000 characters, and now are left with a paltry 2 character limit for their nickname.  Why?  Even though `mysettings.xml` was loaded *first*, `othersettings.xml` was loaded after it, and changed the nick length from 1,000,000 to 2.  If we had `import`'ed `othersettings.xml` before we set our config element, the nick length of 1,000,000 would still be set (because the `nicklength` setting in `mysettings.xml` was loaded after the `nicklength` setting in `othersettings.xml`).
 
 ### `verbose`
 
@@ -105,6 +127,8 @@ Here's where we set who's allowed to connect to the IRC server.  You can set wha
 
 This example will let anyone connect to the server, require a password ("changeme"), spoof all clients' host to "google.com", and remove the tilde from reported hostmasks.  Multiple `auth` elements can be set.
 
+If no `auth` element is set, Raven IRCd will assume that anyone is allowed to connect;  in effect, it will be as if an `auth` element *was* set, with the only child element `mask` set to `*@*`.
+
 ### `mask`
 
 Sets who's allowed to connect to the server.  `*@*` (the default) will let anyone connect.  For example, to let only clients on the `google.com` host connect, you would set `mask` to `*@google.com`.
@@ -145,7 +169,7 @@ Sets the password for the operator, required for login.  Required child element.
 
 Sets what hosts are allowed to use this operator account.  Not a required child element.
 
-## Example configuration
+## Example configuration file
 
 Here's an example configuration file.  It'll set up listening ports on ports 6667-6669, allow anyone to connect (spoofing their host to appear as if they are connecting from `facebook.com`), and create an operator with the username `oracle` and the password `thematrix`.  The server's name with be "example.raven.setup" on the "OscarNet" network, and will allow clients to connect to 50 channels and a time, and let them use only 8 characters in their nick:
 
