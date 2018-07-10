@@ -79,6 +79,14 @@ my $VERBOSE			= 1;
 my $CONFIGURATION_FILE				= "ircd.xml";
 my $CONFIGURATION_DIRECTORY_NAME	= "config";
 
+# Miscellaneous settings
+my $APPLICATION_NAME = "Raven IRCd";
+my $VERSION		= "0.021";
+my $APPLICATION_DESCRIPTION = "An IRC server written in Perl and POE";
+my $APPLICATION_URL = "https://github.com/danhetrick/raven-ircd";
+my $BANNER_PADDING = "-";
+my $LOGO_WIDTH	= 56;
+
 # ----------
 # | ARRAYS |
 # ----------
@@ -102,13 +110,14 @@ if($#ARGV>=0){ $CONFIGURATION_FILE=$ARGV[0]; }
 my $found_configuration_file = find_configuration_file($CONFIGURATION_FILE);
 
 # If configuration file is found, load it. If the configure file is *not* found,
-# use default settings and warn the user.
+# use default settings and warn the user.  No matter what, print the banner to
+# the console if verbosity is turned on.
 if($found_configuration_file){
 	load_xml_configuration_file($found_configuration_file);
-	if($VERBOSE==1){ print logo()."\n"; }
+	if($VERBOSE==1){ print generate_banner(); }
 	verbose("Loaded configuration file '$found_configuration_file'");
 } else {
-	if($VERBOSE==1){ print logo()."\n"; }
+	if($VERBOSE==1){ print generate_banner(); }
 	display_warning("No configuration file found; starting server with default settings");
 }
 
@@ -156,6 +165,7 @@ $poe_kernel->run();
 
 #	timestamp()
 #	verbose()
+#	generate_banner()
 #	logo()
 #	display_error_and_exit()
 #	display_warning()
@@ -248,6 +258,17 @@ sub timestamp {
 	if($VERBOSE==1){
 		print "$time $txt\n";
 	}
+}
+
+# generate_banner()
+# Arguments: None
+# Returns: Scalar
+# Description: Generates a banner with the logo and application information, and returns it.
+sub generate_banner {
+	my $b = logo().($BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_NAME $VERSION")))."$APPLICATION_NAME $VERSION\n";
+	$b .= $BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_DESCRIPTION"))."$APPLICATION_DESCRIPTION\n";
+	$b .= $BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_URL"))."$APPLICATION_URL\n\n";
+	return $b;
 }
 
 # logo()
