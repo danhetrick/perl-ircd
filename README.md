@@ -18,6 +18,11 @@ Raven IRCd (or rIRCd) is an IRC server written in Perl, with POE.  It is still v
 		* [max_targets](#max_targets)
 		* [max_channels](#max_channels)
 		* [info](#info)
+	* [auth element](#auth-element)
+		* [mask](#mask)
+		* [password](#password)
+		* [spoof](#spoof)
+		* [no_tilde](#no_tilde)
 
 # Usage
 
@@ -83,7 +88,7 @@ Sets the text displayed with the `info` IRC command.
 
 ## `auth` element
 
-Here's where we set who's allowed to connect to the IRC server.  You can set what hosts clients must be on to connect, set passwords for certain hosts, whether to spoof client hostnames, and whether or not to remove the tilde (~) from hostnames.  The only requiered child element is `mask`.  Here's an example `auth` entry:
+Here's where we set who's allowed to connect to the IRC server.  You can set what hosts clients must be on to connect, set passwords for certain hosts, whether to spoof client hostnames, and whether or not to remove the tilde (~) from hostnames.  The only required child element is `mask`.  Here's an example `auth` entry:
 
 	<?xml version="1.0" encoding="UTF-8"?>
 	<auth>
@@ -93,4 +98,33 @@ Here's where we set who's allowed to connect to the IRC server.  You can set wha
 		<no_tilde>1</no_tilde>
 	</auth>
 
-blah
+This example will let anyone connect to the server, require a password ("changeme"), spoof all clients' host to "google.com", and remove the tilde from reported hostmasks.  Multiple `auth` elements can be set.
+
+### `mask`
+
+Sets who's allowed to connect to the server.  `*@*` (the default) will let anyone connect.  For example, to let only clients on the `google.com` host connect, you would set `mask` to `*@google.com`.
+
+### `password`
+
+Sets the password required to connect with the given `mask`.  Not required.
+
+### `spoof`
+
+All users connected with the given `mask` will have their host spoofed with the host noted here.  For example, to make it appear if all clients on `@*@` were connected from `facebook.com`, you'd set `spoof` to `facebook.com`.
+
+### `no_tilde`
+
+Removes the tilde (~) from reported hostmaks.
+
+## `operator` element
+
+The `operator` element is where clients can be granted IRC operator status.  There are two required children elements, `username` and `password`, and one optional child, `ipmask`.  Here's an example entry that creates a new operator with the username `bob`, password `changeme`, and ipmask `*@google.com`:
+
+	<?xml version="1.0" encoding="UTF-8"?>
+	<operator>
+		<username>bob</username>
+		<password>changeme</password>
+		<ipmask>*@google.com</ipmask>
+	</operator>
+
+In this example, only clients connecting from the host `google.com` would be allowed to log in.
