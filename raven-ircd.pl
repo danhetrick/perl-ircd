@@ -76,7 +76,7 @@ my $DEFAULT_AUTH	= '*@*';
 my $VERBOSE			= 1;
 
 # Configuration file settings
-my $CONFIGURATION_FILE				= "ircd.xml";
+my $CONFIGURATION_FILE				= "xxircd.xml";
 my $CONFIGURATION_DIRECTORY_NAME	= "config";
 
 # ----------
@@ -105,22 +105,20 @@ my $found_configuration_file = find_configuration_file($CONFIGURATION_FILE);
 # if($found_configuration_file){} else {
 # 	display_error_and_exit("Configuration file '$CONFIGURATION_FILE' not found");
 # }
-if($found_configuration_file){} else {
+if($found_configuration_file){
+	load_xml_configuration_file($found_configuration_file);
+	verbose(logo());
+	verbose("Using configuration file '$found_configuration_file'");
+} else {
+	verbose(logo());
 	display_warning("No configuration file found; starting server with default settings");
 }
-
-# Load our config file
-load_xml_configuration_file($found_configuration_file);
-
-# Display banner to those with verbosity turned on
-verbose(logo());
-verbose("Using configuration file '$found_configuration_file'");
 
 # Make sure we've got enough settings to run
 # If not, make sure the default port and auth
 # are set; we'll let the user know this happened if
 # verbosity is turned on.
-check_config_and_apply_defaults();
+#check_config_and_apply_defaults();
 
 # Set our server configuration 
 my %config = (
@@ -174,9 +172,7 @@ $poe_kernel->run();
 # -------------------------------
 
 #	find_configuration_file()
-#	check_config_and_apply_defaults()
 #	load_xml_configuration_file()
-#	XML::TreePP
 
 # ----------------------
 # | POE Event Handlers |
@@ -189,34 +185,50 @@ sub _start {
     $heap->{ircd}->yield('register', 'all');
 
     # Add authorized connections
-    foreach my $a (@AUTHS){
-    	my @entry = @{$a};
-    	$heap->{ircd}->add_auth(
-	        mask		=> $entry[AUTH_MASK],
-	        password	=> $entry[AUTH_PASSWORD],
-	        spoof		=> $entry[AUTH_SPOOF],
-	        no_tilde	=> $entry[AUTH_TILDE],
-    );
-
+    if(scalar @AUTHS >=1){
+	    foreach my $a (@AUTHS){
+	    	my @entry = @{$a};
+	    	$heap->{ircd}->add_auth(
+		        mask		=> $entry[AUTH_MASK],
+		        password	=> $entry[AUTH_PASSWORD],
+		        spoof		=> $entry[AUTH_SPOOF],
+		        no_tilde	=> $entry[AUTH_TILDE],
+    		); 
+    	}
+    } else {
+    		display_warning('Auth element not found. Using *@* as the auth');
+    		$heap->{ircd}->add_auth(
+	        	mask		=> '*@*',
+    		); 
     }
  
     # Start up listening port(s)
-    foreach my $p (@LISTENER_PORTS){
-    	$heap->{ircd}->add_listener(port => $p);
-    }
+    if(scalar @LISTENER_PORTS >=1){
+	    foreach my $p (@LISTENER_PORTS){
+	    	$heap->{ircd}->add_listener(port => $p);
+	    }
+	} else {
+		display_warning('Port element not found. Using 6667 as the server port');
+	}
  
     # Add IRC operators
-    foreach my $o (@OPERATORS){
-		my @entry = @{$o};
+    if(scalar @OPERATORS>=1){
+	    foreach my $o (@OPERATORS){
+			my @entry = @{$o};
 
-		$heap->{ircd}->add_operator(
-	        {
-	            username	=> $entry[OPERATOR_USERNAME],
-	            password	=> $entry[OPERATOR_PASSWORD],
-	            ipmask		=> $entry[OPERATOR_IPMASK],
-	        }
-	    );
+			$heap->{ircd}->add_operator(
+		        {
+		            username	=> $entry[OPERATOR_USERNAME],
+		            password	=> $entry[OPERATOR_PASSWORD],
+		            ipmask		=> $entry[OPERATOR_IPMASK],
+		        }
+		    );
+		}
+	} else {
+		display_warning('Operator element not found. Server will start without operators');
 	}
+
+
 }
 
 # --------------------
@@ -256,7 +268,7 @@ END
 # Description: Displays an error to the user, and exits the program.
 sub display_error_and_exit {
 	my $msg = shift;
-	print "$msg\n";
+	print "ERROR: $msg\n";
 	exit 1;
 }
 
@@ -275,25 +287,6 @@ sub display_warning {
 # -------------------------------
 # | Configuration File Handling |
 # -------------------------------
-
-# check_config_and_apply_defaults()
-# Arguments: None
-# Returns: Nothing
-# Description: Checks to see if we have enough settings to start up,
-#              and if not, supplies enough defaults to start. If the
-#              user has not defined any listening ports of auth masks
-#              in their config, the defaults (6667 and *@*, respectively),
-#              will be used.
- sub check_config_and_apply_defaults {
-	if(scalar @LISTENER_PORTS >=1){}else{
-		push(@LISTENER_PORTS,$DEFAULT_PORT);
-		display_warning("Setting default listening port to $DEFAULT_PORT (missing from configuration file)")
-	}
-	if(scalar @AUTHS >=1){}else{
-		push(@AUTHS,$DEFAULT_AUTH);
-		display_warning("Setting default auth to $DEFAULT_AUTH (missing from configuration file)")
-	}
-}
 
 # find_configuration_file()
 # Arguments: 1 (scalar, filename)

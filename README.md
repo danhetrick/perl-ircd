@@ -10,6 +10,7 @@ Raven IRCd (or rIRCd) is an [IRC](https://en.wikipedia.org/wiki/Internet_Relay_C
 * [Requirements](#requirements)
 * [Installed files](#installed-files)
 * [Configuration](#configuration)
+	* [Defaults](#defaults)
 	* [import element](#import-element)
 	* [config element](#config-element)
 		* [verbose](#verbose)
@@ -60,7 +61,30 @@ By default, Raven IRCd will load a file named `ircd.xml` located either in the d
 
 Raven IRCd configuration files are written in [XML](https://en.wikipedia.org/wiki/XML), and have several useful features.  All server configuration is done through one or more XML configuration files; the default configuration file is named `ircd.xml`, and is located in the **config** directory.
 
-All configuration elements can be set in any configuration file loaded by Raven IRCd, and do not have to be in `ircd.xml`.  Although Raven IRCd requires at least *one* configuration file to be loaded, all elements are optional.  If there are no elements in any of the configuration file, Raven IRCd is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect.
+All configuration elements can be set in any configuration file loaded by Raven IRCd, and do not have to be in `ircd.xml`. Raven IRCd can also start without a configuration file; if the configuration file does not exist or can't be found, Raven IRCd is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect.
+
+## Defaults
+
+* `auth`
+	* *@*
+* `operator`
+	* No operators
+* `port`
+	* 6667
+* `name`
+	* raven.irc.server
+* `nicklength`
+	* 15
+* `network`
+	* RavenNet
+* `max_targets`
+	* 4
+* `max_channels`
+	* 15
+* `info`
+	* My IRC Server
+* `verbose`
+	* 1
 
 ## `import` element
 
