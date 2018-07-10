@@ -34,41 +34,41 @@ use File::Spec;
 # | CONSTANTS |
 # -------------
 
-use constant AUTH_MASK => 0;
-use constant AUTH_PASSWORD => 1;
-use constant AUTH_SPOOF => 2;
-use constant AUTH_TILDE => 3;
+use constant AUTH_MASK			=> 0;
+use constant AUTH_PASSWORD		=> 1;
+use constant AUTH_SPOOF			=> 2;
+use constant AUTH_TILDE			=> 3;
 
-use constant OPERATOR_USERNAME => 0;
-use constant OPERATOR_PASSWORD => 1;
-use constant OPERATOR_IPMASK => 2;
+use constant OPERATOR_USERNAME	=> 0;
+use constant OPERATOR_PASSWORD	=> 1;
+use constant OPERATOR_IPMASK	=> 2;
 
 # -----------
 # | SCALARS |
 # -----------
 
 # Default server settings
-my $SERVER_NAME = "perl.irc.server";
-my $NICKNAME_LENGTH = 15;
-my $SERVER_NETWORK = "PerlNet";
-my $MAX_TARGETS = 4;
-my $MAX_CHANNELS = 15;
-my $SERVER_INFO = "";
-my $DEFAULT_PORT = 6667;
-my $DEFAULT_AUTH = '*@*';
-my $VERBOSE = 1;
+my $SERVER_NAME		= "perl.irc.server";
+my $NICKNAME_LENGTH	= 15;
+my $SERVER_NETWORK	= "PerlNet";
+my $MAX_TARGETS		= 4;
+my $MAX_CHANNELS	= 15;
+my $SERVER_INFO		= "";
+my $DEFAULT_PORT	= 6667;
+my $DEFAULT_AUTH	= '*@*';
+my $VERBOSE			= 1;
 
 # Configuration file settings
-my $CONFIGURATION_FILE = "ircd.xml";
-my $CONFIGURATION_DIRECTORY_NAME = "config";
+my $CONFIGURATION_FILE				= "ircd.xml";
+my $CONFIGURATION_DIRECTORY_NAME	= "config";
 
 # ----------
 # | ARRAYS |
 # ----------
 
-my @LISTENER_PORTS = ();
-my @AUTHS = ();
-my @OPERATORS = ();
+my @LISTENER_PORTS	= ();
+my @AUTHS			= ();
+my @OPERATORS		= ();
 
 # ===============
 # | GLOBALS END |
