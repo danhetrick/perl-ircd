@@ -4,6 +4,12 @@
 
 Raven IRCd (or rIRCd) is an IRC server written in Perl, with POE.  It is still very much a work in progress, but its base functionality is complete.  Clients can connect to it, join channels, and do all the things that other IRCds can do.
 
+# Table of Contents
+
+* [Usage](#usage)
+* [Configuration](#configuration)
+	* [import element](#import-element)
+
 # Usage
 
 	perl rircd.pl <CONFIGURATION FILE>
@@ -52,3 +58,15 @@ Sets the server's name.
 ### `nicklength`
 
 Sets the maximum number of characters that can be used in a client's nick.
+
+### `network`
+
+Sets the name of the network Raven IRCd will use.
+
+### `max_targets`
+
+Sets the maximum number of clients a user can send a private message to in one operation.
+
+### `max_channels`
+
+Sets the maximum number of channels a client can join.
