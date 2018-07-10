@@ -87,14 +87,14 @@ All configuration elements can be set in any configuration file loaded by Raven 
 * `verbose`
 	* 1
 
-# XML Elements
+## XML Elements
 
-## `import` element
+### `import` element
 
 The `import` element is used to load configuration data from external files, much like C's `#include` preprocesser directive.  Raven IRCd will look for `import`'ed files first in the **home** directory, then in the **config** directory.  The `import` element has no children elements.  Multiple `import` elements can be set, and they can be set in any configuration file loaded;  thus, `import`'ed files can contain `import` elements, which can *also* contain `import` elements, and so on.
 
 ------------
-## `config` element
+### `config` element
 
 The `config` element is where all the main server settings are.  They are all optional; the server will use a listening port of `6667` and let anyone connect to it.  `config` has a number of children elements, all optional.  Here's an example of a basic `config` entry, with all default settings:
 
@@ -136,47 +136,47 @@ When all the configuration files are loaded, our users lose the generous nick le
 The only exception to this rule is the [`port` child element](#port);  it doesn't overwrite `port` elements in any other configuration file.  New `port` elements just add new listening ports without removing previously set ports.
 
 ------------
-### `verbose`
+#### `verbose`
 
 Set this element to 1 if you want to turn on verbosity;  set it to 0 to turn it off.  If `verbose` is turned on, various data will be printed to the console during runtime.
 
 ------------
-### `port`
+#### `port`
 
 Sets the [port](https://en.wikipedia.org/wiki/Port_(computer_networking)) that Raven IRCd will listen on.  Multiple `port` elements can exist; each one will spawn a listener on the given port.
 
 ------------
-### `name`
+#### `name`
 
 Sets the server's name.
 
 ------------
-### `nicklength`
+#### `nicklength`
 
 Sets the maximum number of characters that can be used in a client's nick.
 
 ------------
-### `network`
+#### `network`
 
 Sets the name of the network Raven IRCd will use.
 
 ------------
-### `max_targets`
+#### `max_targets`
 
 Sets the maximum number of clients a user can send a private message to in one operation.
 
 ------------
-### `max_channels`
+#### `max_channels`
 
 Sets the maximum number of channels a client can join.
 
 ------------
-### `info`
+#### `info`
 
 Sets the text displayed with the `info` IRC command.
 
 ------------
-## `auth` element
+### `auth` element
 
 Here's where we set who's allowed to connect to the IRC server.  You can set what hosts clients must be on to connect, set passwords for certain hosts, whether to spoof client hostnames, and whether or not to remove the tilde (~) from hostnames.  The only required child element is `mask`.  Here's an example `auth` entry:
 
@@ -192,27 +192,27 @@ This example will let anyone connect to the server, require a password ("changem
 If no `auth` element is set, Raven IRCd will assume that anyone is allowed to connect;  in effect, it will be as if an `auth` element *was* set, with the only child element `mask` set to `*@*`.
 
 ------------
-### `mask`
+#### `mask`
 
 Sets who's allowed to connect to the server.  `*@*` (the default) will let anyone connect.  For example, to let only clients on the `google.com` host connect, you would set `mask` to `*@google.com`.  Required.
 
 ------------
-### `password`
+#### `password`
 
 Sets the password required to connect with the given `mask`.  Not required.
 
 ------------
-### `spoof`
+#### `spoof`
 
 All users connected with the given `mask` will have their host spoofed with the host noted here.  For example, to make it appear if all clients on `@*@` were connected from `facebook.com`, you'd set `spoof` to `facebook.com`.  Not required.
 
 ------------
-### `no_tilde`
+#### `no_tilde`
 
 Removes the tilde (~) from reported hostmaks.  Set to 1 to remove the tilde, and set to 0 to leave the tilde in place.  Not required.
 
 ------------
-## `operator` element
+### `operator` element
 
 The `operator` element is where clients can be granted IRC operator status.  There are two required children elements, `username` and `password`, and one optional child, `ipmask`.  Here's an example entry that creates a new operator with the username `bob`, password `changeme`, and ipmask `*@google.com`:
 
@@ -225,17 +225,17 @@ The `operator` element is where clients can be granted IRC operator status.  The
 In this example, only clients connecting from the host `google.com` would be allowed to log in.  Multiple `operator` elements can be set.
 
 ------------
-### `username`
+#### `username`
 
 Sets the username of the operator, required for login.  Required child element.
 
 ------------
-### `password`
+#### `password`
 
 Sets the password for the operator, required for login.  Required child element.
 
 ------------
-### `ipmask`
+#### `ipmask`
 
 Sets what hosts are allowed to use this operator account.  Not a required child element.
 
