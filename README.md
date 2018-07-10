@@ -2,7 +2,7 @@
 
 # Raven IRCd
 
-Raven IRCd (or rIRCd) is an IRC server written in Perl, with POE.  It is still very much a work in progress, but its base functionality is complete.  Clients can connect to it, join channels, and do all the things that other IRCds can do.
+Raven IRCd (or rIRCd) is an [IRC](https://en.wikipedia.org/wiki/Internet_Relay_Chat) server written in [Perl](https://en.wikipedia.org/wiki/Perl), with [POE](http://poe.perl.org/).  It is still very much a work in progress, but its base functionality is complete.  [Clients](https://en.wikipedia.org/wiki/Comparison_of_Internet_Relay_Chat_clients) can connect to it, join [channels](https://en.wikipedia.org/wiki/Internet_Relay_Chat#Channels), chat, send private messages, and do [all the things that other IRCds can do](https://en.wikipedia.org/wiki/List_of_Internet_Relay_Chat_commands).
 
 # Table of Contents
 
@@ -40,7 +40,7 @@ By default, Raven IRCd will load a file named `ircd.xml` located either in the d
 
 # Requirements
 
-Perl, POE, POE::Component::Server::IRC.
+[Perl](https://en.wikipedia.org/wiki/Perl), [POE](http://poe.perl.org/), [POE::Component::Server::IRC](https://metacpan.org/pod/POE::Component::Server::IRC).
 
 # Installed files
 
