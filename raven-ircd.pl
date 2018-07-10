@@ -105,12 +105,10 @@ my $found_configuration_file = find_configuration_file($CONFIGURATION_FILE);
 # use default settings and warn the user.
 if($found_configuration_file){
 	load_xml_configuration_file($found_configuration_file);
-	if($VERBOSE==1){
-		print logo();
-	}
-	verbose("Using configuration file '$found_configuration_file'");
+	if($VERBOSE==1){ print logo()."\n"; }
+	verbose("Loaded configuration file '$found_configuration_file'");
 } else {
-	verbose(logo());
+	if($VERBOSE==1){ print logo()."\n"; }
 	display_warning("No configuration file found; starting server with default settings");
 }
 
@@ -223,8 +221,6 @@ sub _start {
 	} else {
 		display_warning('Operator element not found. Server will start without operators');
 	}
-
-
 }
 
 # --------------------
