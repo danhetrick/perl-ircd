@@ -57,6 +57,8 @@ By default, Raven IRCd will load a file named `ircd.xml` located either in the d
 	* operators.xml
 	* auth.xml
 
+------------
+
 # Configuration
 
 Raven IRCd configuration files are written in [XML](https://en.wikipedia.org/wiki/XML), and have several useful features.  All server configuration is done through one or more XML configuration files; the default configuration file is named `ircd.xml`, and is located in the **config** directory.
