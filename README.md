@@ -14,23 +14,26 @@ Raven IRCd (or rIRCd) is an [IRC](https://en.wikipedia.org/wiki/Internet_Relay_C
 	* [XML elements](#xml-elements)
 		* [`import` element](#import-element)
 		* [`config` element](#config-element)
-			* [verbose](#verbose)
-			* [port](#port)
-			* [name](#name)
-			* [nicklength](#nicklength)
-			* [network](#network)
-			* [max_targets](#max_targets)
-			* [max_channels](#max_channels)
-			* [info](#info)
+			* [ `Config` child elements](#config-child-elements)
+				* [verbose](#verbose)
+				* [port](#port)
+				* [name](#name)
+				* [nicklength](#nicklength)
+				* [network](#network)
+				* [max_targets](#max_targets)
+				* [max_channels](#max_channels)
+				* [info](#info)
 		* [`auth` element](#auth-element)
-			* [mask](#mask)
-			* [password](#password)
-			* [spoof](#spoof)
-			* [no_tilde](#no_tilde)
+			* [`auth` child elements](#auth-child-elements)
+				* [mask](#mask)
+				* [password](#password)
+				* [spoof](#spoof)
+				* [no_tilde](#no_tilde)
 		* [`operator` element](#operator-element)
-			* [username](#username)
-			* [password](#password)
-			* [ipmask](#ipmask)
+			* [`operator` child elements](#auth-child-elements)
+				* [username](#username)
+				* [password](#password)
+				* [ipmask](#ipmask)
 	* [Example configuration file](#example-configuration-file)
 * [License](#license)
 
@@ -193,23 +196,25 @@ This example will let anyone connect to the server, require a password ("changem
 
 If no `auth` element is set, Raven IRCd will assume that anyone is allowed to connect;  in effect, it will be as if an `auth` element *was* set, with the only child element `mask` set to `*@*`.
 
+#### `auth` child elements
+
 ------------
-#### `mask`
+##### `mask`
 
 Sets who's allowed to connect to the server.  `*@*` (the default) will let anyone connect.  For example, to let only clients on the `google.com` host connect, you would set `mask` to `*@google.com`.  Required.
 
 ------------
-#### `password`
+##### `password`
 
 Sets the password required to connect with the given `mask`.  Not required.
 
 ------------
-#### `spoof`
+##### `spoof`
 
 All users connected with the given `mask` will have their host spoofed with the host noted here.  For example, to make it appear if all clients on `@*@` were connected from `facebook.com`, you'd set `spoof` to `facebook.com`.  Not required.
 
 ------------
-#### `no_tilde`
+##### `no_tilde`
 
 Removes the tilde (~) from reported hostmaks.  Set to 1 to remove the tilde, and set to 0 to leave the tilde in place.  Not required.
 
@@ -226,18 +231,20 @@ The `operator` element is where clients can be granted IRC operator status.  The
 
 In this example, only clients connecting from the host `google.com` would be allowed to log in.  Multiple `operator` elements can be set.
 
+#### `operator` child elements
+
 ------------
-#### `username`
+##### `username`
 
 Sets the username of the operator, required for login.  Required child element.
 
 ------------
-#### `password`
+##### `password`
 
 Sets the password for the operator, required for login.  Required child element.
 
 ------------
-#### `ipmask`
+##### `ipmask`
 
 Sets what hosts are allowed to use this operator account.  Not a required child element.
 
