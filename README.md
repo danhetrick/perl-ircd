@@ -57,8 +57,6 @@ By default, Raven IRCd will load a file named `ircd.xml` located either in the d
 	* operators.xml
 	* auth.xml
 
-------------
-
 # Configuration
 
 Raven IRCd configuration files are written in [XML](https://en.wikipedia.org/wiki/XML), and have several useful features.  All server configuration is done through one or more XML configuration files; the default configuration file is named `ircd.xml`, and is located in the **config** directory.
@@ -88,7 +86,8 @@ All configuration elements can be set in any configuration file loaded by Raven 
 * `verbose`
 	* 1
 
-------------
+# Elements
+
 ## `import` element
 
 The `import` element is used to load configuration data from external files, much like C's `#include` preprocesser directive.  Raven IRCd will look for `import`'ed files first in the **home** directory, then in the **config** directory.  The `import` element has no children elements.  Multiple `import` elements can be set, and they can be set in any configuration file loaded;  thus, `import`'ed files can contain `import` elements, which can *also* contain `import` elements, and so on.
