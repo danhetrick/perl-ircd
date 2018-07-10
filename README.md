@@ -23,6 +23,10 @@ Raven IRCd (or rIRCd) is an IRC server written in Perl, with POE.  It is still v
 		* [password](#password)
 		* [spoof](#spoof)
 		* [no_tilde](#no_tilde)
+	* [operator element](#operator-element)
+		* [username](#username)
+		* [password](#password)
+		* [ipmask](#ipmask)
 
 # Usage
 
@@ -53,6 +57,8 @@ The `config` element is where all the main server settings are.  They are all op
 		<max_channels>15</max_channels>
 		<info>My IRC Server</info>
 	</config>
+
+In the default set of configuration files, `config`, `operator`, and `auth` elements are contained in seperate files;  `config` is in the default config file, `ircd.xml`, and the two other elements are `import`'ed (in `operators.xml` and `auth.xml`, respectively).
 
 ### `verbose`
 
@@ -127,4 +133,16 @@ The `operator` element is where clients can be granted IRC operator status.  The
 		<ipmask>*@google.com</ipmask>
 	</operator>
 
-In this example, only clients connecting from the host `google.com` would be allowed to log in.
+In this example, only clients connecting from the host `google.com` would be allowed to log in.  Multiple `operator` elements can be set.
+
+### `username`
+
+Sets the username of the operator, required for login.  Required child element.
+
+### `password`
+
+Sets the password for the operator, required for login.  Required child element.
+
+### `ipmask`
+
+Sets what hosts are allowed to use this operator account.  Not a required child element.
