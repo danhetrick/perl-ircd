@@ -76,7 +76,7 @@ my $DEFAULT_AUTH	= '*@*';
 my $VERBOSE			= 1;
 
 # Configuration file settings
-my $CONFIGURATION_FILE				= "xxircd.xml";
+my $CONFIGURATION_FILE				= "ircd.xml";
 my $CONFIGURATION_DIRECTORY_NAME	= "config";
 
 # ----------
@@ -105,7 +105,9 @@ my $found_configuration_file = find_configuration_file($CONFIGURATION_FILE);
 # use default settings and warn the user.
 if($found_configuration_file){
 	load_xml_configuration_file($found_configuration_file);
-	verbose(logo());
+	if($VERBOSE==1){
+		print logo();
+	}
 	verbose("Using configuration file '$found_configuration_file'");
 } else {
 	verbose(logo());
@@ -154,6 +156,7 @@ $poe_kernel->run();
 # | User Interaction |
 # --------------------
 
+#	timestamp()
 #	verbose()
 #	logo()
 #	display_error_and_exit()
@@ -200,6 +203,7 @@ sub _start {
 	    	$heap->{ircd}->add_listener(port => $p);
 	    }
 	} else {
+		$heap->{ircd}->add_listener(port => '6667');
 		display_warning('Port element not found. Using 6667 as the server port');
 	}
  
@@ -227,15 +231,26 @@ sub _start {
 # | User Interaction |
 # --------------------
 
+# timestamp()
+# Arguments: None
+# Returns:  Scalar (timestamp)
+# Description:  Generates a timestamp for the current time/date,
+#               and returns it.
+sub timestamp {
+	my ($second, $minute, $hour, $dayOfMonth, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = gmtime();
+	my $year = 1900 + $yearOffset;
+	return "[$hour:$minute:$second $month/$dayOfMonth/$year]";
+}
+
 # verbose()
 # Arguments: 1 (scalar, text to print)
 # Returns: Nothing
 # Description: Prints text to the console if $VERBOSE is set to 1.
  sub verbose {
 	my $txt = shift;
-
+	my $time = timestamp();
 	if($VERBOSE==1){
-		print "$txt\n";
+		print "$time $txt\n";
 	}
 }
 
@@ -271,8 +286,9 @@ sub display_error_and_exit {
 #              warnings won't be displayed.
 sub display_warning {
 	my $msg = shift;
+	my $time = timestamp();
 	if($VERBOSE==1){
-		print "WARNING: $msg\n";
+		print "$time WARNING: $msg\n";
 	}
 }
 
