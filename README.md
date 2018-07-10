@@ -201,6 +201,7 @@ Here's an example configuration file.  It'll set up listening ports on ports 666
 # License
 
 Raven IRCd - An open-source IRC server written in Perl
+
 Copyright (C) 2018  Daniel Hetrick
 
 This program is free software: you can redistribute it and/or modify
