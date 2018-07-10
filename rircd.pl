@@ -48,9 +48,9 @@ use constant OPERATOR_IPMASK	=> 2;
 # -----------
 
 # Default server settings
-my $SERVER_NAME		= "perl.irc.server";
+my $SERVER_NAME		= "raven.irc.server";
 my $NICKNAME_LENGTH	= 15;
-my $SERVER_NETWORK	= "PerlNet";
+my $SERVER_NETWORK	= "RavenNet";
 my $MAX_TARGETS		= 4;
 my $MAX_CHANNELS	= 15;
 my $SERVER_INFO		= "";
@@ -368,7 +368,7 @@ sub load_xml_configuration_file {
 	#	<ipmask>*@*</ipmask>
 	# </operator>
 	#
-	# Adds an operator to the IRC server.
+	# Adds an operator to the IRC server.  Ipmask is optional.
 	if(ref($tree->{operator}) eq 'ARRAY'){
 		foreach my $a (@{$tree->{operator}}) {
 			my @op = ();
@@ -523,9 +523,9 @@ sub load_xml_configuration_file {
 	# <config>
 	# 	<verbose>1</verbose>
 	# 	<port>6667</port>
-	# 	<name>perl.irc.server</name>
+	# 	<name>raven.irc.server</name>
 	# 	<nicklength>15</nicklength>
-	# 	<network>PerlNet</network>
+	# 	<network>RavenNet</network>
 	# 	<max_targets>4</max_targets>
 	# 	<max_channels>15</max_channels>
 	#	<info>My server info here</info>
