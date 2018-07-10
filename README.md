@@ -134,38 +134,47 @@ When all the configuration files are loaded, our users lose the generous nick le
 
 The only exception to this rule is the [`port` child element](#port);  it doesn't overwrite `port` elements in any other configuration file.  New `port` elements just add new listening ports without removing previously set ports.
 
+------------
 ### `verbose`
 
 Set this element to 1 if you want to turn on verbosity;  set it to 0 to turn it off.  If `verbose` is turned on, various data will be printed to the console during runtime.
 
+------------
 ### `port`
 
 Sets the [port](https://en.wikipedia.org/wiki/Port_(computer_networking)) that Raven IRCd will listen on.  Multiple `port` elements can exist; each one will spawn a listener on the given port.
 
+------------
 ### `name`
 
 Sets the server's name.
 
+------------
 ### `nicklength`
 
 Sets the maximum number of characters that can be used in a client's nick.
 
+------------
 ### `network`
 
 Sets the name of the network Raven IRCd will use.
 
+------------
 ### `max_targets`
 
 Sets the maximum number of clients a user can send a private message to in one operation.
 
+------------
 ### `max_channels`
 
 Sets the maximum number of channels a client can join.
 
+------------
 ### `info`
 
 Sets the text displayed with the `info` IRC command.
 
+------------
 ## `auth` element
 
 Here's where we set who's allowed to connect to the IRC server.  You can set what hosts clients must be on to connect, set passwords for certain hosts, whether to spoof client hostnames, and whether or not to remove the tilde (~) from hostnames.  The only required child element is `mask`.  Here's an example `auth` entry:
@@ -181,18 +190,22 @@ This example will let anyone connect to the server, require a password ("changem
 
 If no `auth` element is set, Raven IRCd will assume that anyone is allowed to connect;  in effect, it will be as if an `auth` element *was* set, with the only child element `mask` set to `*@*`.
 
+------------
 ### `mask`
 
 Sets who's allowed to connect to the server.  `*@*` (the default) will let anyone connect.  For example, to let only clients on the `google.com` host connect, you would set `mask` to `*@google.com`.  Required.
 
+------------
 ### `password`
 
 Sets the password required to connect with the given `mask`.  Not required.
 
+------------
 ### `spoof`
 
 All users connected with the given `mask` will have their host spoofed with the host noted here.  For example, to make it appear if all clients on `@*@` were connected from `facebook.com`, you'd set `spoof` to `facebook.com`.  Not required.
 
+------------
 ### `no_tilde`
 
 Removes the tilde (~) from reported hostmaks.  Set to 1 to remove the tilde, and set to 0 to leave the tilde in place.  Not required.
@@ -209,18 +222,22 @@ The `operator` element is where clients can be granted IRC operator status.  The
 
 In this example, only clients connecting from the host `google.com` would be allowed to log in.  Multiple `operator` elements can be set.
 
+------------
 ### `username`
 
 Sets the username of the operator, required for login.  Required child element.
 
+------------
 ### `password`
 
 Sets the password for the operator, required for login.  Required child element.
 
+------------
 ### `ipmask`
 
 Sets what hosts are allowed to use this operator account.  Not a required child element.
 
+------------
 ## Example configuration file
 
 Here's an example configuration file.  It'll set up listening ports on ports 6667-6669, allow anyone to connect (spoofing their host to appear as if they are connecting from `facebook.com`), and create an operator with the username `oracle` and the password `thematrix`.  The server's name with be "example.raven.setup" on the "OscarNet" network, and will allow clients to connect to 50 channels and a time, and let them use only 8 characters in their nick:
@@ -247,6 +264,7 @@ Here's an example configuration file.  It'll set up listening ports on ports 666
 		<password>thematrix</password>
 	</operator>
 
+------------
 # License
 
 Raven IRCd - An open-source IRC server written in Perl
