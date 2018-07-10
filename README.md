@@ -11,7 +11,7 @@ Raven IRCd (or rIRCd) is an [IRC](https://en.wikipedia.org/wiki/Internet_Relay_C
 * [Installed files](#installed-files)
 * [Configuration](#configuration)
 	* [Default settings](#default-settings)
-	* [XML elements](#xml-elements)
+	* [Configuration file XML elements](#configuration-file-XML-elements)
 		* [`import` element](#import-element)
 		* [`config` element](#config-element)
 			* [ `Config` child elements](#config-child-elements)
@@ -90,7 +90,7 @@ All configuration elements can be set in any configuration file loaded by Raven 
 * `verbose`
 	* 1
 
-## XML Elements
+## Configuration file XML elements
 
 ### `import` element
 
