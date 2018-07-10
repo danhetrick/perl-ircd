@@ -10,7 +10,7 @@ Raven IRCd (or rIRCd) is an [IRC](https://en.wikipedia.org/wiki/Internet_Relay_C
 * [Requirements](#requirements)
 * [Installed files](#installed-files)
 * [Configuration](#configuration)
-	* [Defaults](#defaults)
+	* [Default settings](#default-settings)
 	* [import element](#import-element)
 	* [config element](#config-element)
 		* [verbose](#verbose)
@@ -63,7 +63,7 @@ Raven IRCd configuration files are written in [XML](https://en.wikipedia.org/wik
 
 All configuration elements can be set in any configuration file loaded by Raven IRCd, and do not have to be in `ircd.xml`. Raven IRCd can also start without a configuration file; if the configuration file does not exist or can't be found, Raven IRCd is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect.
 
-## Defaults
+## Default settings
 
 * `auth`
 	* *@*
