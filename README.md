@@ -83,3 +83,14 @@ Sets the text displayed with the `info` IRC command.
 
 ## `auth` element
 
+Here's where we set who's allowed to connect to the IRC server.  You can set what hosts clients must be on to connect, set passwords for certain hosts, whether to spoof client hostnames, and whether or not to remove the tilde (~) from hostnames.  The only requiered child element is `mask`.  Here's an example `auth` entry:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<auth>
+	<mask>*@*</mask>
+	<password>changeme</password>
+	<spoof>google.com</spoof>
+	<no_tilde>1</no_tilde>
+</auth>
+
+blah
