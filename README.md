@@ -34,9 +34,9 @@ Raven IRCd (or rIRCd) is an IRC server written in Perl, with POE.  It is still v
 
 # Usage
 
-	perl rircd.pl <CONFIGURATION FILE>
+	perl raven-ircd.pl <CONFIGURATION FILE>
 
-By default, Raven IRCd will load a file named `ircd.xml` located either in the directory where `rircd.pl` is located, or in the `/config` directory, in the same directory as `rircd.pl`.  The directory where `rircd.pl` is located will be called the **home directory** in the rest of this document;  the `/config` directory located in the home directory will be called the **config directory**.
+By default, Raven IRCd will load a file named `ircd.xml` located either in the directory where `raven-ircd.pl` is located, or in the `/config` directory, in the same directory as `raven-ircd.pl`.  The directory where `raven-ircd.pl` is located will be called the **home directory** in the rest of this document;  the `/config` directory located in the home directory will be called the **config directory**.
 
 # Requirements
 
@@ -44,7 +44,7 @@ Perl, POE, POE::Component::Server::IRC.
 
 # Installed files
 
-* rircd.pl
+* raven-ircd.pl
 * LICENCE
 * README.md
 * lib
