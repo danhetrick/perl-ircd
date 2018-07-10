@@ -135,48 +135,50 @@ When all the configuration files are loaded, our users lose the generous nick le
 
 The only exception to this rule is the [`port` child element](#port);  it doesn't overwrite `port` elements in any other configuration file.  New `port` elements just add new listening ports without removing previously set ports.
 
+#### `config` child elements
+
 ------------
-#### `verbose`
+##### `verbose`
 
 Set this element to 1 if you want to turn on verbosity;  set it to 0 to turn it off.  If `verbose` is turned on, various data will be printed to the console during runtime.
 
 ------------
-#### `port`
+##### `port`
 
 Sets the [port](https://en.wikipedia.org/wiki/Port_(computer_networking)) that Raven IRCd will listen on.  Multiple `port` elements can exist; each one will spawn a listener on the given port.
 
 ------------
-#### `name`
+##### `name`
 
 Sets the server's name.
 
 ------------
-#### `nicklength`
+##### `nicklength`
 
 Sets the maximum number of characters that can be used in a client's nick.
 
 ------------
-#### `network`
+##### `network`
 
 Sets the name of the network Raven IRCd will use.
 
 ------------
-#### `max_targets`
+##### `max_targets`
 
 Sets the maximum number of clients a user can send a private message to in one operation.
 
 ------------
-#### `max_channels`
+##### `max_channels`
 
 Sets the maximum number of channels a client can join.
 
 ------------
-#### `info`
+##### `info`
 
 Sets the text displayed with the `info` IRC command.
 
 ------------
-### `auth` element
+#### `auth` element
 
 Here's where we set who's allowed to connect to the IRC server.  You can set what hosts clients must be on to connect, set passwords for certain hosts, whether to spoof client hostnames, and whether or not to remove the tilde (~) from hostnames.  The only required child element is `mask`.  Here's an example `auth` entry:
 
