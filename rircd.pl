@@ -104,12 +104,12 @@ check_config_and_apply_defaults();
 
 # Set our server configuration 
 my %config = (
-    servername => $SERVER_NAME, 
-    nicklen    => $NICKNAME_LENGTH,
-    network    => $SERVER_NETWORK,
-    maxtargets => $MAX_TARGETS,
-    maxchannels => $MAX_CHANNELS,
-    info => $SERVER_INFO
+    servername	=> $SERVER_NAME, 
+    nicklen		=> $NICKNAME_LENGTH,
+    network		=> $SERVER_NETWORK,
+    maxtargets	=> $MAX_TARGETS,
+    maxchannels	=> $MAX_CHANNELS,
+    info		=> $SERVER_INFO
 );
 
 # Spawn our POE::Component::Server::IRC instance
@@ -138,40 +138,45 @@ $poe_kernel->run();
 # | POE Event Handlers |
 # ----------------------
 
-# _start()
-# _default()
+#	_start()
+#	_default()
 
 # --------------------
 # | User Interaction |
 # --------------------
 
-# verbose()
-# logo()
-# display_error_and_exit()
-# display_warning()
+#	verbose()
+#	logo()
+#	display_error_and_exit()
+#	display_warning()
 
 # -------------------------------
 # | Configuration File Handling |
 # -------------------------------
 
-# find_configuration_file()
-# check_config_and_apply_defaults()
-# load_xml_configuration_file()
-# XML::TreePP
+#	find_configuration_file()
+#	check_config_and_apply_defaults()
+#	load_xml_configuration_file()
+#	XML::TreePP
+
+# ----------------------
+# | POE Event Handlers |
+# ----------------------
  
 sub _start {
     my ($kernel, $heap) = @_[KERNEL, HEAP];
  
+ 	# Make sure we get all events
     $heap->{ircd}->yield('register', 'all');
 
     # Add authorized connections
     foreach my $a (@AUTHS){
     	my @entry = @{$a};
     	$heap->{ircd}->add_auth(
-        mask     => $entry[AUTH_MASK],
-        password     => $entry[AUTH_PASSWORD],
-        spoof    => $entry[AUTH_SPOOF],
-        no_tilde => $entry[AUTH_TILDE],
+	        mask		=> $entry[AUTH_MASK],
+	        password	=> $entry[AUTH_PASSWORD],
+	        spoof		=> $entry[AUTH_SPOOF],
+	        no_tilde	=> $entry[AUTH_TILDE],
     );
 
     }
@@ -181,15 +186,15 @@ sub _start {
     	$heap->{ircd}->add_listener(port => $p);
     }
  
-    # Add operators
+    # Add IRC operators
     foreach my $o (@OPERATORS){
 		my @entry = @{$o};
 
 		$heap->{ircd}->add_operator(
 	        {
-	            username => $entry[OPERATOR_USERNAME],
-	            password => $entry[OPERATOR_PASSWORD],
-	            ipmask => $entry[OPERATOR_IPMASK],
+	            username	=> $entry[OPERATOR_USERNAME],
+	            password	=> $entry[OPERATOR_PASSWORD],
+	            ipmask		=> $entry[OPERATOR_IPMASK],
 	        }
 	    );
 	}
@@ -213,6 +218,10 @@ sub _default {
  
     print "\n";
  }
+
+# --------------------
+# | User Interaction |
+# --------------------
 
 # verbose()
 # Arguments: 1 (scalar, text to print)
@@ -262,6 +271,10 @@ sub display_warning {
 		print "WARNING: $msg\n";
 	}
 }
+
+# -------------------------------
+# | Configuration File Handling |
+# -------------------------------
 
 # check_config_and_apply_defaults()
 # Arguments: None
