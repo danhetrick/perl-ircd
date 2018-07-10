@@ -58,7 +58,7 @@ By default, Raven IRCd will load a file named `ircd.xml` located either in the d
 
 # Configuration
 
-Raven IRCd configuration files are written in XML, and have several useful features.
+Raven IRCd configuration files are written in [XML](https://en.wikipedia.org/wiki/XML), and have several useful features.
 
 ## `import` element
 
@@ -111,7 +111,7 @@ Set this element to 1 if you want to turn on verbosity;  set it to 0 to turn it 
 
 ### `port`
 
-Sets the port that Raven IRCd will listen on.  Multiple `port` elements can exist; each one will spawn a listener on the given port.
+Sets the [port](https://en.wikipedia.org/wiki/Port_(computer_networking)) that Raven IRCd will listen on.  Multiple `port` elements can exist; each one will spawn a listener on the given port.
 
 ### `name`
 
