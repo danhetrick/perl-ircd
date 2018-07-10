@@ -9,6 +9,15 @@ Raven IRCd (or rIRCd) is an IRC server written in Perl, with POE.  It is still v
 * [Usage](#usage)
 * [Configuration](#configuration)
 	* [import element](#import-element)
+	* [config element](#config-element)
+		* [verbose](#verbose)
+		* [port](#port)
+		* [name](#name)
+		* [nicklength](#nicklength)
+		* [network](#network)
+		* [max_targets](#max_targets)
+		* [max_channels](#max_channels)
+		* [info](#info)
 
 # Usage
 
@@ -30,17 +39,14 @@ The `config` element is where all the main server settings are.  They are all op
 
 	<?xml version="1.0" encoding="UTF-8"?>
 	<config>
-
 		<verbose>1</verbose>
 		<port>6667</port>
 		<name>Perl.IRC.Server</name>
 		<nicklength>15</nicklength>
 		<network>PerlNet</network>
-
 		<max_targets>4</max_targets>
 		<max_channels>15</max_channels>
 		<info>My IRC Server</info>
-
 	</config>
 
 ### `verbose`
@@ -70,3 +76,10 @@ Sets the maximum number of clients a user can send a private message to in one o
 ### `max_channels`
 
 Sets the maximum number of channels a client can join.
+
+### `info`
+
+Sets the text displayed with the `info` IRC command.
+
+## `auth` element
+
