@@ -41,7 +41,7 @@ Raven IRCd (or rIRCd) is an [IRC](https://en.wikipedia.org/wiki/Internet_Relay_C
 
 	perl raven-ircd.pl <CONFIGURATION FILE>
 
-By default, Raven IRCd will load a file named `ircd.xml` located either in the directory where `raven-ircd.pl` is located, or in the `/config` directory, in the same directory as `raven-ircd.pl`.  The directory where `raven-ircd.pl` is located will be called the **home directory** in the rest of this document;  the `/config` directory located in the home directory will be called the **config directory**. Raven IRCd doesn't *require* a configuration file; it will just use the default settings (see [Default settings](#default-settings)).
+By default, Raven IRCd will load a file named `ircd.xml` located either in the directory where `raven-ircd.pl` is located, or in the `/config` directory, in the same directory as `raven-ircd.pl`.  The directory where `raven-ircd.pl` is located will be called the **home directory** in the rest of this document;  the `/config` directory located in the home directory will be called the **config directory**. Raven IRCd doesn't *require* a configuration file; it will just use the default settings (see [Default settings](#default-settings)) if one isn't supplied.
 
 # Requirements
 
