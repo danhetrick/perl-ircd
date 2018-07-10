@@ -102,8 +102,11 @@ if($#ARGV>=0){ $CONFIGURATION_FILE=$ARGV[0]; }
 my $found_configuration_file = find_configuration_file($CONFIGURATION_FILE);
 
 # If no config is found, display error and exit.
+# if($found_configuration_file){} else {
+# 	display_error_and_exit("Configuration file '$CONFIGURATION_FILE' not found");
+# }
 if($found_configuration_file){} else {
-	display_error_and_exit("Configuration file '$CONFIGURATION_FILE' not found");
+	display_warning("No configuration file found; starting server with default settings");
 }
 
 # Load our config file
