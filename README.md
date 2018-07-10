@@ -27,6 +27,7 @@ Raven IRCd (or rIRCd) is an IRC server written in Perl, with POE.  It is still v
 		* [username](#username)
 		* [password](#password)
 		* [ipmask](#ipmask)
+	* [Example configuration](#example-configuration)
 
 # Usage
 
@@ -46,7 +47,6 @@ The `import` element is used to load configuration data from external files, muc
 
 The `config` element is where all the main server settings are.  They are all optional; the server will use a listening port of `6667` and let anyone connect to it.  `config` has a number of children elements.  Here's an example of a basic `config` entry, with all default settings:
 
-	<?xml version="1.0" encoding="UTF-8"?>
 	<config>
 		<verbose>1</verbose>
 		<port>6667</port>
@@ -96,7 +96,6 @@ Sets the text displayed with the `info` IRC command.
 
 Here's where we set who's allowed to connect to the IRC server.  You can set what hosts clients must be on to connect, set passwords for certain hosts, whether to spoof client hostnames, and whether or not to remove the tilde (~) from hostnames.  The only required child element is `mask`.  Here's an example `auth` entry:
 
-	<?xml version="1.0" encoding="UTF-8"?>
 	<auth>
 		<mask>*@*</mask>
 		<password>changeme</password>
@@ -126,7 +125,6 @@ Removes the tilde (~) from reported hostmaks.
 
 The `operator` element is where clients can be granted IRC operator status.  There are two required children elements, `username` and `password`, and one optional child, `ipmask`.  Here's an example entry that creates a new operator with the username `bob`, password `changeme`, and ipmask `*@google.com`:
 
-	<?xml version="1.0" encoding="UTF-8"?>
 	<operator>
 		<username>bob</username>
 		<password>changeme</password>
@@ -146,3 +144,31 @@ Sets the password for the operator, required for login.  Required child element.
 ### `ipmask`
 
 Sets what hosts are allowed to use this operator account.  Not a required child element.
+
+## Example configuration
+
+Here's an example configuration file.  It'll set up listening ports on ports 6667-6669, allow anyone to connect (spoofing their host to appear as if they are connecting from `facebook.com`), and create an operator with the username `oracle` and the password `thematrix`.  The server's name with be "example.raven.setup" on the "OscarNet" network, and will allow clients to connect to 50 channels and a time, and let them use only 8 characters in their nick:
+
+	<?xml version="1.0" encoding="UTF-8"?>
+
+	<config>
+		<port>6667</port>
+		<port>6668</port>
+		<port>6669</port>
+		<name>example.raven.setup</name>
+		<nicklength>8</nicklength>
+		<network>OscarNet</network>
+		<max_channels>50</max_channels>
+	</config>
+
+	<auth>
+		<mask>*@*</mask>
+		<spoof>facebook.com</spoof>
+	</auth>
+
+	<operator>
+		<username>oracle</username>
+		<password>thematrix</password>
+	</operator>
+
+Blah
