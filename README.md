@@ -88,7 +88,7 @@ All configuration elements can be set in any configuration file loaded by Raven 
 * `max_channels`
 	* 15
 * `info`
-	* My IRC Server
+	* An IRC server written in Perl and POE
 * `verbose`
 	* 1
 
