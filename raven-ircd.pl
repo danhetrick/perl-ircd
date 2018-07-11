@@ -176,7 +176,7 @@ if($found_configuration_file){
 	# Let the user know what configuration file was loaded.
 	verbose("Loaded configuration file '$found_configuration_file'");
 } else {
-	# Display our banner if verbosity is turned on.
+	# Display our banner if verbosity is turned on; don't if banner is turned off.
 	if($VERBOSE==1){
 			print generate_banner();
 	}
