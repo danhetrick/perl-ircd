@@ -24,9 +24,10 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 [Perl](https://en.wikipedia.org/wiki/Perl), [POE](http://poe.perl.org/), [POE::Component::Server::IRC](https://metacpan.org/pod/POE::Component::Server::IRC).
 
-# Installed files
+# Files
 
 * raven-ircd.pl
+* raven-ircd.png
 * LICENCE
 * README.md
 * lib
