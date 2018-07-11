@@ -289,6 +289,20 @@ Here's an example configuration file.  It'll set up listening ports on ports 666
 		<password>thematrix</password>
 	</operator>
 
+If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configuration file and run it like so:
+	user@localhost:$ perl raven-ircd.pl oscarnet.xml
+	 _____                         _____ _____   _____    _
+	|  __ \                       |_   _|  __ \ / ____|  | |
+	| |__) |__ ___   _____ _ __     | | | |__) | |     __| |
+	|  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
+	| | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
+	|_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
+	----------------------------------------Raven IRCd 0.021
+	-------------------An IRC server written in Perl and POE
+	----------------https://github.com/danhetrick/raven-ircd
+
+	[4:23:40 6/11/2018] Loaded configuration file 'oscarnet.xml'
+
 ------------
 # License
 
