@@ -2,9 +2,21 @@
 
 # Raven IRCd
 
-Raven IRCd (or rIRCd) is an [IRC](https://en.wikipedia.org/wiki/Internet_Relay_Chat) server written in [Perl](https://en.wikipedia.org/wiki/Perl), with [POE](http://poe.perl.org/).  It is still very much a work in progress, but its base functionality is complete.  [Clients](https://en.wikipedia.org/wiki/Comparison_of_Internet_Relay_Chat_clients) can connect to it, join [channels](https://en.wikipedia.org/wiki/Internet_Relay_Chat#Channels), chat, send private messages, and do [all the things that other IRCds can do](https://en.wikipedia.org/wiki/List_of_Internet_Relay_Chat_commands).
+**Raven IRCd** (or rIRCd) is an [IRC](https://en.wikipedia.org/wiki/Internet_Relay_Chat) server written in [Perl](https://en.wikipedia.org/wiki/Perl), with [POE](http://poe.perl.org/).  It is still very much a work in progress, but its base functionality is complete.  [Clients](https://en.wikipedia.org/wiki/Comparison_of_Internet_Relay_Chat_clients) can connect to it, join [channels](https://en.wikipedia.org/wiki/Internet_Relay_Chat#Channels), chat, send private messages, and do [all the things that other IRCds can do](https://en.wikipedia.org/wiki/List_of_Internet_Relay_Chat_commands).
 
-The source code for `raven-ircd.pl` is *heavily* commented. I try to explain everything the program is doing in detail, so if you want to use it as a base for your own IRCd, the Raven IRCd source is a good place to start.  The most complicated part of the source is the code for loading and applying configuration file settings, and thus has the most comments; it's written in pure Perl, and doesn't require POE or anything outside of the standard library (besides XML::TreePP, included with the Raven IRCd distribution).  If you do use Raven IRCd as the base for your own IRC server, remember the [license](#license), and make sure to share your additions/changes.
+The source code for `raven-ircd.pl` is *heavily* commented. I try to explain everything the program is doing in detail, so if you want to use it as a base for your own IRCd, the **Raven IRCd** source is a good place to start.  The most complicated part of the source is the code for loading and applying configuration file settings, and thus has the most comments; it's written in pure Perl, and doesn't require POE or anything outside of the standard library (besides XML::TreePP, included with the **Raven IRCd** distribution).  If you do use **Raven IRCd** as the base for your own IRC server, remember the [license](#license), and make sure to share your additions/changes.
+
+# A new IRCd? Aren't there already a bunch of those available?
+
+Yes, there are, and there are ones with a lot more features than **Raven IRCd**!  However, all the ones I could find for my platform (Windows 10) were fairly difficult to configure.  Most of them said in the documentation that I could expect to spend 30 or 40 minutes digging through dense configuration files *before* I could even start the server; many of these same IRCds introduced *intentional errors* in the config files so you would *have* to spend time reading them and changing settings.
+
+This is good, I suppose, if you're planning on running an IRC server with hundreds or thousands of users, connecting to one of the big networks, like Undernet of EFnet.  But what if you just want to run a server for five or six of your friends?  A server for your class in school, your office, or your home?
+
+**Raven IRCd** was born when I had a need for a IRCd that was *really* easy to set up and configure.  In fact, the server doesn't even need any configuration files to run successfully! At the time, I was writing an [IRC bot](https://en.wikipedia.org/wiki/IRC_bot) ([IRC-patch](https://github.com/danhetrick/ircpatch)) and I needed a server I could test the bot with.  I didn't really care how the server ran, as long as it ran like a basic IRC server.  I fought with the configuration files of [Unreal IRCd](https://www.unrealircd.org/), and after 45 minutes or so or reading and tweaking, had the server up and running. That was time that I could have spent writing and testing [my bot](https://github.com/danhetrick/ircpatch), and it was more than a little frustrating.
+
+**Raven IRCd** is *not* recommended for use with the big networks or with a large user base. If you want to run an IRCd that will host a lot of clients, or connect to an established IRC network, don't use **Raven IRCd**; use one of the more robust IRCds, and spend the time to configure it properly and securely. I recommend [Unreal IRCd](https://www.unrealircd.org/).
+
+**Raven IRCd** *is* recommended for testing IRC software, and small user bases.  Suggested uses would be for a LAN party, small development groups, your roommates, classmates, friends, or family.
 
 # Table of Contents
 
@@ -43,7 +55,7 @@ The source code for `raven-ircd.pl` is *heavily* commented. I try to explain eve
 
 	perl raven-ircd.pl <CONFIGURATION FILE>
 
-By default, Raven IRCd will load a file named `ircd.xml` located either in the directory where `raven-ircd.pl` is located, or in the `/config` directory, in the same directory as `raven-ircd.pl`.  The directory where `raven-ircd.pl` is located will be called the **home directory** in the rest of this document;  the `/config` directory located in the home directory will be called the **config directory**. Raven IRCd doesn't *require* a configuration file; it will just use the default settings (see [Default settings](#default-settings)) if one isn't supplied.
+By default, **Raven IRCd** will load a file named `ircd.xml` located either in the directory where `raven-ircd.pl` is located, or in the `/config` directory, in the same directory as `raven-ircd.pl`.  The directory where `raven-ircd.pl` is located will be called the **home directory** in the rest of this document;  the `/config` directory located in the home directory will be called the **config directory**. **Raven IRCd** doesn't *require* a configuration file; it will just use the default settings (see [Default settings](#default-settings)) if one isn't supplied.
 
 # Requirements
 
@@ -65,9 +77,9 @@ By default, Raven IRCd will load a file named `ircd.xml` located either in the d
 
 # Configuration
 
-Raven IRCd configuration files are written in [XML](https://en.wikipedia.org/wiki/XML), and have several useful features.  All server configuration is done through one or more XML configuration files; the default configuration file is named `ircd.xml`, and is located in the **config** directory.
+**Raven IRCd** configuration files are written in [XML](https://en.wikipedia.org/wiki/XML), and have several useful features.  All server configuration is done through one or more XML configuration files; the default configuration file is named `ircd.xml`, and is located in the **config** directory.
 
-All configuration elements can be set in any configuration file loaded by Raven IRCd, and do not have to be in `ircd.xml`. Raven IRCd can also start without a configuration file; if the configuration file does not exist or can't be found, Raven IRCd is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect.
+All configuration elements can be set in any configuration file loaded by **Raven IRCd**, and do not have to be in `ircd.xml`. **Raven IRCd** can also start without a configuration file; if the configuration file does not exist or can't be found, **Raven IRCd** is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect.
 
 ## Default settings
 
@@ -96,7 +108,7 @@ All configuration elements can be set in any configuration file loaded by Raven 
 
 ### `import` element
 
-The `import` element is used to load configuration data from external files, much like C's `#include` preprocesser directive.  Raven IRCd will look for `import`'ed files first in the **home** directory, then in the **config** directory.  The `import` element has no children elements.  Multiple `import` elements can be set, and they can be set in any configuration file loaded;  thus, `import`'ed files can contain `import` elements, which can *also* contain `import` elements, and so on.
+The `import` element is used to load configuration data from external files, much like C's `#include` preprocesser directive.  **Raven IRCd** will look for `import`'ed files first in the **home** directory, then in the **config** directory.  The `import` element has no children elements.  Multiple `import` elements can be set, and they can be set in any configuration file loaded;  thus, `import`'ed files can contain `import` elements, which can *also* contain `import` elements, and so on.
 
 ------------
 ### `config` element
@@ -150,7 +162,7 @@ Set this element to 1 if you want to turn on verbosity;  set it to 0 to turn it 
 ------------
 ##### `port`
 
-Sets the [port](https://en.wikipedia.org/wiki/Port_(computer_networking)) that Raven IRCd will listen on.  Multiple `port` elements can exist; each one will spawn a listener on the given port.
+Sets the [port](https://en.wikipedia.org/wiki/Port_(computer_networking)) that **Raven IRCd** will listen on.  Multiple `port` elements can exist; each one will spawn a listener on the given port.
 
 ------------
 ##### `name`
@@ -165,7 +177,7 @@ Sets the maximum number of characters that can be used in a client's nick.
 ------------
 ##### `network`
 
-Sets the name of the network Raven IRCd will use.
+Sets the name of the network **Raven IRCd** will use.
 
 ------------
 ##### `max_targets`
@@ -196,7 +208,7 @@ Here's where we set who's allowed to connect to the IRC server.  You can set wha
 
 This example will let anyone connect to the server, require a password ("changeme"), spoof all clients' host to "google.com", and remove the tilde from reported hostmasks.  Multiple `auth` elements can be set.
 
-If no `auth` element is set, Raven IRCd will assume that anyone is allowed to connect;  in effect, it will be as if an `auth` element *was* set, with the only child element `mask` set to `*@*`.
+If no `auth` element is set, **Raven IRCd** will assume that anyone is allowed to connect;  in effect, it will be as if an `auth` element *was* set, with the only child element `mask` set to `*@*`.
 
 #### `auth` child elements
 
