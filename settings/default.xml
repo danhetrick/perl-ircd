@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ _____                         _____ _____   _____    _ 
+|  __ \                       |_   _|  __ \ / ____|  | |
+| |__) |__ ___   _____ _ __     | | | |__) | |     __| |
+|  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
+| | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
+|_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
+
+===============
+| default.xml |
+===============
+
+This configuration file is automatically loaded by Raven IRCd if
+no other configuration file is supplied. It contains all of the
+default server settings, and can be edited.
+-->
+
+<!--
+	To create an operator account, uncomment and edit the operator
+	element below.
+-->
+<!--
+<operator>
+	<username>bob</username>
+	<password>changeme</password>
+	<ipmask>*@*</ipmask>
+</operator>
+-->
+
+<!--
+	To set authorized connections, edit the auth element below.
+	Uncomment options if you wish to use them. The server default
+	is set below, *@*, allowing any user on any host to connect.
+-->
+<auth>
+	<mask>*@*</mask>
+	<!--
+	<password>changeme</password>
+	<spoof>google.com</spoof>
+	<no_tilde>1</no_tilde>
+	-->
+</auth>
+
+<!--
+	Server configuration
+-->
+<config>
+
+	<!-- Turns verbosity on (1) or off (0).  Set to 1 by default. -->
+	<verbose>1</verbose>
+
+	<!-- Sets what port to listen on.  Set to 6667 by default. -->
+	<port>6667</port>
+
+	<!-- Sets the IRC server name.  Set to raven.irc.server by default. -->
+	<name>raven.irc.server</name>
+
+	<!-- Sets the IRC network name.  Set to RavenNet by default. -->
+	<network>RavenNet</network>
+
+	<!-- Sets the maximum number of characters in a nick allowed.  Set to 15 by default. -->
+	<nicklength>15</nicklength>
+	
+	<!-- Sets the maximum number of targets a private message can be sent to.  Set to 4 by default. -->
+	<max_targets>4</max_targets>
+
+	<!-- Sets the maximum number of channels a client can join.  Set to 15 by default. -->
+	<max_channels>15</max_channels>
+
+	<!-- Sets what is returned by the server when the "info" command is issued.
+	     Set to "An IRC server written in Perl and POE" by default. -->
+	<info>My IRC Server</info>
+
+</config>

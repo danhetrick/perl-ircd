@@ -105,9 +105,9 @@ use constant OPERATOR_IPMASK	=> 2;
 # { CONFIGURATION FILE SETTINGS }
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Default config filename.
-my $CONFIGURATION_FILE				= "ircd.xml";
+my $CONFIGURATION_FILE				= "default.xml";
 # Where the server will look for config files besides the local directory.
-my $CONFIGURATION_DIRECTORY_NAME	= "config";
+my $CONFIGURATION_DIRECTORY_NAME	= "settings";
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # { APPLICATION DATA SETTINGS }

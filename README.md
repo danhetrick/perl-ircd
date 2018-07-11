@@ -34,11 +34,9 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 	* XML
 		* TreePP.pm
 	* RavenIRCd.pm
-* config
-	* ircd.xml
-	* operators.xml
-	* auth.xml
-
+* settings
+	* default.xml
+	
 ------------
 # Table of Contents
 
@@ -75,13 +73,13 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 	perl raven-ircd.pl <CONFIGURATION FILE>
 
-By default, **Raven IRCd** will load a file named `ircd.xml` located either in the directory where `raven-ircd.pl` is located, or in the `/config` directory, in the same directory as `raven-ircd.pl`.  The directory where `raven-ircd.pl` is located will be called the **home directory** in the rest of this document;  the `/config` directory located in the home directory will be called the **config directory**. **Raven IRCd** doesn't *require* a configuration file; it will just use the default settings (see [Default settings](#default-settings)) if one isn't supplied.
+By default, **Raven IRCd** will load a file named `default.xml` located either in the directory where `raven-ircd.pl` is located, or in the `/settings` directory, in the same directory as `raven-ircd.pl`.  The directory where `raven-ircd.pl` is located will be called the **home directory** in the rest of this document;  the `/settings` directory located in the home directory will be called the **settings directory**. **Raven IRCd** doesn't *require* a configuration file; it will just use the default settings (see [Default settings](#default-settings)) if one isn't supplied.
 
 # Configuration
 
-**Raven IRCd** configuration files are written in [XML](https://en.wikipedia.org/wiki/XML), and have several useful features.  All server configuration is done through one or more XML configuration files; the default configuration file is named `ircd.xml`, and is located in the **config** directory.
+**Raven IRCd** configuration files are written in [XML](https://en.wikipedia.org/wiki/XML), and have several useful features.  All server configuration is done through one or more XML configuration files; the default configuration file is named `default.xml`, and is located in the **settings** directory.
 
-All configuration elements can be set in any configuration file loaded by **Raven IRCd**, and do not have to be in `ircd.xml`. **Raven IRCd** can also start without a configuration file; if the configuration file does not exist or can't be found, **Raven IRCd** is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect.
+All configuration elements can be set in any configuration file loaded by **Raven IRCd**, and do not have to be in `default.xml`. **Raven IRCd** can also start without a configuration file; if the configuration file does not exist or can't be found, **Raven IRCd** is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect.
 
 ## Default settings
 
@@ -110,7 +108,7 @@ All configuration elements can be set in any configuration file loaded by **Rave
 
 ### `import` element
 
-The `import` element is used to load configuration data from external files, much like C's `#include` preprocesser directive.  **Raven IRCd** will look for `import`'ed files first in the **home** directory, then in the **config** directory.  The `import` element has no children elements.  Multiple `import` elements can be set, and they can be set in any configuration file loaded;  thus, `import`'ed files can contain `import` elements, which can *also* contain `import` elements, and so on.
+The `import` element is used to load configuration data from external files, much like C's `#include` preprocesser directive.  **Raven IRCd** will look for `import`'ed files first in the **home** directory, then in the **settings** directory.  The `import` element has no children elements.  Multiple `import` elements can be set, and they can be set in any configuration file loaded;  thus, `import`'ed files can contain `import` elements, which can *also* contain `import` elements, and so on.
 
 ------------
 ### `config` element
@@ -127,8 +125,6 @@ The `config` element is where all the main server settings are.  They are all op
 		<max_channels>15</max_channels>
 		<info>Raven IRCd</info>
 	</config>
-
-In the default set of configuration files, `config`, `operator`, and `auth` elements are contained in seperate files;  `config` is in the default config file, `ircd.xml`, and the two other elements are `import`'ed (in `operators.xml` and `auth.xml`, respectively).
 
 Multiple `config` elements can be set, though it may confuse the server (and you!). Configuration files are processed in order;  for example, if a file is imported with the `import` element, it will be loaded before any other elements following the `import` element are loaded.  As an example, let's say that you have two configuration files that you want to use, `mysettings.xml` and `othersettings.xml`.
 
