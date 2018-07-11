@@ -170,12 +170,16 @@ if($found_configuration_file){
 	# Configuration file found, load it into memory.
 	load_xml_configuration_file($found_configuration_file);
 	# Display our banner if verbosity is turned on.
-	if($VERBOSE==1){ print generate_banner(); }
+	if($VERBOSE==1){
+		print generate_banner();
+	}
 	# Let the user know what configuration file was loaded.
 	verbose("Loaded configuration file '$found_configuration_file'");
 } else {
 	# Display our banner if verbosity is turned on.
-	if($VERBOSE==1){ print generate_banner(); }
+	if($VERBOSE==1){
+			print generate_banner();
+	}
 	# Configuration file *not* found; defaults will be used.
 	# Warn the user that no file was found.
 	display_warning("No configuration file found; starting server with default settings");
@@ -347,6 +351,7 @@ sub timestamp {
 # Description: Generates a banner with the logo and application information, and returns it.
 #              App name, version, description, and URL text length is measured so that the
 #              banner will look all neat and spiffy, even if we make changes to the text.
+#              Can be turned on or off with the config->banner element.
 #              Looks like this:
 #  _____                         _____ _____   _____    _
 # |  __ \                       |_   _|  __ \ / ____|  | |
@@ -756,7 +761,6 @@ sub load_xml_configuration_file {
 	} elsif($tree->{config}->{info}){
 		$SERVER_INFO = $tree->{config}->{info};
 	}
-
 }
 
 # ===========================
