@@ -20,11 +20,27 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 **Raven IRCd** __*is*__ recommended for testing IRC software, and small user bases.  Suggested uses would be for a LAN party, small development groups, your roommates, classmates, friends, or family.
 
+# Requirements
+
+[Perl](https://en.wikipedia.org/wiki/Perl), [POE](http://poe.perl.org/), [POE::Component::Server::IRC](https://metacpan.org/pod/POE::Component::Server::IRC).
+
+# Installed files
+
+* raven-ircd.pl
+* LICENCE
+* README.md
+* lib
+	* XML
+		* TreePP.pm
+	* RavenIRCd.pm
+* config
+	* ircd.xml
+	* operators.xml
+	* auth.xml
+
 # Table of Contents
 
 * [Usage](#usage)
-* [Requirements](#requirements)
-* [Installed files](#installed-files)
 * [Configuration](#configuration)
 	* [Default settings](#default-settings)
 	* [Configuration file XML elements](#configuration-file-XML-elements)
@@ -58,24 +74,6 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 	perl raven-ircd.pl <CONFIGURATION FILE>
 
 By default, **Raven IRCd** will load a file named `ircd.xml` located either in the directory where `raven-ircd.pl` is located, or in the `/config` directory, in the same directory as `raven-ircd.pl`.  The directory where `raven-ircd.pl` is located will be called the **home directory** in the rest of this document;  the `/config` directory located in the home directory will be called the **config directory**. **Raven IRCd** doesn't *require* a configuration file; it will just use the default settings (see [Default settings](#default-settings)) if one isn't supplied.
-
-# Requirements
-
-[Perl](https://en.wikipedia.org/wiki/Perl), [POE](http://poe.perl.org/), [POE::Component::Server::IRC](https://metacpan.org/pod/POE::Component::Server::IRC).
-
-# Installed files
-
-* raven-ircd.pl
-* LICENCE
-* README.md
-* lib
-	* XML
-		* TreePP.pm
-	* RavenIRCd.pm
-* config
-	* ircd.xml
-	* operators.xml
-	* auth.xml
 
 # Configuration
 
