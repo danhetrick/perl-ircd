@@ -72,6 +72,4 @@ default server settings, and can be edited.
 	     Set to "An IRC server written in Perl and POE" by default. -->
 	<info>My IRC Server</info>
 
-	<banner>0</banner>
-
 </config>
