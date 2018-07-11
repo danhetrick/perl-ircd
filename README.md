@@ -86,7 +86,7 @@ All configuration elements can be set in any configuration file loaded by **Rave
 ## Default settings
 
 * `auth`
-	* *@*
+	* \*@\*
 * `operator`
 	* No operators
 * `port`
