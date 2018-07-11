@@ -290,6 +290,7 @@ Here's an example configuration file.  It'll set up listening ports on ports 666
 	</operator>
 
 If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configuration file and run it like so:
+
 	user@localhost:$ perl raven-ircd.pl oscarnet.xml
 	 _____                         _____ _____   _____    _
 	|  __ \                       |_   _|  __ \ / ____|  | |
@@ -302,6 +303,8 @@ If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configurati
 	----------------https://github.com/danhetrick/raven-ircd
 
 	[4:23:40 6/11/2018] Loaded configuration file 'oscarnet.xml'
+
+**Raven IRCd** is up and running!  Connect to it on port 6667, 6668, or 6669 and chat away!
 
 ------------
 # License
