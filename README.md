@@ -38,6 +38,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 	* operators.xml
 	* auth.xml
 
+------------
 # Table of Contents
 
 * [Usage](#usage)
