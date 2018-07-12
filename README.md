@@ -79,7 +79,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 If ran with no arguments, **Raven IRCd** will load a file named `default.xml` located either in the directory where `raven-ircd.pl` is located, or in the `/settings` directory, in the same directory as `raven-ircd.pl`.  The directory where `raven-ircd.pl` is located will be called the **home directory** in the rest of this document;  the `/settings` directory located in the home directory will be called the **settings directory**.
 
-If ran with a single filename as an argument, **Raven IRCd** will load that file as a configuration file (see [Configuration](#configuration)).  Any settings that file does *not* contain will use the default values (see [Default settings](#default-settings)).  If the file can't be found, the server will alert the user of this, but still start with all default values.
+If ran with a single filename as an argument, **Raven IRCd** will load that file as a configuration file (see [Configuration](#configuration)), and if it can't be found, will look for it first in the **home** directory, and then in the **settings** directory.  Any settings that the configuration file does *not* contain will use the default values (see [Default settings](#default-settings)).  If the file can't be found, the server will alert the user of this, but still start with all default values.
 
 If ran with 'default' as an argument, **Raven IRCd** will start *wihout* any configuration file; it will just use the default settings (see [Default settings](#default-settings)).
 
