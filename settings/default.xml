@@ -33,6 +33,9 @@ default server settings, and can be edited.
 	<!-- Turns banner display on (1) or off (0). Set to 1 by default. -->
 	<banner>1</banner>
 
+	<!-- Turns warnings on (1) or off (0). Set to 1 by default. -->
+	<warn>1</warn>
+
 	<!-- Sets what port to listen on.  Set to 6667 by default. -->
 	<port>6667</port>
 

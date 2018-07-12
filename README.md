@@ -89,7 +89,7 @@ If ran with `default` as an argument, **Raven IRCd** will start *without* any co
 
 All configuration elements can be set in any configuration file loaded by **Raven IRCd**, and do not have to be in `default.xml`. **Raven IRCd** can also start without a configuration file; if the configuration file does not exist or can't be found, **Raven IRCd** is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect.
 
-In the default configuration, **Raven IRCd** ships with three configuration files:  `default.xml`, `auth.xml`, and `operators.xml`.  `default.xml` contains basic server settings, and `import`s (see [`import` element](#import-element)) `auth.xml` and `operators.xml`. `auth.xml` contains any auth entries (see [`auth` element](#auth-element)); by default, it contains only one, allowing anyone to connect.  `operators` contains any operator account entries (see [`operator` element](#operator-element)); by default, it doesn't contain *any* functional operator accounts, only a commented-out one that you can uncomment and edit.
+In the default configuration, **Raven IRCd** ships with three configuration files:  `default.xml`, `auth.xml`, and `operators.xml`.  `default.xml` contains basic server settings, and `import`s (see [`import` element](#import-element)) `auth.xml` and `operators.xml`. `auth.xml` contains any auth entries (see [`auth` element](#auth-element)); by default, it contains only one, allowing anyone to connect.  `operators.xml` contains any operator account entries (see [`operator` element](#operator-element)); by default, it doesn't contain *any* functional operator accounts, only a commented-out one that you can uncomment and edit.
 
 ## Default settings
 
@@ -115,6 +115,8 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 	* 1
 * `banner`
 	* 1
+* `warn`
+	* 1
 
 ## Configuration file XML elements
 
@@ -137,6 +139,7 @@ The `config` element is where all the main server settings are.  They are all op
 		<max_channels>15</max_channels>
 		<info>Raven IRCd</info>
 		<banner>1</banner>
+		<warn>1</warn>
 	</config>
 
 Multiple `config` elements can be set, though it may confuse the server (and you!). Configuration files are processed in order;  for example, if a file is imported with the `import` element, it will be loaded before any other elements following the `import` element are loaded.  As an example, let's say that you have two configuration files that you want to use, `mysettings.xml` and `othersettings.xml`.
@@ -168,7 +171,7 @@ The only exception to this rule is the [`port` child element](#port);  it doesn'
 ------------
 ##### `verbose`
 
-Set this element to 1 if you want to turn on verbosity;  set it to 0 to turn it off.  If `verbose` is turned on, various data will be printed to the console during runtime.
+Set this element to 1 if you want to turn on verbosity;  set it to 0 to turn it off.  If `verbose` is turned on, various data will be printed to the console during runtime.  Warnings will *always* be displayed if `verbose` is turned on.
 
 ------------
 ##### `port`
@@ -209,6 +212,11 @@ Sets the text displayed with the `info` IRC command.
 ##### `banner`
 
 Turns banner display on start up on (1) or off (0).
+
+------------
+##### `warn`
+
+Turns warnings on (1) or off (1). If `warn` us turned on, warnings will *always* be displayed, even if `verbose` is turned off.
 
 ------------
 #### `auth` element

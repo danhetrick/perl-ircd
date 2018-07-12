@@ -130,6 +130,7 @@ my $DEFAULT_PORT	= 6667;
 my $DEFAULT_AUTH	= '*@*';
 my $VERBOSE			= 1;
 my $BANNER			= 1;
+my $WARNING			= 1;
 
 # ----------
 # | ARRAYS |
@@ -418,11 +419,15 @@ sub display_error_and_exit {
 # Arguments: 1 (scalar, warning text)
 # Returns: Nothing
 # Description: Displays a timestamped warning to the user; only displayed
-#              if verbosity is turned on.
+#              if verbosity is turned on. Warnings will *always* display
+#              if warnings are turned on, even if verbosity is turned off.
 sub display_warning {
 	my $msg = shift;
 	my $time = timestamp();
 	if($VERBOSE==1){
+		print "$time WARNING: $msg\n";
+	}
+	if(($VERBOSE==0)&&($WARNING==1)){
 		print "$time WARNING: $msg\n";
 	}
 }
@@ -717,6 +722,7 @@ sub load_xml_configuration_file {
 	# 	<max_channels>15</max_channels>
 	#	<info>My server info here</info>
 	#	<banner>1</banner>
+	#	<warning>1</warning>
 	# </config>
 	#
 	# Allows for server configuration.  Multiple port elements are allowed. All elements are optional;
@@ -785,6 +791,13 @@ sub load_xml_configuration_file {
 		display_error_and_exit("Error in $filename: config element can't have more than one banner element");
 	} elsif($tree->{config}->{banner} ne undef){
 		$BANNER = $tree->{config}->{banner};
+	}
+
+	# config->warn element
+	if(ref($tree->{config}->{warn}) eq 'ARRAY'){
+		display_error_and_exit("Error in $filename: config element can't have more than one warn element");
+	} elsif($tree->{config}->{warn} ne undef){
+		$WARNING = $tree->{config}->{warn};
 	}
 }
 
