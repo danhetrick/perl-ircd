@@ -24,7 +24,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 # Requirements
 
-[Perl](https://en.wikipedia.org/wiki/Perl), [POE](http://poe.perl.org/) (available from [CPAN](https://www.cpan.org/)), [POE::Component::Server::IRC](https://metacpan.org/pod/POE::Component::Server::IRC) (available from [CPAN](https://www.cpan.org/)), [XML::TreePP](https://metacpan.org/pod/XML::TreePP) (included with the base installation).
+[Perl](https://en.wikipedia.org/wiki/Perl), [POE](http://poe.perl.org/) (available from [CPAN](https://www.cpan.org/)), [POE::Component::Server::IRC](https://metacpan.org/pod/POE::Component::Server::IRC) (available from [CPAN](https://www.cpan.org/)), [XML::TreePP](https://metacpan.org/pod/XML::TreePP) (included with the base installation but also from available from [CPAN](https://www.cpan.org/)).
 
 # Files
 
