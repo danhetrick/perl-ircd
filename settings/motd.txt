@@ -7,7 +7,3 @@
 ----------------------------------------Raven IRCd 0.025
 -----Raven IRCd is an IRC server written in Perl and POE
 ----------------https://github.com/danhetrick/raven-ircd
-
-MESSAGE OF THE DAY
-
-Thanks for logging into my server!
