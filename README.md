@@ -178,20 +178,20 @@ The only exception to this rule is the [`port` child element](#port);  it doesn'
 
 #### `config` child elements
 
-Child elements marked with an asterix (**__\*__**) are optional.
+* [verbose](#verbose)**\***
+* [port](#port)**\***
+* [name](#name)**\***
+* [nicklength](#nicklength)**\***
+* [network](#network)**\***
+* [max_targets](#max_targets)**\***
+* [max_channels](#max_channels)**\***
+* [info](#info)**\***
+* [banner](#banner)**\***
+* [warn](#warn)**\***
+* [admin](#admin)**\***
+* [description](#description)**\***
 
-* [verbose](#verbose)\*
-* [port](#port)\*
-* [name](#name)\*
-* [nicklength](#nicklength)\*
-* [network](#network)\*
-* [max_targets](#max_targets)\*
-* [max_channels](#max_channels)\*
-* [info](#info)\*
-* [banner](#banner)\*
-* [warn](#warn)\*
-* [admin](#admin)\*
-* [description](#description)\*
+Elements marked with an asterix (**\***) are optional.
 
 ------------
 ##### `verbose`
@@ -271,12 +271,12 @@ If no `auth` element is set, **Raven IRCd** will assume that anyone is allowed t
 
 #### `auth` child elements
 
-Child elements marked with an asterix (\*) are optional.
-
 * [mask](#mask)
-* [password](#password-auth)\*
-* [spoof](#spoof)\*
-* [no_tilde](#no_tilde)\*
+* [password](#password-auth)**\***
+* [spoof](#spoof)**\***
+* [no_tilde](#no_tilde)**\***
+
+Elements marked with an asterix (**\***) are optional.
 
 ------------
 ##### `mask`
@@ -313,11 +313,11 @@ In this example, only clients connecting from the host `google.com` would be all
 
 #### `operator` child elements
 
-Child elements marked with an asterix (\*) are optional.
-
 * [username](#username)
 * [password](#password-operator)
-* [ipmask](#ipmask)\*
+* [ipmask](#ipmask)**\***
+
+Elements marked with an asterix (**\***) are optional.
 
 ------------
 ##### `username`
