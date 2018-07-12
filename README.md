@@ -8,6 +8,8 @@
 
 The source code for `raven-ircd.pl` is *heavily* commented. I try to explain everything the program is doing in detail, so if you want to use it as a base for your own IRCd, the **Raven IRCd** source is a good place to start.  The most complicated part of the source is the code for loading and applying configuration file settings, and thus has the most comments; it's written in pure Perl, and doesn't require POE or anything outside of the standard library (besides XML::TreePP, included with the **Raven IRCd** distribution).  If you do use **Raven IRCd** as the base for your own IRC server, remember the [license](#license), and make sure to share your additions/changes.
 
+The latest version of **Raven IRCd** is 0.023.
+
 # A new IRCd? Aren't there already a bunch of those available?
 
 Yes, there are, and there are ones with a lot more features than **Raven IRCd**!  However, all the ones I could find for my platform (Windows 10) were fairly difficult to configure.  Most of them said in the documentation that I could expect to spend 30 or 40 minutes digging through dense configuration files *before* I could even start the server; many of these same IRCds introduced *intentional errors* in the config files so you would *have* to spend time reading them and changing settings.
@@ -22,7 +24,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 # Requirements
 
-[Perl](https://en.wikipedia.org/wiki/Perl), [POE](http://poe.perl.org/), [POE::Component::Server::IRC](https://metacpan.org/pod/POE::Component::Server::IRC).
+[Perl](https://en.wikipedia.org/wiki/Perl), [POE](http://poe.perl.org/), [POE::Component::Server::IRC](https://metacpan.org/pod/POE::Component::Server::IRC), [XML::TreePP](https://metacpan.org/pod/XML::TreePP) (included with the base installation).
 
 # Files
 
@@ -36,6 +38,8 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 	* RavenIRCd.pm
 * settings
 	* default.xml
+	* operators.xml
+	* auth.xml
 	
 ------------
 # Table of Contents
@@ -81,6 +85,8 @@ By default, **Raven IRCd** will load a file named `default.xml` located either i
 
 All configuration elements can be set in any configuration file loaded by **Raven IRCd**, and do not have to be in `default.xml`. **Raven IRCd** can also start without a configuration file; if the configuration file does not exist or can't be found, **Raven IRCd** is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect.
 
+In the default configuration, **Raven IRCd** ships with three configuration files:  `default.xml`, `auth.xml`, and `operators.xml`.  `default.xml` contains basic server settings, and `import`s (see [`import` element](#import-element)) `auth.xml` and `operators.xml`. `auth.xml` contains any auth entries (see [`auth` element](#auth-element)); by default, it contains only one, allowing anyone to connect.  `operators` contains any operator account entries (see [`operator` element](#operator-element)); by default, it doesn't contain *any* functional operator accounts, only a commented-out one that you can uncomment and edit.
+
 ## Default settings
 
 * `auth`
@@ -100,8 +106,10 @@ All configuration elements can be set in any configuration file loaded by **Rave
 * `max_channels`
 	* 15
 * `info`
-	* An IRC server written in Perl and POE
+	* Raven IRCd is an IRC server written in Perl and POE
 * `verbose`
+	* 1
+* `banner`
 	* 1
 
 ## Configuration file XML elements
@@ -124,6 +132,7 @@ The `config` element is where all the main server settings are.  They are all op
 		<max_targets>4</max_targets>
 		<max_channels>15</max_channels>
 		<info>Raven IRCd</info>
+		<banner>1</banner>
 	</config>
 
 Multiple `config` elements can be set, though it may confuse the server (and you!). Configuration files are processed in order;  for example, if a file is imported with the `import` element, it will be loaded before any other elements following the `import` element are loaded.  As an example, let's say that you have two configuration files that you want to use, `mysettings.xml` and `othersettings.xml`.
@@ -191,6 +200,11 @@ Sets the maximum number of channels a client can join.
 ##### `info`
 
 Sets the text displayed with the `info` IRC command.
+
+------------
+##### `banner`
+
+Turns banner display on start up on (1) or off (0).
 
 ------------
 #### `auth` element
@@ -296,8 +310,8 @@ If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configurati
 	|  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
 	| | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
 	|_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
-	----------------------------------------Raven IRCd 0.021
-	-------------------An IRC server written in Perl and POE
+	----------------------------------------Raven IRCd 0.023
+	-----Raven IRCd is an IRC server written in Perl and POE
 	----------------https://github.com/danhetrick/raven-ircd
 
 	[4:23:40 6/11/2018] Loaded configuration file 'oscarnet.xml'

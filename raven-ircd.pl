@@ -33,9 +33,6 @@
 # strict -- Perl pragma to restrict unsafe constructs
 use strict;
 
-# warnings -- Perl pragma to warn users of problematic code
-use warnings;
-
 # FindBin -- Locates directory of original perl script
 use FindBin qw($RealBin);
 
@@ -114,8 +111,8 @@ my $CONFIGURATION_DIRECTORY_NAME	= "settings";
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # These are used by generate_banner(), and nowhere else.
 my $APPLICATION_NAME = "Raven IRCd";
-my $VERSION		= "0.021";
-my $APPLICATION_DESCRIPTION = "An IRC server written in Perl and POE";
+my $VERSION		= "0.023";
+my $APPLICATION_DESCRIPTION = "Raven IRCd is an IRC server written in Perl and POE";
 my $APPLICATION_URL = "https://github.com/danhetrick/raven-ircd";
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -132,6 +129,7 @@ my $SERVER_INFO		= $APPLICATION_DESCRIPTION;
 my $DEFAULT_PORT	= 6667;
 my $DEFAULT_AUTH	= '*@*';
 my $VERBOSE			= 1;
+my $BANNER			= 1;
 
 # ----------
 # | ARRAYS |
@@ -169,17 +167,13 @@ my $found_configuration_file = find_configuration_file($CONFIGURATION_FILE);
 if($found_configuration_file){
 	# Configuration file found, load it into memory.
 	load_xml_configuration_file($found_configuration_file);
-	# Display our banner if verbosity is turned on.
-	if($VERBOSE==1){
-		print generate_banner();
-	}
+	# Display banner unless configured otherwise
+	if($BANNER==1){ print generate_banner(); }
 	# Let the user know what configuration file was loaded.
 	verbose("Loaded configuration file '$found_configuration_file'");
 } else {
-	# Display our banner if verbosity is turned on; don't if banner is turned off.
-	if($VERBOSE==1){
-			print generate_banner();
-	}
+	# Display banner unless configured otherwise
+	if($BANNER==1){ print generate_banner(); }
 	# Configuration file *not* found; defaults will be used.
 	# Warn the user that no file was found.
 	display_warning("No configuration file found; starting server with default settings");
@@ -271,6 +265,7 @@ sub _start {
     	# Add authorized connections from the list in @AUTHS
 	    foreach my $a (@AUTHS){
 	    	my @entry = @{$a};
+	    	verbose("Adding auth entry for '$entry[AUTH_MASK]'");
 	    	$heap->{ircd}->add_auth(
 		        mask		=> $entry[AUTH_MASK],
 		        password	=> $entry[AUTH_PASSWORD],
@@ -290,6 +285,7 @@ sub _start {
     if(scalar @LISTENER_PORTS >=1){
     	# Add ports from the list in @LISTENER_PORTS
 	    foreach my $p (@LISTENER_PORTS){
+	    	verbose("Adding a listener on port '$p'");
 	    	$heap->{ircd}->add_listener(port => $p);
 	    }
 	} else {
@@ -301,6 +297,7 @@ sub _start {
     # Add IRC operators
     if(scalar @OPERATORS>=1){
     	# Add operators from the list in @OPERATORS
+    	verbose("Adding operator(s)");
 	    foreach my $o (@OPERATORS){
 			my @entry = @{$o};
 			$heap->{ircd}->add_operator(
@@ -456,13 +453,10 @@ sub load_xml_configuration_file {
 	my $tpp = XML::TreePP->new();
 	my $tree = $tpp->parsefile( $filename );
 
-	# Double check for file existence. If the file is not found, alert the
-	# user and exit. This is already checked before this subroutine is normally
-	# called, but it doesn't hurt to check again.
-	$filename = find_configuration_file($filename);
-	if(!$filename){
-		display_error_and_exit("Configuration file '$filename' not found");
-	}
+	# If the parsed tree is empty, there's nothing to parse; exit subroutine
+	# This may occur because all the elements in the configuration file are
+	# commented out.
+	if($tree eq '') { return; }
 
 	# ------------------
 	# | IMPORT ELEMENT |
@@ -482,7 +476,7 @@ sub load_xml_configuration_file {
 			# from the imported file
 			load_xml_configuration_file($i);
 		}
-	} elsif($tree->{import}){
+	} elsif($tree->{import} ne undef){
 		# Single import element
 		my $f = find_configuration_file($tree->{import});
 		if(!$f){
@@ -513,7 +507,7 @@ sub load_xml_configuration_file {
 			if(ref($a->{username}) eq 'ARRAY'){
 				display_error_and_exit("Error in $filename: operator element can't have more than one username element");
 			}
-			if($a->{username}){
+			if($a->{username} ne undef){
 				push(@op,$a->{username});
 			} else {
 				display_error_and_exit("Error in $filename: operator element missing a username element");
@@ -523,7 +517,7 @@ sub load_xml_configuration_file {
 			if(ref($a->{password}) eq 'ARRAY'){
 				display_error_and_exit("Error in $filename: operator element can't have more than one password element");
 			}
-			if($a->{password}){
+			if($a->{password} ne undef){
 				push(@op,$a->{password});
 			} else {
 				display_error_and_exit("Error in $filename: operator element missing a password element");
@@ -533,7 +527,7 @@ sub load_xml_configuration_file {
 			if(ref($a->{ipmask}) eq 'ARRAY'){
 				display_error_and_exit("Error in $filename: operator element can't have more than one ipmask element");
 			}
-			if($a->{ipmask}){
+			if($a->{ipmask} ne undef){
 				push(@op,$a->{ipmask});
 			} else {
 				push(@op,undef);
@@ -542,12 +536,12 @@ sub load_xml_configuration_file {
 			# Add operator entry to the operator list
 			push(@OPERATORS,\@op);
 		}
-	} elsif($tree->{operator}){
+	} elsif($tree->{operator} ne undef){
 		# Single operator element
 		my @op = ();
 
 		# operator->username
-		if($tree->{operator}->{username}){
+		if($tree->{operator}->{username} ne undef){
 			if(ref($tree->{operator}->{username}) eq 'ARRAY'){
 				display_error_and_exit("Error in $filename: operator element can't have more than one username element");
 			}
@@ -557,7 +551,7 @@ sub load_xml_configuration_file {
 		}
 
 		# operator->password
-		if($tree->{operator}->{password}){
+		if($tree->{operator}->{password} ne undef){
 			if(ref($tree->{operator}->{password}) eq 'ARRAY'){
 				display_error_and_exit("Error in $filename: operator element can't have more than one password element");
 			}
@@ -567,7 +561,7 @@ sub load_xml_configuration_file {
 		}
 
 		# operator->ipmask
-		if($tree->{operator}->{ipmask}){
+		if($tree->{operator}->{ipmask} ne undef){
 			if(ref($tree->{operator}->{ipmask}) eq 'ARRAY'){
 				display_error_and_exit("Error in $filename: operator element can't have more than one ipmask element");
 			}
@@ -600,7 +594,7 @@ sub load_xml_configuration_file {
 			if(ref($a->{mask}) eq 'ARRAY'){
 				display_error_and_exit("Error in $filename: auth element can't have more than one mask element");
 			}
-			if($a->{mask}){
+			if($a->{mask} ne undef){
 				push(@auth,$a->{mask});
 			} else {
 				display_error_and_exit("Error in $filename: auth element missing a mask element");
@@ -610,7 +604,7 @@ sub load_xml_configuration_file {
 			if(ref($a->{password}) eq 'ARRAY'){
 				display_error_and_exit("Error in $filename: auth element can't have more than one password element");
 			}
-			if($a->{password}){
+			if($a->{password} ne undef){
 				push(@auth,$a->{password});
 			} else {
 				push(@auth,undef);
@@ -620,7 +614,7 @@ sub load_xml_configuration_file {
 			if(ref($a->{spoof}) eq 'ARRAY'){
 				display_error_and_exit("Error in $filename: auth element can't have more than one spoof element");
 			}
-			if($a->{spoof}){
+			if($a->{spoof} ne undef){
 				push(@auth,$a->{spoof});
 			} else {
 				push(@auth,undef);
@@ -630,7 +624,7 @@ sub load_xml_configuration_file {
 			if(ref($a->{no_tilde}) eq 'ARRAY'){
 				display_error_and_exit("Error in $filename: auth element can't have more than one no_tilde element");
 			}
-			if($a->{no_tilde}){
+			if($a->{no_tilde} ne undef){
 				push(@auth,$a->{no_tilde});
 			} else {
 				push(@auth,undef);
@@ -639,7 +633,7 @@ sub load_xml_configuration_file {
 			# Add auth entry to the auth list
 			push(@AUTHS,\@auth);
 		}
-	} elsif($tree->{auth}){
+	} elsif($tree->{auth} ne undef){
 		# Single auth element
 		my @auth = ();
 
@@ -647,7 +641,7 @@ sub load_xml_configuration_file {
 		if(ref($tree->{auth}->{mask}) eq 'ARRAY'){
 			display_error_and_exit("Error in $filename: auth element can't have more than one mask element");
 		}
-		if($tree->{auth}->{mask}){
+		if($tree->{auth}->{mask} ne undef){
 			push (@auth,$tree->{auth}->{mask});
 		} else {
 			display_error_and_exit("Error in $filename: auth element missing a mask element");
@@ -657,7 +651,7 @@ sub load_xml_configuration_file {
 		if(ref($tree->{auth}->{password}) eq 'ARRAY'){
 			display_error_and_exit("Error in $filename: auth element can't have more than one password element");
 		}
-		if($tree->{auth}->{password}){
+		if($tree->{auth}->{password} ne undef){
 			push(@auth,$tree->{auth}->{password});
 		} else {
 			push(@auth,undef);
@@ -667,7 +661,7 @@ sub load_xml_configuration_file {
 		if(ref($tree->{auth}->{spoof}) eq 'ARRAY'){
 			display_error_and_exit("Error in $filename: auth element can't have more than one spoof element");
 		}
-		if($tree->{auth}->{spoof}){
+		if($tree->{auth}->{spoof} ne undef){
 			push(@auth,$tree->{auth}->{spoof});
 		} else {
 			push(@auth,undef);
@@ -677,7 +671,7 @@ sub load_xml_configuration_file {
 		if(ref($tree->{auth}->{no_tilde}) eq 'ARRAY'){
 			display_error_and_exit("Error in $filename: auth element can't have more than one no_tilde element");
 		}
-		if($tree->{auth}->{no_tilde}){
+		if($tree->{auth}->{no_tilde} ne undef){
 			push(@auth,$tree->{auth}->{no_tilde});
 		} else {
 			push(@auth,undef);
@@ -699,6 +693,7 @@ sub load_xml_configuration_file {
 	# 	<max_targets>4</max_targets>
 	# 	<max_channels>15</max_channels>
 	#	<info>My server info here</info>
+	#	<banner>1</banner>
 	# </config>
 	#
 	# Allows for server configuration.  Multiple port elements are allowed. All elements are optional;
@@ -707,7 +702,7 @@ sub load_xml_configuration_file {
 	# config->verbose element
 	if(ref($tree->{config}->{verbose}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one verbose element");
-	} elsif($tree->{config}->{verbose}){
+	} elsif($tree->{config}->{verbose} ne undef){
 		$VERBOSE = $tree->{config}->{verbose};
 	}
 
@@ -716,50 +711,57 @@ sub load_xml_configuration_file {
 		foreach my $p (@{$tree->{config}->{port}}) {
 			push(@LISTENER_PORTS,$p);
 		}
-	} elsif($tree->{config}->{port}){
+	} elsif($tree->{config}->{port} ne undef){
 		push(@LISTENER_PORTS,$tree->{config}->{port});
 	}
 
 	# config->name element
 	if(ref($tree->{config}->{name}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one name element");
-	} elsif($tree->{config}->{name}){
+	} elsif($tree->{config}->{name} ne undef){
 		$SERVER_NAME = $tree->{config}->{name};
 	}
 
 	# config->nicklength element
 	if(ref($tree->{config}->{nicklength}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one nicklength element");
-	} elsif($tree->{config}->{nicklength}){
+	} elsif($tree->{config}->{nicklength} ne undef){
 		$NICKNAME_LENGTH = $tree->{config}->{nicklength};
 	}
 
 	# config->network element
 	if(ref($tree->{config}->{network}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one network element");
-	} elsif($tree->{config}->{network}){
+	} elsif($tree->{config}->{network} ne undef){
 		$SERVER_NETWORK = $tree->{config}->{network};
 	}
 
 	# config->max_targets element
 	if(ref($tree->{config}->{max_targets}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one max_targets element");
-	} elsif($tree->{config}->{max_targets}){
+	} elsif($tree->{config}->{max_targets} ne undef){
 		$MAX_TARGETS = $tree->{config}->{max_targets};
 	}
 
 	# config->max_channels element
 	if(ref($tree->{config}->{max_channels}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one max_channels element");
-	} elsif($tree->{config}->{max_channels}){
+	} elsif($tree->{config}->{max_channels} ne undef){
 		$MAX_CHANNELS = $tree->{config}->{max_channels};
 	}
 
 	# config->info element
 	if(ref($tree->{config}->{info}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one info element");
-	} elsif($tree->{config}->{info}){
+	} elsif($tree->{config}->{info} ne undef){
 		$SERVER_INFO = $tree->{config}->{info};
+	}
+
+	# config->banner element
+	if(ref($tree->{config}->{banner}) eq 'ARRAY'){
+		display_error_and_exit("Error in $filename: config element can't have more than one banner element");
+	} elsif($tree->{config}->{banner} ne undef){
+		$BANNER = $tree->{config}->{banner};
 	}
 }
 

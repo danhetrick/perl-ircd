@@ -16,31 +16,11 @@ no other configuration file is supplied. It contains all of the
 default server settings, and can be edited.
 -->
 
-<!--
-	To create an operator account, uncomment and edit the operator
-	element below.
--->
-<!--
-<operator>
-	<username>bob</username>
-	<password>changeme</password>
-	<ipmask>*@*</ipmask>
-</operator>
--->
+<!-- Default operator accounts are loaded in here (hint: there are none) -->
+<import>operators.xml</import>
 
-<!--
-	To set authorized connections, edit the auth element below.
-	Uncomment options if you wish to use them. The server default
-	is set below, *@*, allowing any user on any host to connect.
--->
-<auth>
-	<mask>*@*</mask>
-	<!--
-	<password>changeme</password>
-	<spoof>google.com</spoof>
-	<no_tilde>1</no_tilde>
-	-->
-</auth>
+<!-- Default auth entries are loaded in here (*@*) -->
+<import>auth.xml</import>
 
 <!--
 	Server configuration
@@ -49,6 +29,9 @@ default server settings, and can be edited.
 
 	<!-- Turns verbosity on (1) or off (0).  Set to 1 by default. -->
 	<verbose>1</verbose>
+
+	<!-- Turns banner display on (1) or off (0). Set to 1 by default. -->
+	<banner>1</banner>
 
 	<!-- Sets what port to listen on.  Set to 6667 by default. -->
 	<port>6667</port>
@@ -69,7 +52,7 @@ default server settings, and can be edited.
 	<max_channels>15</max_channels>
 
 	<!-- Sets what is returned by the server when the "info" command is issued.
-	     Set to "An IRC server written in Perl and POE" by default. -->
-	<info>My IRC Server</info>
+	     Set to "Raven IRCd is an IRC server written in Perl and POE" by default. -->
+	<info>Raven IRCd is an IRC server written in Perl and POE</info>
 
 </config>
