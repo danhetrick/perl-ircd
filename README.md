@@ -115,11 +115,11 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 
 **Raven IRCd** configuration files are written in an XML-like language. The main difference between the XML format and the format used for **Raven IRCd** configuration files is that, unlike XML, **Raven IRCd** configuration files can have multiple root elements.  There are four root elements in a **Raven IRCd** configuration file: [`config`](#config-element), [`import`](#import-element), [`auth`](#auth-element), and [`operator`](#operator-element).  All root elements have mandatory and/or optional child elements (with the exception of `import`, which has no child elements): `config` has _no_ manditory child elements, `auth` elements have _one_ mandatory child element ([`mask`](#mask)), and `operator` has *two* mandatory child elements ([`username`](#username) and [`password`](#password-operator)).  See [Restrictions](#restrictions) for more information.
 
-The first like in a **Raven IRCd** configuration file should be this:
+The first line in a **Raven IRCd** configuration file should be this:
 
 	<?xml version="1.0" encoding="UTF-8"?>
 
-This is not enforced by **Raven IRCd** (that is, it will still read and parse configuration files that *do not* start with this encoding declaration). The reason why it is included in the default configuration files is because if you open a configuration file in most decent text editors, it will be idetified by the editor as an XML document, and it will display the file's contents with syntax highlighting, making it easier to read and edit.  Personally, I used [Sublime Text](https://www.sublimetext.com/) to edit this file, edit the configuration files, and write `raven-ircd.pl` . The syntax highlighting for XML in Sublime looks pretty good.
+This is not enforced by **Raven IRCd** (that is, it will still read and parse configuration files that *do not* start with this encoding declaration). The reason why it is included in the default configuration files is because if you open a configuration file in most decent text editors, it will be identified by the editor as an XML document, and it will display the file's contents with syntax highlighting, making it easier to read and edit.  Personally, I used [Sublime Text](https://www.sublimetext.com/) to edit this file, edit the configuration files, and write `raven-ircd.pl` . The syntax highlighting for XML (and for Perl) in Sublime looks pretty good.
 
 ### Restrictions
 
