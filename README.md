@@ -2,7 +2,7 @@
 
 # Raven IRCd
 
-**Raven IRCd** (or rIRCd) is an [IRC](https://en.wikipedia.org/wiki/Internet_Relay_Chat) server written in [Perl](https://en.wikipedia.org/wiki/Perl), with [POE](http://poe.perl.org/).  It is still very much a work in progress, but its base functionality is complete.  [Clients](https://en.wikipedia.org/wiki/Comparison_of_Internet_Relay_Chat_clients) can connect to it, join [channels](https://en.wikipedia.org/wiki/Internet_Relay_Chat#Channels), chat, send private messages, and do [all the things that other IRCds can do](https://en.wikipedia.org/wiki/List_of_Internet_Relay_Chat_commands).
+**Raven IRCd** (or rIRCd) is an [IRC](https://en.wikipedia.org/wiki/Internet_Relay_Chat) [server](https://en.wikipedia.org/wiki/IRCd) written in [Perl](https://en.wikipedia.org/wiki/Perl), with [POE](http://poe.perl.org/).  It is still very much a work in progress, but its base functionality is complete.  [Clients](https://en.wikipedia.org/wiki/Comparison_of_Internet_Relay_Chat_clients) can connect to it, join [channels](https://en.wikipedia.org/wiki/Internet_Relay_Chat#Channels), chat, send private messages, and do [all the things that other IRCds can do](https://en.wikipedia.org/wiki/List_of_Internet_Relay_Chat_commands).
 
 **Raven IRCd** was written with cross-platform compatability in mind. It has been tested on Windows 10, Debian Linux, and Ubuntu Linux.
 
@@ -10,7 +10,7 @@ The source code for `raven-ircd.pl` is *heavily* commented. I try to explain eve
 
 The latest version of **Raven IRCd** is 0.025.
 
-# A new IRCd? Aren't there already a bunch of those available?
+# A new IRCd? Aren't there already [a](http://www.ircd-hybrid.org/) [bunch](https://www.unrealircd.org/) [of](http://www.inspircd.org/) [those](https://www.ratbox.org/) [available](http://pure-ircd.sourceforge.net/)? [You're reinventing the wheel!](https://en.wikipedia.org/wiki/Reinventing_the_wheel)
 
 Yes, there are, and there are ones with a lot more features than **Raven IRCd**!  However, all the ones I could find for my platform (Windows 10) were fairly difficult to configure.  Most of them said in the documentation that I could expect to spend 30 or 40 minutes digging through dense configuration files *before* I could even start the server; many of these same IRCds introduced *intentional errors* in the config files so you would *have* to spend time reading them and changing settings.
 
