@@ -51,7 +51,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 		* [Restrictions](#restrictions)
 		* [`import` element](#import-element)
 		* [`config` element](#config-element)
-			* [ `Config` child elements](#config-child-elements)
+			* [ `config` child elements](#config-child-elements)
 				* [verbose](#verbose)
 				* [port](#port)
 				* [name](#name)
@@ -67,7 +67,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 		* [`auth` element](#auth-element)
 			* [`auth` child elements](#auth-child-elements)
 				* [mask](#mask)
-				* [password](#password)
+				* [password](#password-(auth))
 				* [spoof](#spoof)
 				* [no_tilde](#no_tilde)
 		* [`operator` element](#operator-element)
@@ -133,13 +133,13 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 
 ### Restrictions
 
-* Configuration files are only allowed to have **one `config` element each**, and each `config` element is only allowed to have **one** of the following child elements: `verbose`, `banner`, `warn`, `name`, `nicklength`, `network`, `max_targets`,` max_channels`, `info`, `description`.  Each `config` element is allowed to have three (3) `admin` child elements (see [admin](#admin)).  Each `config` element is allowed to have multiple `port` child elements (see [port](#port)).
+* Configuration files are only allowed to have **one [`config`](#config-element) element each**, and each `config` element is only allowed to have **one** of the following child elements: [`verbose`](#verbose), [`banner`](#banner), [`warn`](#warn), [`name`](#name), [`nicklength`](#nicklength), [`network`](#network), [`max_targets`](#max_targets),[`max_channels`](#max_channels), [`info`](#info), [`description`](#description).  Each `config` element is allowed to have three (3) [`admin`](#admin) child elements). Each `config` element is allowed to have multiple [`port`](#port) child elements.
 
-* Configuration files are allowed to have multiple `import` elements.
+* Configuration files are allowed to have multiple [`import`](#import-element) elements. `import` elements have no child elements.
 
-* Configuration files are allowed to have multiple `auth` elements, but each `auth` element is only allowed to have **one** of the following child elements: `mask`, `password`, `spoof`, `no_tilde`.
+* Configuration files are allowed to have multiple [`auth`](#auth-element) elements, but each `auth` element is only allowed to have **one** of the following child elements: [`mask`](#password), `password`, `spoof`, `no_tilde`.
 
-* Configuration files are allowed to have multiple `operator` elements, but each `operator` elements is only allowed to have **one** of the following child elements: `username`, `password`, ipmask.
+* Configuration files are allowed to have multiple [`operator`](#operator-element) elements, but each `operator` elements is only allowed to have **one** of the following child elements: `username`, `password`, ipmask.
 
 ### `import` element
 
@@ -277,7 +277,7 @@ If no `auth` element is set, **Raven IRCd** will assume that anyone is allowed t
 Sets who's allowed to connect to the server.  `*@*` (the default) will let anyone connect.  For example, to let only clients on the `google.com` host connect, you would set `mask` to `*@google.com`.  Required child element.
 
 ------------
-##### `password`
+##### `password` (auth)
 
 Sets the password required to connect with the given `mask`.  Not a required child element.
 
@@ -312,7 +312,7 @@ In this example, only clients connecting from the host `google.com` would be all
 Sets the username of the operator, required for login.  Required child element.
 
 ------------
-##### `password`
+##### `password` (operator)
 
 Sets the password for the operator, required for login.  Required child element.
 
