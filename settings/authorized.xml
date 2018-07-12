@@ -9,27 +9,29 @@
 -----Raven IRCd is an IRC server written in Perl and POE
 ----------------https://github.com/danhetrick/raven-ircd
 
-=================
-| operators.xml |
-=================
+==================
+| authorized.xml |
+==================
 -->
 
 <!--
-	=====================
-	| OPERATOR ACCOUNTS |
-	=====================
+	==========================
+	| AUTHORIZED CONNECTIONS |
+	==========================
 
-	To create an operator account, uncomment and edit the operator
-	element below.
+	To set up authorized connections, edit the auth element below.
+	Uncomment options if you wish to use them. The server default
+	is set below, *@*, allowing any user on any host to connect.
 
-	Multiple operator tags are allowed, allowing for more than one
-	operator account.
+	Multiple auth tags are allowed, allowing more than one rule
+	to apply to authorized connections.
 -->
 
-<!--
-<operator>
-	<username>bob</username>
+<auth>
+	<mask>*@*</mask>
+	<!--
 	<password>changeme</password>
-	<ipmask>*</ipmask>
-</operator>
--->
+	<spoof>google.com</spoof>
+	<no_tilde>1</no_tilde>
+	-->
+</auth>

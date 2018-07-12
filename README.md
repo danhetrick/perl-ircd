@@ -108,6 +108,8 @@ All configuration elements can be set in *any* configuration file loaded by **Ra
 	* Sorry!
 * `config`->`description`
 	* Raven IRCd 0.025
+* `config`->`motd`
+	* motd.txt
 
 In the default configuration, **Raven IRCd** ships with three configuration files:  `default.xml`, `auth.xml`, and `operators.xml`.  `default.xml` contains basic server settings, and `import`s (see [`import` element](#import-element)) `auth.xml` and `operators.xml`. `auth.xml` contains any auth entries (see [`auth` element](#auth-element)); by default, it contains only one, allowing anyone to connect.  `operators.xml` contains any operator account entries (see [`operator` element](#operator-element)); by default, it doesn't contain *any* functional operator accounts, only a commented-out one that you can uncomment and edit.
 
@@ -123,7 +125,7 @@ This is not enforced by **Raven IRCd** (that is, it will still read and parse co
 
 ### Configuration File Restrictions
 
-* Configuration files are only allowed to have **_one_ [`config`](#config-element) _element in each file_**; each `config` element is only allowed to have **one** of the following child elements: [`verbose`](#verbose), [`banner`](#banner), [`warn`](#warn), [`name`](#name), [`nicklength`](#nicklength), [`network`](#network), [`max_targets`](#max_targets),[`max_channels`](#max_channels), [`info`](#info), [`description`](#description).  Each `config` element is allowed to have three (3) [`admin`](#admin) child elements). Each `config` element is allowed to have multiple [`port`](#port) child elements.  All `config` child elements are optional.
+* Configuration files are only allowed to have **_one_ [`config`](#config-element) _element in each file_**; each `config` element is only allowed to have **one** of the following child elements: [`verbose`](#verbose), [`banner`](#banner), [`warn`](#warn), [`name`](#name), [`nicklength`](#nicklength), [`network`](#network), [`max_targets`](#max_targets),[`max_channels`](#max_channels), [`info`](#info), [`description`](#description), [`motd`](#motd).  Each `config` element is allowed to have three (3) [`admin`](#admin) child elements. Each `config` element is allowed to have multiple [`port`](#port) child elements.  All `config` child elements are optional.
 
 * Configuration files are allowed to have **_multiple_ [`import`](#import-element) _elements_**. `import` elements have no child elements.
 
@@ -156,6 +158,7 @@ The `config` element is where all the main server settings are.  They are all op
 		<admin>The operator of this server didn't set up the admin option.</admin>
 		<admin>Sorry!</admin>
 		<description>Raven IRCd 0.025</description>
+		<motd>motd.txt</motd>
 	</config>
 
 Multiple `config` elements can be set (although they must be in separate files; see [Restrictions](#configuration-file-restrictions)), though it may confuse the server (and you!). Configuration files are processed in order;  for example, if a file is imported with the `import` element, it will be loaded before any other elements following the `import` element are loaded.  As an example, let's say that you have two configuration files that you want to use, `mysettings.xml` and `othersettings.xml`.
@@ -196,6 +199,7 @@ The only exception to this rule is the [`port` child element](#port);  it doesn'
 * [warn](#warn)**\***
 * [admin](#admin)**\***
 * [description](#description)**\***
+* [motd](#motd)**\***
 
 Elements marked with an asterix (**\***) are optional.
 
@@ -258,6 +262,11 @@ Sets the text returned by the `/admin` IRC command. Each `admin` element adds on
 ##### `description`
 
 Sets the server's description text.
+
+------------
+##### `motd`
+
+Sets the name of the file containing the "Message of the Day", or MOTD.  The server will look for the MOTD file first in the **home** directory, and then in the **settings** directory.
 
 ------------
 #### `auth` element

@@ -34,12 +34,12 @@ default server settings, and can be edited.
 <import>operators.xml</import>
 
 <!--
-	============
-	| auth.xml |
-	============
+	==================
+	| authorized.xml |
+	==================
 	Default auth entries are loaded in here (*@*)
 -->
-<import>auth.xml</import>
+<import>authorized.xml</import>
 
 <!-- 
 	######################
@@ -53,6 +53,8 @@ default server settings, and can be edited.
 	##############################
 -->
 <config>
+
+	<motd>motd.txt</motd>
 
 	<!--
 		===============

@@ -135,6 +135,7 @@ my $DEFAULT_ADMIN_LINE_1	= "$APPLICATION_NAME $VERSION";
 my $DEFAULT_ADMIN_LINE_2	= "The operator of this server didn't set up the admin option.";
 my $DEFAULT_ADMIN_LINE_3	= "Sorry!";
 my $DESCRIPTION				= "$APPLICATION_NAME $VERSION";
+my $MOTD_FILE				= "motd.txt";
 
 # ----------
 # | ARRAYS |
@@ -155,11 +156,13 @@ my $DESCRIPTION				= "$APPLICATION_NAME $VERSION";
 # It's also populated by load_xml_configuration_file(), and then sanity
 # checked by check_admin_info(), which makes sure that the array only
 # contains 3 items and sets them to default values if they are missing.
+# @MOTD contains the message of the day.
 my @LISTENER_PORTS	= ();	# List of server listening ports to use
 my @AUTHS			= ();	# List of auth entries
 my @OPERATORS		= ();	# List of operator entries
 my @IMPORTED_FILES	= ();	# List of imported files
 my @ADMIN			= ();	# Text returned by the /admin command
+my @MOTD			= ();	# Message of the Day
 
 # ===============
 # | GLOBALS END |
@@ -217,6 +220,29 @@ if((scalar @ARGV>=1)&&(lc($ARGV[0]) eq 'default')){
 	check_admin_info();
 }
 
+# Set up the Message of the Day! $MOTD_FILE (default: motd.txt) has
+# its value set by the config file, in config->motd. Here, we look
+# for the MOTD file, and if it's found, open it and read it, populating
+# @MOTD with its contents. As with configuration files, the program
+# first checks to see if $MOTD_FILE contains a complete path,
+# and if not, looks for it in the same directory as this program
+# and the settings directory.
+my $motd = find_configuration_file($MOTD_FILE);
+if($motd){
+	verbose("Reading in MOTD from '$motd'");
+	open(FILE,"<$motd") or display_error_and_exit("Error opening MOTD file '$motd'");
+	while ( my $line = <FILE> ) {
+        chomp $line;
+        push(@MOTD,$line);
+    }
+    close FILE;
+} else {
+	# MOTD fine wasn't found, so warn the user and populate @MOTD
+	# with an error message (of sorts).
+	display_warning("MOTD file not found! MOTD set to 'No MOTD set'");
+	push(@MOTD, "No MOTD set");
+}
+
 # Set up our server configuration.
 my %config = (
     servername	=> $SERVER_NAME, 
@@ -227,6 +253,7 @@ my %config = (
     info		=> $SERVER_INFO,
     admin		=> \@ADMIN,
     serverdesc	=> $DESCRIPTION,
+    motd 		=> \@MOTD,
 );
 
 # Spawn our RavenIRCd instance, and pass it our server configuration.
@@ -316,7 +343,7 @@ sub _start {
     	}
     } else {
     		# @AUTHS is empty, so let the user know and use the default auth entry.
-    		display_warning("Auth element not found. Using $DEFAULT_AUTH as the auth");
+    		display_warning("No authorized connections found! Using $DEFAULT_AUTH as the auth");
     		$heap->{ircd}->add_auth(
 	        	mask		=> $DEFAULT_AUTH,
     		); 
@@ -332,13 +359,13 @@ sub _start {
 	} else {
 		# @LISTENER_PORTS is empty, so let the user know and use the default port.
 		$heap->{ircd}->add_listener(port => $DEFAULT_PORT);
-		display_warning("Port element not found. Using $DEFAULT_PORT as the listening port");
+		display_warning("No listening ports found! Using $DEFAULT_PORT as the listening port");
 	}
  
     # Add IRC operators
     if(scalar @OPERATORS>=1){
     	# Add operators from the list in @OPERATORS
-    	verbose("Adding operator(s)");
+    	verbose("Adding operator account(s)");
 	    foreach my $o (@OPERATORS){
 			my @entry = @{$o};
 			$heap->{ircd}->add_operator(
@@ -351,7 +378,7 @@ sub _start {
 		}
 	} else {
 		# @OPERATORS is empty, so let the user know and start with no operators.
-		display_warning('Operator element not found. Server will start without operators');
+		display_warning('No operator accounts found! Server will start without operators');
 	}
 }
 
@@ -875,6 +902,13 @@ sub load_xml_configuration_file {
 		display_error_and_exit("Error in $filename: config element can't have more than one description element");
 	} elsif($tree->{config}->{description} ne undef){
 		$DESCRIPTION = $tree->{config}->{description};
+	}
+
+	# config->motd element
+	if(ref($tree->{config}->{motd}) eq 'ARRAY'){
+		display_error_and_exit("Error in $filename: config element can't have more than one motd element");
+	} elsif($tree->{config}->{motd} ne undef){
+		$MOTD_FILE = $tree->{config}->{motd};
 	}
 }
 

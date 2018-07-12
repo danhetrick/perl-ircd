@@ -1,4 +1,3 @@
-<!--
  _____                         _____ _____   _____    _ 
 |  __ \                       |_   _|  __ \ / ____|  | |
 | |__) |__ ___   _____ _ __     | | | |__) | |     __| |
@@ -9,25 +8,6 @@
 -----Raven IRCd is an IRC server written in Perl and POE
 ----------------https://github.com/danhetrick/raven-ircd
 
-============
-| auth.xml |
-============
--->
+MESSAGE OF THE DAY
 
-<!--
-	To set up authorized connections, edit the auth element below.
-	Uncomment options if you wish to use them. The server default
-	is set below, *@*, allowing any user on any host to connect.
-
-	Multiple auth tags are allowed, allowing more than one rule
-	to apply to authorized connections.
--->
-
-<auth>
-	<mask>*@*</mask>
-	<!--
-	<password>changeme</password>
-	<spoof>google.com</spoof>
-	<no_tilde>1</no_tilde>
-	-->
-</auth>
+Thanks for logging into my server!
