@@ -67,13 +67,13 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 		* [`auth` element](#auth-element)
 			* [`auth` child elements](#auth-child-elements)
 				* [mask](#mask)
-				* [password](#password-(auth))
+				* [password](#password-auth)
 				* [spoof](#spoof)
 				* [no_tilde](#no_tilde)
 		* [`operator` element](#operator-element)
 			* [`operator` child elements](#auth-child-elements)
 				* [username](#username)
-				* [password](#password)
+				* [password](#password-operator)
 				* [ipmask](#ipmask)
 	* [Example configuration file](#example-configuration-file)
 * [License](#license)
@@ -137,9 +137,9 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 
 * Configuration files are allowed to have multiple [`import`](#import-element) elements. `import` elements have no child elements.
 
-* Configuration files are allowed to have multiple [`auth`](#auth-element) elements, but each `auth` element is only allowed to have **one** of the following child elements: [`mask`](#password), `password`, `spoof`, `no_tilde`.
+* Configuration files are allowed to have multiple [`auth`](#auth-element) elements; each `auth` element is only allowed to have **one** of the following child elements: [`mask`](#mask), [`password`](#password-auth), [`spoof`](#spoof), [`no_tilde`](#no_tilde).
 
-* Configuration files are allowed to have multiple [`operator`](#operator-element) elements, but each `operator` elements is only allowed to have **one** of the following child elements: `username`, `password`, ipmask.
+* Configuration files are allowed to have multiple [`operator`](#operator-element) elements; each `operator` elements is only allowed to have **one** of the following child elements: [`username`](#username), [`password`](#password-operator), [`ipmask`](#ipmask).
 
 ### `import` element
 
