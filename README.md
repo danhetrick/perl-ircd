@@ -178,7 +178,7 @@ The only exception to this rule is the [`port` child element](#port);  it doesn'
 
 #### `config` child elements
 
-Child elements marked with an asterix (\*) are optional.
+Child elements marked with an asterix (**\***) are optional.
 
 * [verbose](#verbose)\*
 * [port](#port)\*
