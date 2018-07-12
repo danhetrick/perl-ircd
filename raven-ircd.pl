@@ -110,27 +110,31 @@ my $CONFIGURATION_DIRECTORY_NAME	= "settings";
 # { APPLICATION DATA SETTINGS }
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # These are used by generate_banner(), and nowhere else.
-my $APPLICATION_NAME = "Raven IRCd";
-my $VERSION		= "0.023";
-my $APPLICATION_DESCRIPTION = "Raven IRCd is an IRC server written in Perl and POE";
-my $APPLICATION_URL = "https://github.com/danhetrick/raven-ircd";
+my $APPLICATION_NAME		= "Raven IRCd";
+my $VERSION					= "0.025";
+my $APPLICATION_DESCRIPTION	= "Raven IRCd is an IRC server written in Perl and POE";
+my $APPLICATION_URL			= "https://github.com/danhetrick/raven-ircd";
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # { SERVER DEFAULT SETTINGS }
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # These are the settings the server will use if no other
 # setting is supplied by a configuration file.
-my $SERVER_NAME		= "raven.irc.server";
-my $NICKNAME_LENGTH	= 15;
-my $SERVER_NETWORK	= "RavenNet";
-my $MAX_TARGETS		= 4;
-my $MAX_CHANNELS	= 15;
-my $SERVER_INFO		= $APPLICATION_DESCRIPTION;
-my $DEFAULT_PORT	= 6667;
-my $DEFAULT_AUTH	= '*@*';
-my $VERBOSE			= 1;
-my $BANNER			= 1;
-my $WARNING			= 1;
+my $SERVER_NAME				= "raven.irc.server";
+my $NICKNAME_LENGTH			= 15;
+my $SERVER_NETWORK			= "RavenNet";
+my $MAX_TARGETS				= 4;
+my $MAX_CHANNELS			= 15;
+my $SERVER_INFO				= $APPLICATION_DESCRIPTION;
+my $DEFAULT_PORT			= 6667;
+my $DEFAULT_AUTH			= '*@*';
+my $VERBOSE					= 1;
+my $BANNER					= 1;
+my $WARNING					= 1;
+my $DEFAULT_ADMIN_LINE_1	= "$APPLICATION_NAME $VERSION";
+my $DEFAULT_ADMIN_LINE_2	= "The operator of this server didn't set up the admin option.";
+my $DEFAULT_ADMIN_LINE_3	= "Sorry!";
+my $DESCRIPTION				= "$APPLICATION_NAME $VERSION";
 
 # ----------
 # | ARRAYS |
@@ -147,10 +151,15 @@ my $WARNING			= 1;
 # @IMPORTED_FILES contains a list of all the files imported by configuration
 # files, so we can display them to the user with verbose() after we've
 # loaded them.
+# @ADMIN contains the three lines returned by the IRC command /admin.
+# It's also populated by load_xml_configuration_file(), and then sanity
+# checked by check_admin_info(), which makes sure that the array only
+# contains 3 items and sets them to default values if they are missing.
 my @LISTENER_PORTS	= ();	# List of server listening ports to use
 my @AUTHS			= ();	# List of auth entries
 my @OPERATORS		= ();	# List of operator entries
-my @IMPORTED_FILES = ();	# List of imported files
+my @IMPORTED_FILES	= ();	# List of imported files
+my @ADMIN			= ();	# Text returned by the /admin command
 
 # ===============
 # | GLOBALS END |
@@ -197,6 +206,15 @@ if((scalar @ARGV>=1)&&(lc($ARGV[0]) eq 'default')){
 			verbose("Loaded configuration file '$i'");
 		}
 	}
+
+	# Do a sanity check for the config->admin element
+	# No more than three entries are allowed, so make sure that
+	# @ADMIN (the array that contains the entries) has no more
+	# or no less than 3 entries. Since it's not really a critical
+	# setting, we'll only warn the user if there's too many, rather
+	# than error and exit, and we'll only use the first three
+	# entries.
+	check_admin_info();
 }
 
 # Set up our server configuration.
@@ -206,7 +224,9 @@ my %config = (
     network		=> $SERVER_NETWORK,
     maxtargets	=> $MAX_TARGETS,
     maxchannels	=> $MAX_CHANNELS,
-    info		=> $SERVER_INFO
+    info		=> $SERVER_INFO,
+    admin		=> \@ADMIN,
+    serverdesc	=> $DESCRIPTION,
 );
 
 # Spawn our RavenIRCd instance, and pass it our server configuration.
@@ -253,6 +273,7 @@ $poe_kernel->run();
 # | Configuration File Handling |
 # -------------------------------
 
+#	check_admin_info()
 #	find_configuration_file()
 #	load_xml_configuration_file()
 
@@ -376,8 +397,8 @@ sub timestamp {
 # |  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
 # | | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
 # |_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
-# ----------------------------------------Raven IRCd 0.021
-# -------------------An IRC server written in Perl and POE
+# ----------------------------------------Raven IRCd 0.025
+# ------Raven IRCd is an IRC server written in Perl and POE
 # ----------------https://github.com/danhetrick/raven-ircd
 sub generate_banner {
 	my $BANNER_PADDING = "-";	# What the spaces to the left of the text is filled with
@@ -435,6 +456,45 @@ sub display_warning {
 # -------------------------------
 # | Configuration File Handling |
 # -------------------------------
+
+# check_admin_info()
+# Arguments: 0
+# Returns: Nothing
+# Description: Makes sure that the @ADMIN array is populated correctly; it should
+#              have no more (or no less) than three entries. This is used to set
+#              up the /admin IRC command, and the text that's returned by that
+#              command is what's in the array. If only one or two lines are set
+#              in the configuration files, the rest of the array is populated with
+#              blank entries. If the array isn't populated at *all*, the default
+#              server values are entered (which are in the scalars $DEFAULT_ADMIN_LINE_1,
+#              $DEFAULT_ADMIN_LINE_2, and $DEFAULT_ADMIN_LINE_3).
+sub check_admin_info {
+	if(scalar @ADMIN==3) { return; }
+	if(scalar @ADMIN>3){
+		display_warning("Too many admin elements set; using only the first three");
+		my @ac;
+		push(@ac,shift @ADMIN);
+		push(@ac,shift @ADMIN);
+		push(@ac,shift @ADMIN);
+		@ADMIN = @ac;
+		return;
+	}
+	if(scalar @ADMIN==2){
+		push(@ADMIN,"");
+		return;
+	}
+	if(scalar @ADMIN==1){
+		push(@ADMIN,"");
+		push(@ADMIN,"");
+		return;
+	}
+	if(scalar @ADMIN==0){
+		push(@ADMIN,$DEFAULT_ADMIN_LINE_1);
+		push(@ADMIN,$DEFAULT_ADMIN_LINE_2);
+		push(@ADMIN,$DEFAULT_ADMIN_LINE_3);
+		return;
+	}
+}
 
 # find_configuration_file()
 # Arguments: 1 (scalar, filename)
@@ -798,6 +858,23 @@ sub load_xml_configuration_file {
 		display_error_and_exit("Error in $filename: config element can't have more than one warn element");
 	} elsif($tree->{config}->{warn} ne undef){
 		$WARNING = $tree->{config}->{warn};
+	}
+
+	# config->admin element
+	if(ref($tree->{config}->{admin}) eq 'ARRAY'){
+		my @a = @{$tree->{config}->{admin}};
+		foreach my $ae (@a){
+			push(@ADMIN,$ae);
+		}
+	} elsif($tree->{config}->{admin} ne undef){
+		push(@ADMIN,$tree->{config}->{admin});
+	}
+
+	# config->description element
+	if(ref($tree->{config}->{description}) eq 'ARRAY'){
+		display_error_and_exit("Error in $filename: config element can't have more than one description element");
+	} elsif($tree->{config}->{description} ne undef){
+		$DESCRIPTION = $tree->{config}->{description};
 	}
 }
 

@@ -8,7 +8,7 @@
 
 The source code for `raven-ircd.pl` is *heavily* commented. I try to explain everything the program is doing in detail, so if you want to use it as a base for your own IRCd, the **Raven IRCd** source is a good place to start.  The most complicated part of the source is the code for loading and applying configuration file settings, and thus has the most comments; it's written in pure Perl, and doesn't require POE or anything outside of the standard library (besides XML::TreePP, included with the **Raven IRCd** distribution).  If you do use **Raven IRCd** as the base for your own IRC server, remember the [license](#license), and make sure to share your additions/changes.
 
-The latest version of **Raven IRCd** is 0.023.
+The latest version of **Raven IRCd** is 0.025.
 
 # A new IRCd? Aren't there already a bunch of those available?
 
@@ -48,6 +48,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 * [Configuration](#configuration)
 	* [Default settings](#default-settings)
 	* [Configuration file XML elements](#configuration-file-XML-elements)
+		* [Restrictions](#restrictions)
 		* [`import` element](#import-element)
 		* [`config` element](#config-element)
 			* [ `Config` child elements](#config-child-elements)
@@ -59,6 +60,10 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 				* [max_targets](#max_targets)
 				* [max_channels](#max_channels)
 				* [info](#info)
+				* [banner](#banner)
+				* [warn](#warn)
+				* [admin](#admin)
+				* [description](#description)
 		* [`auth` element](#auth-element)
 			* [`auth` child elements](#auth-child-elements)
 				* [mask](#mask)
@@ -93,32 +98,48 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 
 ## Default settings
 
-* `auth`
+* `auth`->`mask`
 	* \*@\*
 * `operator`
 	* No operators
-* `port`
+* `config`->`port`
 	* 6667
-* `name`
+* `config`->`name`
 	* raven.irc.server
-* `nicklength`
+* `config`-> `nicklength`
 	* 15
-* `network`
+* `config`->`network`
 	* RavenNet
-* `max_targets`
+* `config`->`max_targets`
 	* 4
-* `max_channels`
+* `config`->`max_channels`
 	* 15
-* `info`
+* `config`->`info`
 	* Raven IRCd is an IRC server written in Perl and POE
-* `verbose`
+* `config`->`verbose`
 	* 1
-* `banner`
+* `config`->`banner`
 	* 1
-* `warn`
+* `config`->`warn`
 	* 1
+* `config`->`admin`
+	* Raven IRCd 0.025
+	* The operator of this server didn't set up the admin option.
+	* Sorry!
+* `config`->`description`
+	* Raven IRCd 0.025
 
 ## Configuration file XML elements
+
+### Restrictions
+
+* Configuration files are only allowed to have **one `config` element each**, and each `config` element is only allowed to have **one** of the following child elements: `verbose`, `banner`, `warn`, `name`, `nicklength`, `network`, `max_targets`,` max_channels`, `info`, `description`.  Each `config` element is allowed to have three (3) `admin` child elements (see [admin](#admin)).  Each `config` element is allowed to have multiple `port` child elements (see [port](#port)).
+
+* Configuration files are allowed to have multiple `import` elements.
+
+* Configuration files are allowed to have multiple `auth` elements, but each `auth` element is only allowed to have **one** of the following child elements: `mask`, `password`, `spoof`, `no_tilde`.
+
+* Configuration files are allowed to have multiple `operator` elements, but each `operator` elements is only allowed to have **one** of the following child elements: `username`, `password`, ipmask.
 
 ### `import` element
 
@@ -140,9 +161,13 @@ The `config` element is where all the main server settings are.  They are all op
 		<max_targets>4</max_targets>
 		<max_channels>15</max_channels>
 		<info>Raven IRCd</info>
+		<admin>Raven IRCd 0.025</admin>
+		<admin>The operator of this server didn't set up the admin option.</admin>
+		<admin>Sorry!</admin>
+		<description>Raven IRCd 0.025</description>
 	</config>
 
-Multiple `config` elements can be set, though it may confuse the server (and you!). Configuration files are processed in order;  for example, if a file is imported with the `import` element, it will be loaded before any other elements following the `import` element are loaded.  As an example, let's say that you have two configuration files that you want to use, `mysettings.xml` and `othersettings.xml`.
+Multiple `config` elements can be set (although they must be in separate files; see [Restrictions](#restrictions)), though it may confuse the server (and you!). Configuration files are processed in order;  for example, if a file is imported with the `import` element, it will be loaded before any other elements following the `import` element are loaded.  As an example, let's say that you have two configuration files that you want to use, `mysettings.xml` and `othersettings.xml`.
 
 	<!-- mysettings.xml -->
 	<?xml version="1.0" encoding="UTF-8"?>
@@ -219,6 +244,16 @@ Turns banner display on start up on (1) or off (0).
 Turns warnings on (1) or off (1). If `warn` us turned on, warnings will *always* be displayed, even if `verbose` is turned off.
 
 ------------
+##### `admin`
+
+Sets the text returned by the `/admin` IRC command. Each `admin` element adds one line to the admin text, with a maximum of three lines allowed. If more than three lines are added (that is, if there's more than three `admin` elements), only the first three `admin` elements are used, and the user is warned. If only one or two `admin` elements are set, the other line(s) are set to be blank. If no `admin` elements are set, the default values are used (see [Default settings](#default-settings)).
+
+------------
+##### `description`
+
+Sets the server's description text.
+
+------------
 #### `auth` element
 
 Here's where we set who's allowed to connect to the IRC server.  You can set what hosts clients must be on to connect, set passwords for certain hosts, whether to spoof client hostnames, and whether or not to remove the tilde (~) from hostnames.  The only required child element is `mask`.  Here's an example `auth` entry:
@@ -239,22 +274,22 @@ If no `auth` element is set, **Raven IRCd** will assume that anyone is allowed t
 ------------
 ##### `mask`
 
-Sets who's allowed to connect to the server.  `*@*` (the default) will let anyone connect.  For example, to let only clients on the `google.com` host connect, you would set `mask` to `*@google.com`.  Required.
+Sets who's allowed to connect to the server.  `*@*` (the default) will let anyone connect.  For example, to let only clients on the `google.com` host connect, you would set `mask` to `*@google.com`.  Required child element.
 
 ------------
 ##### `password`
 
-Sets the password required to connect with the given `mask`.  Not required.
+Sets the password required to connect with the given `mask`.  Not a required child element.
 
 ------------
 ##### `spoof`
 
-All users connected with the given `mask` will have their host spoofed with the host noted here.  For example, to make it appear if all clients on `@*@` were connected from `facebook.com`, you'd set `spoof` to `facebook.com`.  Not required.
+All users connected with the given `mask` will have their host spoofed with the host noted here.  For example, to make it appear if all clients on `@*@` were connected from `facebook.com`, you'd set `spoof` to `facebook.com`.  Not a required child element.
 
 ------------
 ##### `no_tilde`
 
-Removes the tilde (~) from reported hostmaks.  Set to 1 to remove the tilde, and set to 0 to leave the tilde in place.  Not required.
+Removes the tilde (~) from reported hostmaks.  Set to 1 to remove the tilde, and set to 0 to leave the tilde in place.  Not a required child element.
 
 ------------
 ### `operator` element
@@ -284,7 +319,7 @@ Sets the password for the operator, required for login.  Required child element.
 ------------
 ##### `ipmask`
 
-Sets what hosts are allowed to use this operator account.  Not a required child element.
+Sets what IP addresses are allowed to use this operator account.  Not a required child element. Use \*\ for a multiple character wild card, or ? for a single character wild card.  For example, if you're on a LAN with all internal IP addresses starting with "192.168.1", to allow only people on your LAN to become operators, use an ipmask of "192.168.1.\*".
 
 ------------
 ## Example configuration file
@@ -322,7 +357,7 @@ If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configurati
 	|  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
 	| | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
 	|_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
-	----------------------------------------Raven IRCd 0.023
+	----------------------------------------Raven IRCd 0.025
 	-----Raven IRCd is an IRC server written in Perl and POE
 	----------------https://github.com/danhetrick/raven-ircd
 
