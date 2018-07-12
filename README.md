@@ -72,9 +72,9 @@ If ran with `default` as an argument, **Raven IRCd** will start *without* any co
 
 # Configuration
 
-**Raven IRCd** configuration files are written in an [XML](https://en.wikipedia.org/wiki/XML)-like format, and have several useful features.  All server configuration is done through one or more XML configuration files; the default configuration file is named `default.xml`, and is located in the **settings** directory.
+All server configuration is done through one or more [XML](https://en.wikipedia.org/wiki/XML)-like configuration files; the default configuration file is named `default.xml`, and is located in the **settings** directory.
 
-All configuration elements can be set in any configuration file loaded by **Raven IRCd**, and do not have to be in `default.xml`; passing the filename of a configuration file as the first argument to `raven-ircd.pl` will cause the program to load that file instead of `default.xml`. **Raven IRCd** can also start without a configuration file; if the configuration file does not exist or can't be found, **Raven IRCd** is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect. To "force" **Raven IRCd** to start up without any configuration files, pass `default` as the first argument to `raven-ircd.pl`; the server won't load any configuration files, and will use the default server settings:
+All configuration elements can be set in *any* configuration file loaded by **Raven IRCd**, and do not have to be in `default.xml`; passing the filename of a configuration file as the first argument to `raven-ircd.pl` will cause the program to load that file instead of `default.xml`. **Raven IRCd** can also start without a configuration file; if the configuration file does not exist or can't be found, **Raven IRCd** will use the default server settings, opening a listening port on 6667 and allowing clients from any host to connect. To "force" **Raven IRCd** to start up without any configuration files, pass `default` as the first argument to `raven-ircd.pl`; the server won't load any configuration files, and will use the default server settings:
 
 ## Default Settings
 
@@ -113,7 +113,13 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 
 ## Configuration File Format
 
-**Raven IRCd** configuration files are written in XML.  There are four root elements in a **Raven IRCd** configuration file: [`config`](#config-element), [`import`](#import-element), [`auth`](#auth-element), and [`operator`](#operator-element).  All root elements have mandatory and/or optional child elements (with the exception of `import`, which has no child elements): `config` has _no_ manditory child elements, `auth` elements have _one_ mandatory child element ([`mask`](#mask)), and `operator` has *two* mandatory child elements ([`username`](#username) and [`password`](#password-operator)).  See [Restrictions](#restrictions) for more information.
+**Raven IRCd** configuration files are written in an XML-like language. The main difference between the XML format and the format used for **Raven IRCd** configuration files is that, unlike XML, **Raven IRCd** configuration files can have multiple root elements.  There are four root elements in a **Raven IRCd** configuration file: [`config`](#config-element), [`import`](#import-element), [`auth`](#auth-element), and [`operator`](#operator-element).  All root elements have mandatory and/or optional child elements (with the exception of `import`, which has no child elements): `config` has _no_ manditory child elements, `auth` elements have _one_ mandatory child element ([`mask`](#mask)), and `operator` has *two* mandatory child elements ([`username`](#username) and [`password`](#password-operator)).  See [Restrictions](#restrictions) for more information.
+
+The first like in a **Raven IRCd** configuration file should be this:
+
+	<?xml version="1.0" encoding="UTF-8"?>
+
+This is not enforced by **Raven IRCd** (that is, it will still read and parse configuration files that *do not* start with this encoding declaration). The reason why it is included in the default configuration files is because if you open a configuration file in most decent text editors, it will be idetified by the editor as an XML document, and it will display the file's contents with syntax highlighting, making it easier to read and edit.  Personally, I used [Sublime Text](https://www.sublimetext.com/) to edit this file, edit the configuration files, and write `raven-ircd.pl` . The syntax highlighting for XML in Sublime looks pretty good.
 
 ### Restrictions
 
