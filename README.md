@@ -75,9 +75,13 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 # Usage
 
-	perl raven-ircd.pl <CONFIGURATION FILE>
+	perl raven-ircd.pl <CONFIGURATION FILE> -or- default
 
-By default, **Raven IRCd** will load a file named `default.xml` located either in the directory where `raven-ircd.pl` is located, or in the `/settings` directory, in the same directory as `raven-ircd.pl`.  The directory where `raven-ircd.pl` is located will be called the **home directory** in the rest of this document;  the `/settings` directory located in the home directory will be called the **settings directory**. **Raven IRCd** doesn't *require* a configuration file; it will just use the default settings (see [Default settings](#default-settings)) if one isn't supplied.
+If ran with no arguments, **Raven IRCd** will load a file named `default.xml` located either in the directory where `raven-ircd.pl` is located, or in the `/settings` directory, in the same directory as `raven-ircd.pl`.  The directory where `raven-ircd.pl` is located will be called the **home directory** in the rest of this document;  the `/settings` directory located in the home directory will be called the **settings directory**.
+
+If ran with a single filename as an argument, **Raven IRCd** will load that file as a configuration file (see [Configuration](#configuration)).  Any settings that file does *not* contain will use the default values (see [Default settings](#default-settings)).  If the file can't be found, the server will alert the user of this, but still start with all default values.
+
+If ran with 'default' as an argument, **Raven IRCd** will start *wihout* any configuration file; it will just use the default settings (see [Default settings](#default-settings)).
 
 # Configuration
 

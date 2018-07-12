@@ -159,33 +159,42 @@ my @IMPORTED_FILES = ();	# List of imported files
 # | MAIN PROGRAM BEGIN |
 # ======================
 
-# See if a config file is passed to the program in an argument.
-if($#ARGV>=0){ $CONFIGURATION_FILE=$ARGV[0]; }
-
-# Look for the configuration file in the local directory or the config/ directory.
-my $found_configuration_file = find_configuration_file($CONFIGURATION_FILE);
-
-# If configuration file is found, load it. If the configure file is *not* found,
-# use default settings and warn the user.  No matter what, print the banner to
-# the console if verbosity is turned on.
-if($found_configuration_file){
-	# Configuration file found, load it into memory.
-	load_xml_configuration_file($found_configuration_file);
+if((scalar @ARGV>=1)&&(lc($ARGV[0]) eq 'default')){
 	# Display banner unless configured otherwise
 	if($BANNER==1){ print generate_banner(); }
-	# Let the user know what configuration file was loaded.
-	verbose("Loaded configuration file '$found_configuration_file'");
+	# User wants to start with all default settings, no configuration
+	# files, so we won't even bother trying to look for or load any.
+	display_warning("Starting server with default settings");
 } else {
-	# Display banner unless configured otherwise
-	if($BANNER==1){ print generate_banner(); }
-	# Configuration file *not* found; defaults will be used.
-	# Warn the user that no file was found.
-	display_warning("No configuration file found; starting server with default settings");
-}
-# Display any files imported by any configuration files
-if(scalar @IMPORTED_FILES>=1){
-	foreach my $i (@IMPORTED_FILES){
-		verbose("Loaded configuration file '$i'");
+	# See if a config file is passed to the program in an argument.
+	if($#ARGV>=0){ $CONFIGURATION_FILE=$ARGV[0]; }
+
+	# Look for the configuration file in the local directory or the config/ directory.
+	my $found_configuration_file = find_configuration_file($CONFIGURATION_FILE);
+
+	# If configuration file is found, load it. If the configure file is *not* found,
+	# use default settings and warn the user.  No matter what, print the banner to
+	# the console if verbosity is turned on.
+	if($found_configuration_file){
+		# Configuration file found, load it into memory.
+		load_xml_configuration_file($found_configuration_file);
+		# Display banner unless configured otherwise
+		if($BANNER==1){ print generate_banner(); }
+		# Let the user know what configuration file was loaded.
+		verbose("Loaded configuration file '$found_configuration_file'");
+	} else {
+		# Display banner unless configured otherwise
+		if($BANNER==1){ print generate_banner(); }
+		# Configuration file *not* found; defaults will be used.
+		# Warn the user that no file was found.
+		display_warning("Configuration file '$CONFIGURATION_FILE' not found!");
+		display_warning("Starting server with default settings");
+	}
+	# Display any files imported by any configuration files
+	if(scalar @IMPORTED_FILES>=1){
+		foreach my $i (@IMPORTED_FILES){
+			verbose("Loaded configuration file '$i'");
+		}
 	}
 }
 
