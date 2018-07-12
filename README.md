@@ -309,7 +309,7 @@ The `operator` element is where clients can be granted IRC operator status.  The
 		<ipmask>192.168.0.*</ipmask>
 	</operator>
 
-In this example, only clients connecting from an IP address that starts with "192.168.0" would be allowed to log in to this operator account.  Multiple `operator` elements can be set.
+In this example, only clients connecting from an IP address that starts with "192.168.0." would be allowed to log in to this operator account.  Multiple `operator` elements can be set.
 
 #### `operator` child elements
 
