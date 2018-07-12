@@ -133,13 +133,13 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 
 ### Restrictions
 
-* Configuration files are only allowed to have **_one_ [`config`](#config-element) element each**, and each `config` element is only allowed to have **one** of the following child elements: [`verbose`](#verbose), [`banner`](#banner), [`warn`](#warn), [`name`](#name), [`nicklength`](#nicklength), [`network`](#network), [`max_targets`](#max_targets),[`max_channels`](#max_channels), [`info`](#info), [`description`](#description).  Each `config` element is allowed to have three (3) [`admin`](#admin) child elements). Each `config` element is allowed to have multiple [`port`](#port) child elements.
+* Configuration files are only allowed to have **_one_ [`config`](#config-element) _element each_**, and each `config` element is only allowed to have **one** of the following child elements: [`verbose`](#verbose), [`banner`](#banner), [`warn`](#warn), [`name`](#name), [`nicklength`](#nicklength), [`network`](#network), [`max_targets`](#max_targets),[`max_channels`](#max_channels), [`info`](#info), [`description`](#description).  Each `config` element is allowed to have three (3) [`admin`](#admin) child elements). Each `config` element is allowed to have multiple [`port`](#port) child elements.  All `config` child elements are optional.
 
-* Configuration files are allowed to have **_multiple_ [`import`](#import-element) elements**. `import` elements have no child elements.
+* Configuration files are allowed to have **_multiple_ [`import`](#import-element) _elements_**. `import` elements have no child elements.
 
-* Configuration files are allowed to have **_multiple_ [`auth`](#auth-element) elements**; each `auth` element is only allowed to have **_one_** of the following child elements: [`mask`](#mask), [`password`](#password-auth), [`spoof`](#spoof), [`no_tilde`](#no_tilde).
+* Configuration files are allowed to have **_multiple_ [`auth`](#auth-element) _elements_**; each `auth` element is only allowed to have **_one_** of the following child elements: [`mask`](#mask), [`password`](#password-auth), [`spoof`](#spoof), [`no_tilde`](#no_tilde). All `auth` elements **_must have a `mask` child element_**; all other `auth` child elements are optional.
 
-* Configuration files are allowed to have **_multiple_ [`operator`](#operator-element) elements**; each `operator` elements is only allowed to have **_one_** of the following child elements: [`username`](#username), [`password`](#password-operator), [`ipmask`](#ipmask).
+* Configuration files are allowed to have **_multiple_ [`operator`](#operator-element) _elements_**; each `operator` element is only allowed to have **_one_** of the following child elements: [`username`](#username), [`password`](#password-operator), [`ipmask`](#ipmask). All `operator` elements **_must have `username` and `password` child elements_**; `ipmask` child element is optional
 
 ### `import` element
 
