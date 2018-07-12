@@ -12,7 +12,7 @@ The latest version of **Raven IRCd** is 0.025.
 
 # A new IRCd? Aren't there already [a](http://www.ircd-hybrid.org/) [bunch](https://www.unrealircd.org/) [of](http://www.inspircd.org/) [those](https://www.ratbox.org/) [available](http://pure-ircd.sourceforge.net/)? [You're reinventing the wheel!](https://en.wikipedia.org/wiki/Reinventing_the_wheel)
 
-Yes, there are, and there are ones with a lot more features than **Raven IRCd**!  However, all the ones I could find for my platform (Windows 10) were fairly difficult to configure.  Most of them said in the documentation that I could expect to spend 30 or 40 minutes digging through dense configuration files *before* I could even start the server; many of these same IRCds introduced *intentional errors* in the config files so you would *have* to spend time reading them and changing settings.
+Yes, there are, and there are ones with a lot more features than **Raven IRCd**!  However, all the ones I could find for my platform (Windows 10) were fairly difficult to configure.  Most of them said in the documentation that I could expect to spend 30 or 40 minutes digging through dense configuration files *before* I could even start the server; many of these same IRCds introduced *intentional errors* in the config files so you would *be required* to spend time reading them and changing settings.
 
 This is good, I suppose, if you're planning on running an IRC server with hundreds or thousands of users, connecting to one of the big networks, like [Undernet](http://www.undernet.org/) or [EFnet](http://www.efnet.org/).  But what if you just want to run a server for five or six of your friends?  A server for your class in school, your office, or your home?
 
