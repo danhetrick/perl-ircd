@@ -81,7 +81,7 @@ If ran with no arguments, **Raven IRCd** will load a file named `default.xml` lo
 
 If ran with a single filename as an argument, **Raven IRCd** will load that file as a configuration file (see [Configuration](#configuration)), and if it can't be found, will look for it first in the **home** directory, and then in the **settings** directory.  Any settings that the configuration file does *not* contain will use the default values (see [Default settings](#default-settings)).  If the file can't be found, the server will alert the user of this, but still start with all default values.
 
-If ran with 'default' as an argument, **Raven IRCd** will start *wihout* any configuration file; it will just use the default settings (see [Default settings](#default-settings)).
+If ran with 'default' as an argument, **Raven IRCd** will start *without* any configuration file; it will just use the default settings (see [Default settings](#default-settings)).
 
 # Configuration
 
