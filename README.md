@@ -49,7 +49,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 	* [Default Settings](#default-settings)
 	* [Configuration File Format](#configuration-file-format)
 		* [Default Settings](#default-settings)
-		* [Restrictions](#restrictions)
+		* [Configuration File Restrictions](#configuration-file-restrictions)
 		* [`import` element](#import-element)
 		* [`config` element](#config-element)
 			* [`config` child elements](#config-child-elements)
@@ -113,7 +113,7 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 
 ## Configuration File Format
 
-**Raven IRCd** configuration files are written in an XML-like language. The main difference between the XML format and the format used for **Raven IRCd** configuration files is that, unlike XML, **Raven IRCd** configuration files can have multiple root elements.  There are four root elements in a **Raven IRCd** configuration file: [`config`](#config-element), [`import`](#import-element), [`auth`](#auth-element), and [`operator`](#operator-element).  All root elements have mandatory and/or optional child elements (with the exception of `import`, which has no child elements): `config` has _no_ manditory child elements, `auth` elements have _one_ mandatory child element ([`mask`](#mask)), and `operator` has *two* mandatory child elements ([`username`](#username) and [`password`](#password-operator)).  See [Restrictions](#restrictions) for more information.
+**Raven IRCd** configuration files are written in an XML-like language. The main difference between the XML format and the format used for **Raven IRCd** configuration files is that, unlike XML, **Raven IRCd** configuration files can have multiple root elements.  There are four root elements in a **Raven IRCd** configuration file: [`config`](#config-element), [`import`](#import-element), [`auth`](#auth-element), and [`operator`](#operator-element).  All root elements have mandatory and/or optional child elements (with the exception of `import`, which has no child elements): `config` has _no_ manditory child elements, `auth` elements have _one_ mandatory child element ([`mask`](#mask)), and `operator` has *two* mandatory child elements ([`username`](#username) and [`password`](#password-operator)).  See [Restrictions](#configuration-file-restrictions) for more information.
 
 The first line in a **Raven IRCd** configuration file should be this:
 
@@ -121,7 +121,7 @@ The first line in a **Raven IRCd** configuration file should be this:
 
 This is not enforced by **Raven IRCd** (that is, it will still read and parse configuration files that *do not* start with this encoding declaration). The reason why it is included in the default configuration files is because if you open a configuration file in most decent text editors, it will be identified by the editor as an XML document, and it will display the file's contents with syntax highlighting, making it easier to read and edit.  Personally, I used [Sublime Text](https://www.sublimetext.com/) to edit this file, edit the configuration files, and write `raven-ircd.pl` . The syntax highlighting for XML (and for Perl) in Sublime looks pretty good.
 
-### Restrictions
+### Configuration File Restrictions
 
 * Configuration files are only allowed to have **_one_ [`config`](#config-element) _element in each file_**; each `config` element is only allowed to have **one** of the following child elements: [`verbose`](#verbose), [`banner`](#banner), [`warn`](#warn), [`name`](#name), [`nicklength`](#nicklength), [`network`](#network), [`max_targets`](#max_targets),[`max_channels`](#max_channels), [`info`](#info), [`description`](#description).  Each `config` element is allowed to have three (3) [`admin`](#admin) child elements). Each `config` element is allowed to have multiple [`port`](#port) child elements.  All `config` child elements are optional.
 
@@ -158,7 +158,7 @@ The `config` element is where all the main server settings are.  They are all op
 		<description>Raven IRCd 0.025</description>
 	</config>
 
-Multiple `config` elements can be set (although they must be in separate files; see [Restrictions](#restrictions)), though it may confuse the server (and you!). Configuration files are processed in order;  for example, if a file is imported with the `import` element, it will be loaded before any other elements following the `import` element are loaded.  As an example, let's say that you have two configuration files that you want to use, `mysettings.xml` and `othersettings.xml`.
+Multiple `config` elements can be set (although they must be in separate files; see [Restrictions](#configuration-file-restrictions)), though it may confuse the server (and you!). Configuration files are processed in order;  for example, if a file is imported with the `import` element, it will be loaded before any other elements following the `import` element are loaded.  As an example, let's say that you have two configuration files that you want to use, `mysettings.xml` and `othersettings.xml`.
 
 	<!-- mysettings.xml -->
 	<?xml version="1.0" encoding="UTF-8"?>
