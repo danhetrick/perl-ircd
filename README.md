@@ -247,7 +247,7 @@ Turns banner display on start up on (1) or off (0).
 ------------
 ##### `warn`
 
-Turns warnings on (1) or off (1). If `warn` us turned on, warnings will *always* be displayed, even if `verbose` is turned off.
+Turns warnings on (1) or off (0). If `warn` us turned on, warnings will *always* be displayed, even if `verbose` is turned off.
 
 ------------
 ##### `admin`
@@ -338,7 +338,7 @@ Sets the password for the operator, required for login.  Required child element.
 ------------
 ##### `ipmask`
 
-Sets what IP addresses are allowed to use this operator account.  Not a required child element. Use \*\ for a multiple character wild card, or ? for a single character wild card.  For example, if you're on a LAN with all internal IP addresses starting with "192.168.1", to allow only people on your LAN to become operators, use an ipmask of "192.168.1.\*".
+Sets what IP addresses are allowed to use this operator account.  Not a required child element. Use **\*** for a multiple character wild card, or **?** for a single character wild card.  For example, if you're on a LAN with all internal IP addresses starting with "192.168.1", to allow only people on your LAN to become operators, use an ipmask of "192.168.1.\*".
 
 ------------
 ## Example Configuration File
