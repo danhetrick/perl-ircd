@@ -131,6 +131,8 @@ The `config` element is where all the main server settings are.  They are all op
 
 	<config>
 		<verbose>1</verbose>
+		<banner>1</banner>
+		<warn>1</warn>
 		<port>6667</port>
 		<name>raven.irc.server</name>
 		<nicklength>15</nicklength>
@@ -138,8 +140,6 @@ The `config` element is where all the main server settings are.  They are all op
 		<max_targets>4</max_targets>
 		<max_channels>15</max_channels>
 		<info>Raven IRCd</info>
-		<banner>1</banner>
-		<warn>1</warn>
 	</config>
 
 Multiple `config` elements can be set, though it may confuse the server (and you!). Configuration files are processed in order;  for example, if a file is imported with the `import` element, it will be loaded before any other elements following the `import` element are loaded.  As an example, let's say that you have two configuration files that you want to use, `mysettings.xml` and `othersettings.xml`.
