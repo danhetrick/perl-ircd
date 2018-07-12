@@ -52,7 +52,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 		* [Restrictions](#restrictions)
 		* [`import` element](#import-element)
 		* [`config` element](#config-element)
-			* [ `config` child elements](#config-child-elements)
+			* [`config` child elements](#config-child-elements)
 		* [`auth` element](#auth-element)
 			* [`auth` child elements](#auth-child-elements)
 		* [`operator` element](#operator-element)
@@ -72,7 +72,7 @@ If ran with `default` as an argument, **Raven IRCd** will start *without* any co
 
 # Configuration
 
-**Raven IRCd** configuration files are written in [XML](https://en.wikipedia.org/wiki/XML), and have several useful features.  All server configuration is done through one or more XML configuration files; the default configuration file is named `default.xml`, and is located in the **settings** directory.
+**Raven IRCd** configuration files are written in an [XML](https://en.wikipedia.org/wiki/XML)-like format, and have several useful features.  All server configuration is done through one or more XML configuration files; the default configuration file is named `default.xml`, and is located in the **settings** directory.
 
 All configuration elements can be set in any configuration file loaded by **Raven IRCd**, and do not have to be in `default.xml`; passing the filename of a configuration file as the first argument to `raven-ircd.pl` will cause the program to load that file instead of `default.xml`. **Raven IRCd** can also start without a configuration file; if the configuration file does not exist or can't be found, **Raven IRCd** is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect. To "force" **Raven IRCd** to start up without any configuration files, pass `default` as the first argument to `raven-ircd.pl`; the server won't load any configuration files, and will use the default server settings:
 
@@ -130,7 +130,7 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 
 The `import` element is used to load configuration data from external files, much like C's `#include` preprocesser directive.  **Raven IRCd** will look for `import`'ed files first in the **home** directory, then in the **settings** directory.  The `import` element has no children elements.  Multiple `import` elements can be set, and they can be set in any configuration file loaded;  thus, `import`'ed files can contain `import` elements, which can *also* contain `import` elements, and so on.
 
-------------
+-----------
 ### `config` element
 
 The `config` element is where all the main server settings are.  They are all optional; the server will use a listening port of `6667` and let anyone connect to it.  `config` has a number of children elements, all optional.  Here's an example of a basic `config` entry, with all default settings:
@@ -178,18 +178,20 @@ The only exception to this rule is the [`port` child element](#port);  it doesn'
 
 #### `config` child elements
 
-* [verbose](#verbose)
-* [port](#port)
-* [name](#name)
-* [nicklength](#nicklength)
-* [network](#network)
-* [max_targets](#max_targets)
-* [max_channels](#max_channels)
-* [info](#info)
-* [banner](#banner)
-* [warn](#warn)
-* [admin](#admin)
-* [description](#description)
+Child elements marked with an asterix (\*) are optional.
+
+* [verbose](#verbose)\*
+* [port](#port)\*
+* [name](#name)\*
+* [nicklength](#nicklength)\*
+* [network](#network)\*
+* [max_targets](#max_targets)\*
+* [max_channels](#max_channels)\*
+* [info](#info)\*
+* [banner](#banner)\*
+* [warn](#warn)\*
+* [admin](#admin)\*
+* [description](#description)\*
 
 ------------
 ##### `verbose`
@@ -269,10 +271,12 @@ If no `auth` element is set, **Raven IRCd** will assume that anyone is allowed t
 
 #### `auth` child elements
 
+Child elements marked with an asterix (\*) are optional.
+
 * [mask](#mask)
-* [password](#password-auth)
-* [spoof](#spoof)
-* [no_tilde](#no_tilde)
+* [password](#password-auth)\*
+* [spoof](#spoof)\*
+* [no_tilde](#no_tilde)\*
 
 ------------
 ##### `mask`
@@ -309,9 +313,11 @@ In this example, only clients connecting from the host `google.com` would be all
 
 #### `operator` child elements
 
+Child elements marked with an asterix (\*) are optional.
+
 * [username](#username)
 * [password](#password-operator)
-* [ipmask](#ipmask)
+* [ipmask](#ipmask)\*
 
 ------------
 ##### `username`
