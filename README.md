@@ -46,36 +46,18 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 * [Usage](#usage)
 * [Configuration](#configuration)
-	* [Default settings](#default-settings)
-	* [Configuration file XML elements](#configuration-file-XML-elements)
+	* [Default Settings](#default-settings)
+	* [Configuration File Format](#configuration-file-format)
+		* [Default Settings](#default-settings)
 		* [Restrictions](#restrictions)
 		* [`import` element](#import-element)
 		* [`config` element](#config-element)
 			* [ `config` child elements](#config-child-elements)
-				* [verbose](#verbose)
-				* [port](#port)
-				* [name](#name)
-				* [nicklength](#nicklength)
-				* [network](#network)
-				* [max_targets](#max_targets)
-				* [max_channels](#max_channels)
-				* [info](#info)
-				* [banner](#banner)
-				* [warn](#warn)
-				* [admin](#admin)
-				* [description](#description)
 		* [`auth` element](#auth-element)
 			* [`auth` child elements](#auth-child-elements)
-				* [mask](#mask)
-				* [password](#password-auth)
-				* [spoof](#spoof)
-				* [no_tilde](#no_tilde)
 		* [`operator` element](#operator-element)
 			* [`operator` child elements](#auth-child-elements)
-				* [username](#username)
-				* [password](#password-operator)
-				* [ipmask](#ipmask)
-	* [Example configuration file](#example-configuration-file)
+	* [Example Configuration File](#example-configuration-file)
 * [License](#license)
 
 # Usage
@@ -92,16 +74,14 @@ If ran with `default` as an argument, **Raven IRCd** will start *without* any co
 
 **Raven IRCd** configuration files are written in [XML](https://en.wikipedia.org/wiki/XML), and have several useful features.  All server configuration is done through one or more XML configuration files; the default configuration file is named `default.xml`, and is located in the **settings** directory.
 
-All configuration elements can be set in any configuration file loaded by **Raven IRCd**, and do not have to be in `default.xml`. **Raven IRCd** can also start without a configuration file; if the configuration file does not exist or can't be found, **Raven IRCd** is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect.
+All configuration elements can be set in any configuration file loaded by **Raven IRCd** v, and do not have to be in `default.xml`; passing a filename of a configuration file as the first argument to `raven-ircd.pl` will cause the program to load the passed filename instead of `default.xml`. **Raven IRCd** can also start without a configuration file; if the configuration file does not exist or can't be found, **Raven IRCd** is loaded with default settings, opening a listening port on 6667 and allowing clients from any host to connect. To "force" **Raven IRCd** to start up without any configuration files, pass `default` as the first argument to `raven-ircd.pl`; the server won't load any configuration files, and will use the default server settings:
 
-In the default configuration, **Raven IRCd** ships with three configuration files:  `default.xml`, `auth.xml`, and `operators.xml`.  `default.xml` contains basic server settings, and `import`s (see [`import` element](#import-element)) `auth.xml` and `operators.xml`. `auth.xml` contains any auth entries (see [`auth` element](#auth-element)); by default, it contains only one, allowing anyone to connect.  `operators.xml` contains any operator account entries (see [`operator` element](#operator-element)); by default, it doesn't contain *any* functional operator accounts, only a commented-out one that you can uncomment and edit.
-
-## Default settings
+## Default Settings
 
 * `auth`->`mask`
 	* \*@\*
 * `operator`
-	* No operators
+	* No operators are defined
 * `config`->`port`
 	* 6667
 * `config`->`name`
@@ -129,11 +109,15 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 * `config`->`description`
 	* Raven IRCd 0.025
 
-## Configuration file XML elements
+In the default configuration, **Raven IRCd** ships with three configuration files:  `default.xml`, `auth.xml`, and `operators.xml`.  `default.xml` contains basic server settings, and `import`s (see [`import` element](#import-element)) `auth.xml` and `operators.xml`. `auth.xml` contains any auth entries (see [`auth` element](#auth-element)); by default, it contains only one, allowing anyone to connect.  `operators.xml` contains any operator account entries (see [`operator` element](#operator-element)); by default, it doesn't contain *any* functional operator accounts, only a commented-out one that you can uncomment and edit.
+
+## Configuration File Format
+
+**Raven IRCd** configuration files are written in XML.  There are four root elements in a **Raven IRCd** configuration file: [`config`](#config-element), [`import`](#import-element), [`auth`](#auth-element), and [`operator`](#operator-element).  All root elements have mandatory and/or optional child elements (with the exception of `import`, which has no child elements): `config` has _no_ manditory child elements, `auth` elements have _one_ mandatory child element ([`mask`](#mask)), and `operator` has *two* mandatory child elements ([`username`](#username) and [`password`](#password-operator)).  See [Restrictions](#restrictions) for more information.
 
 ### Restrictions
 
-* Configuration files are only allowed to have **_one_ [`config`](#config-element) _element each_**, and each `config` element is only allowed to have **one** of the following child elements: [`verbose`](#verbose), [`banner`](#banner), [`warn`](#warn), [`name`](#name), [`nicklength`](#nicklength), [`network`](#network), [`max_targets`](#max_targets),[`max_channels`](#max_channels), [`info`](#info), [`description`](#description).  Each `config` element is allowed to have three (3) [`admin`](#admin) child elements). Each `config` element is allowed to have multiple [`port`](#port) child elements.  All `config` child elements are optional.
+* Configuration files are only allowed to have **_one_ [`config`](#config-element) _element in each file_**; each `config` element is only allowed to have **one** of the following child elements: [`verbose`](#verbose), [`banner`](#banner), [`warn`](#warn), [`name`](#name), [`nicklength`](#nicklength), [`network`](#network), [`max_targets`](#max_targets),[`max_channels`](#max_channels), [`info`](#info), [`description`](#description).  Each `config` element is allowed to have three (3) [`admin`](#admin) child elements). Each `config` element is allowed to have multiple [`port`](#port) child elements.  All `config` child elements are optional.
 
 * Configuration files are allowed to have **_multiple_ [`import`](#import-element) _elements_**. `import` elements have no child elements.
 
@@ -141,6 +125,7 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 
 * Configuration files are allowed to have **_multiple_ [`operator`](#operator-element) _elements_**; each `operator` element is only allowed to have **_one_** of the following child elements: [`username`](#username), [`password`](#password-operator), [`ipmask`](#ipmask). All `operator` elements **_must have_** `username` **_and_** `password` **_child elements_**; `ipmask` child element is optional.
 
+------------
 ### `import` element
 
 The `import` element is used to load configuration data from external files, much like C's `#include` preprocesser directive.  **Raven IRCd** will look for `import`'ed files first in the **home** directory, then in the **settings** directory.  The `import` element has no children elements.  Multiple `import` elements can be set, and they can be set in any configuration file loaded;  thus, `import`'ed files can contain `import` elements, which can *also* contain `import` elements, and so on.
@@ -192,6 +177,19 @@ When all the configuration files are loaded, our users lose the generous nick le
 The only exception to this rule is the [`port` child element](#port);  it doesn't overwrite `port` elements in any other configuration file.  New `port` elements just add new listening ports without removing previously set ports.
 
 #### `config` child elements
+
+* [verbose](#verbose)
+* [port](#port)
+* [name](#name)
+* [nicklength](#nicklength)
+* [network](#network)
+* [max_targets](#max_targets)
+* [max_channels](#max_channels)
+* [info](#info)
+* [banner](#banner)
+* [warn](#warn)
+* [admin](#admin)
+* [description](#description)
 
 ------------
 ##### `verbose`
@@ -271,6 +269,11 @@ If no `auth` element is set, **Raven IRCd** will assume that anyone is allowed t
 
 #### `auth` child elements
 
+* [mask](#mask)
+* [password](#password-auth)
+* [spoof](#spoof)
+* [no_tilde](#no_tilde)
+
 ------------
 ##### `mask`
 
@@ -306,6 +309,10 @@ In this example, only clients connecting from the host `google.com` would be all
 
 #### `operator` child elements
 
+* [username](#username)
+* [password](#password-operator)
+* [ipmask](#ipmask)
+
 ------------
 ##### `username`
 
@@ -322,7 +329,7 @@ Sets the password for the operator, required for login.  Required child element.
 Sets what IP addresses are allowed to use this operator account.  Not a required child element. Use \*\ for a multiple character wild card, or ? for a single character wild card.  For example, if you're on a LAN with all internal IP addresses starting with "192.168.1", to allow only people on your LAN to become operators, use an ipmask of "192.168.1.\*".
 
 ------------
-## Example configuration file
+## Example Configuration File
 
 Here's an example configuration file.  It'll set up listening ports on ports 6667-6669, allow anyone to connect (spoofing their host to appear as if they are connecting from `facebook.com`), and create an operator with the username `oracle` and the password `thematrix`.  The server's name with be "example.raven.setup" on the "OscarNet" network, and will allow clients to connect to 50 channels and a time, and let them use only 8 characters in their nick:
 
