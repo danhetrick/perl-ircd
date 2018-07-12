@@ -143,9 +143,13 @@ my $BANNER			= 1;
 # @AUTHS is an array of arrays, each mapped using AUTH LIST STRUCTURE
 # set in the CONSTANTS. @OPERATORS is an array of arrays, each mapped using
 # OPERATOR LIST STRUCTURE set in the CONSTANTS.
+# @IMPORTED_FILES contains a list of all the files imported by configuration
+# files, so we can display them to the user with verbose() after we've
+# loaded them.
 my @LISTENER_PORTS	= ();	# List of server listening ports to use
 my @AUTHS			= ();	# List of auth entries
 my @OPERATORS		= ();	# List of operator entries
+my @IMPORTED_FILES = ();	# List of imported files
 
 # ===============
 # | GLOBALS END |
@@ -177,6 +181,12 @@ if($found_configuration_file){
 	# Configuration file *not* found; defaults will be used.
 	# Warn the user that no file was found.
 	display_warning("No configuration file found; starting server with default settings");
+}
+# Display any files imported by any configuration files
+if(scalar @IMPORTED_FILES>=1){
+	foreach my $i (@IMPORTED_FILES){
+		verbose("Loaded configuration file '$i'");
+	}
 }
 
 # Set up our server configuration.
@@ -475,6 +485,8 @@ sub load_xml_configuration_file {
 			# Recursively call load_xml_configuration_file() to load in the settings
 			# from the imported file
 			load_xml_configuration_file($i);
+			# Add imported file to the imported file list
+			push(@IMPORTED_FILES,$i);
 		}
 	} elsif($tree->{import} ne undef){
 		# Single import element
@@ -486,6 +498,8 @@ sub load_xml_configuration_file {
 		# Recursively call load_xml_configuration_file() to load in the settings
 		# from the imported file
 		load_xml_configuration_file($f);
+		# Add imported file to the imported file list
+		push(@IMPORTED_FILES,$f);
 	}
 
 	# --------------------
