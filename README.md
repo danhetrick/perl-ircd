@@ -430,15 +430,41 @@ If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configurati
 **Raven IRCd** is up and running!  Connect to it on port 6667, 6668, or 6669 and chat away!
 
 ------------
-
 # OperServ
 
 **Raven IRCd** has an optional OperServ bot built into it.  To turn it on, create a `operserv` element in you config file, and set `operserv`'s child element `use` to 1. You can change the nick the OperServ uses by setting `operserv`'s child element `nick` to the desired nick.
 
 ## OperServ Usage
 
-If activated, the Operserv will join the server as soon as the server starts, and will be ready to take commands.  All commands require that the issuing user is an operator (see (`operator`)[#operator-element] for information on how to create operator accounts).
+If activated, the Operserv will join the server as soon as the server starts, and will be ready to take commands.  All commands require that the issuing user is an operator (see [`operator`](#operator-element) for information on how to create operator accounts).  Once active, operators can issue commands to OperServ by sending a private message containing the command and any arguments.
 
+### OperServ Commands
+
+#### `clear <CHANNEL>`
+
+OperServ will remove all channel modes on the indicated channel, including all users' `+ov` flags. The timestamp of the channel will be reset and the OperServ will join that channel with `+o`.
+
+------------
+#### `join <CHANNEL>`
+
+OperServ will join the channel specified with `+o`.
+
+------------
+#### `part <CHANNEL>`
+
+OperServ will part the channel specified.
+
+------------
+#### `mode <CHANNEL> <MODE>`
+
+OperServ will set the channel mode you tell it to. You can also remove the channel mode by prefixing the mode with a '-' (minus) sign.
+
+------------
+#### `op <CHANNEL> <USER>`
+
+The OperServ will give +o to any user on a channel you specify. OperServ does not need to be in that channel (as this is mostly a server hack).
+
+------------
 # License
 
 Raven IRCd - An open-source IRC server written in Perl
