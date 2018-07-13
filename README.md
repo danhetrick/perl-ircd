@@ -57,6 +57,8 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 			* [`auth` child elements](#auth-child-elements)
 		* [`operator` element](#operator-element)
 			* [`operator` child elements](#auth-child-elements)
+		* [`operserv` element](#operserv-element)
+			* [`operserv` child elements](#operserv-child-elements)
 	* [Example Configuration File](#example-configuration-file)
 * [License](#license)
 
@@ -82,6 +84,10 @@ All configuration elements can be set in *any* configuration file loaded by **Ra
 	* \*@\*
 * `operator`
 	* No operators are defined
+* `operserv`->`use`
+	* 0
+* `operserv`->`nick`
+	* OperServ
 * `config`->`port`
 	* 6667
 * `config`->`name`
@@ -115,7 +121,7 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 
 ## Configuration File Format
 
-**Raven IRCd** configuration files are written in an XML-like language. The main difference between the XML format and the format used for **Raven IRCd** configuration files is that, unlike XML, **Raven IRCd** configuration files can have multiple root elements.  There are four root elements in a **Raven IRCd** configuration file: [`config`](#config-element), [`import`](#import-element), [`auth`](#auth-element), and [`operator`](#operator-element).  All root elements have mandatory and/or optional child elements (with the exception of `import`, which has no child elements): `config` has _no_ manditory child elements, `auth` elements have _one_ mandatory child element ([`mask`](#mask)), and `operator` has *two* mandatory child elements ([`username`](#username) and [`password`](#password-operator)).  See [Restrictions](#configuration-file-restrictions) for more information.
+**Raven IRCd** configuration files are written in an XML-like language. The main difference between the XML format and the format used for **Raven IRCd** configuration files is that, unlike XML, **Raven IRCd** configuration files can have multiple root elements.  There are five root elements in a **Raven IRCd** configuration file: [`config`](#config-element), [`import`](#import-element), [`auth`](#auth-element), [`operator`](#operator-element), and [`operserv`](#operserv-element).  All root elements have mandatory and/or optional child elements (with the exception of `import`, which has no child elements): `config` has _no_ manditory child elements, `auth` elements have _one_ mandatory child element ([`mask`](#mask)), `operator` has *two* mandatory child elements ([`username`](#username) and [`password`](#password-operator)), and `operserv` has *one* mandatory child elements ([`use`](#use)).  See [Restrictions](#configuration-file-restrictions) for more information.
 
 The first line in a **Raven IRCd** configuration file should be this:
 
@@ -126,6 +132,8 @@ This is not enforced by **Raven IRCd** (that is, it will still read and parse co
 ### Configuration File Restrictions
 
 * Configuration files are only allowed to have **_one_ [`config`](#config-element) _element in each file_**; each `config` element is only allowed to have **one** of the following child elements: [`verbose`](#verbose), [`banner`](#banner), [`warn`](#warn), [`name`](#name), [`nicklength`](#nicklength), [`network`](#network), [`max_targets`](#max_targets),[`max_channels`](#max_channels), [`info`](#info), [`description`](#description), [`motd`](#motd).  Each `config` element is allowed to have three (3) [`admin`](#admin) child elements. Each `config` element is allowed to have multiple [`port`](#port) child elements.  All `config` child elements are optional.
+
+* Configuration files are only allowed to have **_one_ [`operserv`](#operserv-element) _element in each file_**; each `operserv` element is only allowed to have **one** of the following child elements: [`use`](#use) (which is mandatory), and [`nick`](#nick) (which is optional).
 
 * Configuration files are allowed to have **_multiple_ [`import`](#import-element) _elements_**. `import` elements have no child elements.
 
@@ -348,6 +356,34 @@ Sets the password for the operator, required for login.  Required child element.
 ##### `ipmask`
 
 Sets what IP addresses are allowed to use this operator account.  Not a required child element. Use **\*** for a multiple character wild card, or **?** for a single character wild card.  For example, if you're on a LAN with all internal IP addresses starting with "192.168.1", to allow only people on your LAN to become operators, use an ipmask of "192.168.1.\*".
+
+------------
+
+### `operserv` element
+
+The `operserv` element activates and configures an OperServ bot for your server.
+
+	<operserv>
+		<use>0</use>
+		<nick>changeme</nick>
+	</operserv>
+
+#### `operserv` child elements
+
+* [use](#use)
+* [nick](#nick)**\*
+
+Elements marked with an asterix (**\***) are optional.
+
+------------
+##### `use`
+
+Activates the OperServ bot if set to 1, leaves it turned off if set to 0.
+
+------------
+##### `nick`
+
+Sets the OperServ's IRC nick.
 
 ------------
 ## Example Configuration File

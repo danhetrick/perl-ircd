@@ -136,6 +136,8 @@ my $DEFAULT_ADMIN_LINE_2	= "The operator of this server didn't set up the admin 
 my $DEFAULT_ADMIN_LINE_3	= "Sorry!";
 my $DESCRIPTION				= "$APPLICATION_NAME $VERSION";
 my $MOTD_FILE				= "motd.txt";
+my $OPERSERV				= 0;
+my $OPERSERV_NAME 			= "OperServ";
 
 # ----------
 # | ARRAYS |
@@ -258,6 +260,18 @@ my %config = (
 
 # Spawn our RavenIRCd instance, and pass it our server configuration.
 my $pocosi = RavenIRCd->spawn( config => \%config );
+
+# OPERSERVE
+if($OPERSERV==1){
+	use POE::Component::Server::IRC::Plugin::OperServ;
+
+	 $pocosi->plugin_add(
+	     "$OPERSERV_NAME",
+	     POE::Component::Server::IRC::Plugin::OperServ->new(),
+	 );
+	 verbose("Activated OperServ ($OPERSERV_NAME)");
+}
+
 
 # Create our POE session, and hook in the _start() handler.
 # _start() will be executed when the POE kernel is started up.
@@ -794,6 +808,38 @@ sub load_xml_configuration_file {
 
 		# Add auth entry to the auth list
 		push(@AUTHS,\@auth);
+	}
+
+	# --------------------
+	# | OPERSERV ELEMENT |
+	# --------------------
+	# <operserv>
+	# 	<use>0</use>
+	# 	<nick>OperServ</nick>
+	# </operserv>
+	#
+	# Activates and configures an OperServ bot
+	if(ref($tree->{operserv}) eq 'ARRAY'){
+		# Multiple operserv elements
+		display_error_and_exit("Error in $filename: multiple operserv elements are not allowed");
+	} elsif($tree->{operserv} ne undef){
+		# Single operserv element
+
+		# operserv->active
+		if(ref($tree->{operserv}->{use}) eq 'ARRAY'){
+			display_error_and_exit("Error in $filename: operserv element can't have more than one use element");
+		}
+		if($tree->{operserv}->{use} ne undef){
+			$OPERSERV = $tree->{operserv}->{use};
+		}
+
+		# operserv->nick
+		if(ref($tree->{operserv}->{nick}) eq 'ARRAY'){
+			display_error_and_exit("Error in $filename: operserv element can't have more than one nick element");
+		}
+		if($tree->{operserv}->{nick} ne undef){
+			$OPERSERV_NAME = $tree->{operserv}->{nick};
+		}
 	}
 
 	# ------------------
