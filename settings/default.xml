@@ -56,7 +56,7 @@ default server settings, and can be edited.
 -->
 <operserv>
 	<use>1</use>
-	<nick>OperServ</nick>
+	<nick>Edgar</nick>
 </operserv>
 
 <!--

@@ -60,6 +60,14 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 		* [`operserv` element](#operserv-element)
 			* [`operserv` child elements](#operserv-child-elements)
 	* [Example Configuration File](#example-configuration-file)
+* [OperServ](#operserv)
+	* [OperServ Usage](#operserv-usage)
+	* [OperServ Commands](#operserv-commands)
+		* [`clear`](#clear-channel)
+		* [`join`](#join-channel)
+		* [`part`](#part-channel)
+		* [`mode`](#mode-channel-mode)
+		* [`op`](#mode-channel-user)
 * [License](#license)
 
 # Usage
@@ -439,6 +447,12 @@ If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configurati
 If activated, the Operserv will join the server as soon as the server starts, and will be ready to take commands.  All commands require that the issuing user is an operator (see [`operator`](#operator-element) for information on how to create operator accounts).  Once active, operators can issue commands to OperServ by sending a private message containing the command and any arguments.
 
 ### OperServ Commands
+
+* [`clear`](#clear-channel)
+* [`join`](#join-channel)
+* [`part`](#part-channel)
+* [`mode`](#mode-channel-mode)
+* [`op`](#mode-channel-user)
 
 #### `clear <CHANNEL>`
 
