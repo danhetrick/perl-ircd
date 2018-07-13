@@ -36,6 +36,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 	* XML
 		* TreePP.pm
 	* RavenIRCd.pm
+	* OperServ.pm
 * settings
 	* default.xml
 	* operators.xml
