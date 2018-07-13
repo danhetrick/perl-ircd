@@ -371,7 +371,7 @@ The `operserv` element activates and configures an OperServ bot for your server.
 #### `operserv` child elements
 
 * [use](#use)
-* [nick](#nick)**\*
+* [nick](#nick)**\***
 
 Elements marked with an asterix (**\***) are optional.
 
@@ -430,6 +430,15 @@ If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configurati
 **Raven IRCd** is up and running!  Connect to it on port 6667, 6668, or 6669 and chat away!
 
 ------------
+
+# OperServ
+
+**Raven IRCd** has an optional OperServ bot built into it.  To turn it on, create a `operserv` element in you config file, and set `operserv`'s child element `use` to 1. You can change the nick the OperServ uses by setting `operserv`'s child element `nick` to the desired nick.
+
+## OperServ Usage
+
+If activated, the Operserv will join the server as soon as the server starts, and will be ready to take commands.  All commands require that the issuing user is an operator (see (`operator`)[#operator-element] for information on how to create operator accounts).
+
 # License
 
 Raven IRCd - An open-source IRC server written in Perl
