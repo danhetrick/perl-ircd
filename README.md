@@ -451,6 +451,8 @@ If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configurati
 
 **Raven IRCd** has an optional OperServ bot built into it.  To turn it on, create a `operserv` element in you config file, and set `operserv`'s child element `use` to 1. You can change the nick the OperServ uses by setting `operserv`'s child element `nick` to the desired nick.
 
+**Raven IRCd** features a special option for OperServ: channel control mode. If this is turned on (set `operserv`'s child element `control` to 1), whenever a user joins a "new" channel (one that no one was in before the join), OperServ will join that channel *before* the user joins it, claiming ops status for itself.
+
 ## OperServ Usage
 
 If activated, the Operserv will join the server as soon as the server starts, and will be ready to take commands.  All commands require that the issuing user is an operator (see [`operator`](#operator-element) for information on how to create operator accounts).  Once active, operators can issue commands to OperServ by sending a private message containing the command and any arguments.
