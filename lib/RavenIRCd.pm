@@ -27,6 +27,36 @@ use strict;
 use POE::Component::Server::IRC::Plugin qw(:ALL);
 use base qw(POE::Component::Server::IRC);
 
+# =================
+# | GLOBALS BEGIN |
+# =================
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# | OPERSERV SETTINGS BEGIN |
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# -----------
+# | SCALARS |
+# -----------
+
+my $OPERSERV                    = 0;            # Is OperServ on (1)?
+my $OPERSERV_NAME               = "OperServ";   # OperServ's nick
+my $OPERSERV_CHANNEL_CONTROL    = 0;            # Is channel control mode on (1)?
+
+# ----------
+# | ARRAYS |
+# ----------
+
+my @CHANNELS                    = ();           # Channels OperServ is in
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~
+# | OPERSERV SETTINGS END |
+# ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# ===============
+# | GLOBALS END |
+# ===============
+
 # ==================
 # Overloaded Methods
 # ==================
@@ -115,6 +145,20 @@ sub IRCD_daemon_join {
     my $hostmask = ( split /!/, ${ $_[0] } )[1];
     my $channel  = ${ $_[1] };
 
+    # If OperServ is turned on...
+    if($OPERSERV==1){
+        # And OperServ isn't in the channel being joined...
+        if(in_channel($channel)==0){
+            # And OperServ channel control mode is on...
+            if($OPERSERV_CHANNEL_CONTROL==1){
+                # Add the channel to the list of channels OperServ is in
+                add_channel($channel);
+                # "Super join" the channel, claiming ops
+                $ircd->yield('daemon_cmd_sjoin', $OPERSERV_NAME, $channel);
+            }
+        }
+    }
+
     return PCSI_EAT_NONE;
 }
 
@@ -134,7 +178,87 @@ sub IRCD_daemon_part {
     my $channel  = ${ $_[1] };
     my $partmsg  = ${ $_[2] };
 
+    # If OperServ is turned on...
+    if($OPERSERV==1){
+        # And OperServ is in this channel...
+        if(in_channel($channel)==1){
+            # And the user parting is OperServ...
+            if($nick eq $OPERSERV_NAME){
+                    # Remove the channel from OperServ's list
+                    remove_channel($channel);
+            }
+        }
+     }
+
+
     return PCSI_EAT_NONE;
 }
+
+# =============================
+# | SUPPORT SUBROUTINES BEGIN |
+# =============================
+
+# enable_operserv()
+# in_channel()
+# remove_channel()
+# add_channel()
+
+# enable_operserv()
+# Arguments: 2 (scalar [OperServ's nick], scalar [channel control on/off])
+# Returns: Nothing
+# Description: Enables OperServ and sets channel control mode
+sub enable_operserv {
+    my $n = shift;
+    my $c = shift;
+    $OPERSERV = 1;
+    $OPERSERV_NAME = $n;
+    $OPERSERV_CHANNEL_CONTROL = $c;
+}
+
+# in_channel()
+# Arguments: 1 (scalar [channel])
+# Returns: 1 or 0
+# Description: Returns 1 if OperServ is in the channel, 0 if not.
+sub in_channel {
+    my $chan = shift;
+    foreach my $c (@CHANNELS){
+        if($c eq $chan){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+# remove_channel()
+# Arguments: 1 (scalar [channel])
+# Returns: Nothing
+# Description: Removes a channel from OperServ's list
+sub remove_channel {
+    my $chan = shift;
+    my @new = ();
+    foreach my $c (@CHANNELS){
+        if($c eq $chan) { next; }
+        push(@new,$c);
+    }
+    @CHANNELS = @new;
+}
+
+# add_channel()
+# Arguments: 1 (scalar [channel])
+# Returns: Nothing
+# Description: Adds a channel to OperServ's list
+sub add_channel {
+    my $chan = shift;
+    foreach my $c (@CHANNELS){
+        if($c eq $chan){
+            return;
+        }
+    }
+    push(@CHANNELS,$chan);
+}
+
+# ===========================
+# | SUPPORT SUBROUTINES END |
+# ===========================
 
 1;

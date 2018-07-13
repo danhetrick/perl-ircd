@@ -120,24 +120,25 @@ my $APPLICATION_URL			= "https://github.com/danhetrick/raven-ircd";
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # These are the settings the server will use if no other
 # setting is supplied by a configuration file.
-my $SERVER_NAME				= "raven.irc.server";
-my $NICKNAME_LENGTH			= 15;
-my $SERVER_NETWORK			= "RavenNet";
-my $MAX_TARGETS				= 4;
-my $MAX_CHANNELS			= 15;
-my $SERVER_INFO				= $APPLICATION_DESCRIPTION;
-my $DEFAULT_PORT			= 6667;
-my $DEFAULT_AUTH			= '*@*';
-my $VERBOSE					= 1;
-my $BANNER					= 1;
-my $WARNING					= 1;
-my $DEFAULT_ADMIN_LINE_1	= "$APPLICATION_NAME $VERSION";
-my $DEFAULT_ADMIN_LINE_2	= "The operator of this server didn't set up the admin option.";
-my $DEFAULT_ADMIN_LINE_3	= "Sorry!";
-my $DESCRIPTION				= "$APPLICATION_NAME $VERSION";
-my $MOTD_FILE				= "motd.txt";
-my $OPERSERV				= 0;
-my $OPERSERV_NAME 			= "OperServ";
+my $SERVER_NAME					= "raven.irc.server";
+my $NICKNAME_LENGTH				= 15;
+my $SERVER_NETWORK				= "RavenNet";
+my $MAX_TARGETS					= 4;
+my $MAX_CHANNELS				= 15;
+my $SERVER_INFO					= $APPLICATION_DESCRIPTION;
+my $DEFAULT_PORT				= 6667;
+my $DEFAULT_AUTH				= '*@*';
+my $VERBOSE						= 1;
+my $BANNER						= 1;
+my $WARNING						= 1;
+my $DEFAULT_ADMIN_LINE_1		= "$APPLICATION_NAME $VERSION";
+my $DEFAULT_ADMIN_LINE_2		= "The operator of this server didn't set up the admin option.";
+my $DEFAULT_ADMIN_LINE_3		= "Sorry!";
+my $DESCRIPTION					= "$APPLICATION_NAME $VERSION";
+my $MOTD_FILE					= "motd.txt";
+my $OPERSERV					= 0;
+my $OPERSERV_NAME 				= "OperServ";
+my $OPERSERV_CHANNEL_CONTROL	= 0;
 
 # ----------
 # | ARRAYS |
@@ -261,15 +262,31 @@ my %config = (
 # Spawn our RavenIRCd instance, and pass it our server configuration.
 my $pocosi = RavenIRCd->spawn( config => \%config );
 
-# OPERSERVE
+# If the OperServ is turned on, add it and configure it.
 if($OPERSERV==1){
+	# Load libraries
 	use POE::Component::Server::IRC::Plugin::OperServ;
+	use OperServ;
 
-	 $pocosi->plugin_add(
-	     "$OPERSERV_NAME",
-	     POE::Component::Server::IRC::Plugin::OperServ->new(),
-	 );
-	 verbose("Activated OperServ ($OPERSERV_NAME)");
+	# Enable OperServ and set whether its in channel control more
+	RavenIRCd::enable_operserv($OPERSERV_NAME,$OPERSERV_CHANNEL_CONTROL);
+
+	# Make sure OperSev knows its own name :-)
+	OperServ::set_opserv_name($OPERSERV_NAME);
+
+	# Add it!
+	$pocosi->plugin_add(
+		"OperServ",
+		OperServ->new(),
+	);
+
+	# Let the user know OperServ is turned on, and if it's in
+	# channel control mode or not.
+	if($OPERSERV_CHANNEL_CONTROL==1){
+		verbose("Activated OperServ ($OPERSERV_NAME) in channel control mode");
+	} else {
+		verbose("Activated OperServ ($OPERSERV_NAME)");
+	}
 }
 
 
@@ -816,6 +833,7 @@ sub load_xml_configuration_file {
 	# <operserv>
 	# 	<use>0</use>
 	# 	<nick>OperServ</nick>
+	# 	<control>0</control>
 	# </operserv>
 	#
 	# Activates and configures an OperServ bot
@@ -839,6 +857,14 @@ sub load_xml_configuration_file {
 		}
 		if($tree->{operserv}->{nick} ne undef){
 			$OPERSERV_NAME = $tree->{operserv}->{nick};
+		}
+
+		# operserv->control
+		if(ref($tree->{operserv}->{control}) eq 'ARRAY'){
+			display_error_and_exit("Error in $filename: operserv element can't have more than one control element");
+		}
+		if($tree->{operserv}->{control} ne undef){
+			$OPERSERV_CHANNEL_CONTROL = $tree->{operserv}->{control};
 		}
 	}
 

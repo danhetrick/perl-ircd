@@ -48,6 +48,12 @@ default server settings, and can be edited.
 -->
 
 <!--
+	##############################
+	# BEGIN SERVER CONFIGURATION #
+	##############################
+-->
+
+<!--
 	============
 	| operserv |
 	============
@@ -55,17 +61,45 @@ default server settings, and can be edited.
 	Activates OperServ, and configurates it.
 -->
 <operserv>
-	<use>1</use>
-	<nick>Edgar</nick>
+
+	<!--
+		=======
+		| use |
+		=======
+		Multiple use elements are not allowed.
+		Turns OperServ on (1) or off (0).  Set to 0 by default.
+	-->
+	<use>0</use>
+
+	<!--
+		========
+		| nick |
+		========
+		Multiple nick elements are not allowed.
+		Sets OperServ's nick.
+	-->
+	<nick>OperServ</nick>
+
+	<!--
+		===========
+		| control |
+		===========
+		Multiple control elements are not allowed.
+		Turns channel control mode on (1) or off (0).  Set to 0 by default.
+	-->
+	<control>0</control>
+
 </operserv>
 
-<!--
-	##############################
-	# BEGIN SERVER CONFIGURATION #
-	##############################
--->
 <config>
 
+	<!--
+		========
+		| motd |
+		========
+		Multiple motd elements are not allowed.
+		Sets the filename the server will use for the Message of the Day.
+	-->
 	<motd>motd.txt</motd>
 
 	<!--

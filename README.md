@@ -94,6 +94,8 @@ All configuration elements can be set in *any* configuration file loaded by **Ra
 	* No operators are defined
 * `operserv`->`use`
 	* 0
+* `operserv`->`control`
+	* 0
 * `operserv`->`nick`
 	* OperServ
 * `config`->`port`
@@ -373,13 +375,15 @@ The `operserv` element activates and configures an OperServ bot for your server.
 
 	<operserv>
 		<use>0</use>
-		<nick>changeme</nick>
+		<nick>OperServ</nick>
+		<control>0</control>
 	</operserv>
 
 #### `operserv` child elements
 
 * [use](#use)
 * [nick](#nick)**\***
+* [control](#control)**\***
 
 Elements marked with an asterix (**\***) are optional.
 
@@ -392,6 +396,11 @@ Activates the OperServ bot if set to 1, leaves it turned off if set to 0.
 ##### `nick`
 
 Sets the OperServ's IRC nick.
+
+------------
+##### `control`
+
+Set to 1 to turn on channel control mode, and 0 to turn it off. In channel control mode, OperServ will join any channel a user joins, claiming ops for itself (denying the joining user ops).
 
 ------------
 ## Example Configuration File

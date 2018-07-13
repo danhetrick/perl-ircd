@@ -34,8 +34,3 @@
 </operator>
 -->
 
-<operator>
-	<username>bob</username>
-	<password>bob</password>
-	<ipmask>*</ipmask>
-</operator>
