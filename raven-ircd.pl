@@ -39,6 +39,9 @@ use FindBin qw($RealBin);
 # File::Spec -- Portably perform operations on file names
 use File::Spec;
 
+# Scalar::Util -- A selection of general-utility scalar subroutines
+use Scalar::Util qw(looks_like_number);
+
 # lib -- Manipulate @INC at compile time
 # Looks for additional modules in /lib, in the same directory
 # as the script. Done in a platform agnostic fashion, so environments
@@ -771,6 +774,10 @@ sub load_xml_configuration_file {
 				display_error_and_exit("Error in $filename: auth element can't have more than one no_tilde element");
 			}
 			if($a->{no_tilde} ne undef){
+				# Sanity check for no_tilde; it should either be 1 or 0, and nothing else
+				if(($a->{no_tilde} eq '0')||($a->{no_tilde} eq '1')){}else{
+					display_error_and_exit("Error in $filename: '$a->{no_tilde}' is not a valid setting for auth->no_tilde (must be 0 or 1)");
+				}
 				push(@auth,$a->{no_tilde});
 			} else {
 				push(@auth,undef);
@@ -818,6 +825,10 @@ sub load_xml_configuration_file {
 			display_error_and_exit("Error in $filename: auth element can't have more than one no_tilde element");
 		}
 		if($tree->{auth}->{no_tilde} ne undef){
+			# Sanity check for auth->no_tilde; it should either be 1 or 0, and nothing else
+			if(($tree->{auth}->{no_tilde} eq '0')||($tree->{auth}->{no_tilde} eq '1')){}else{
+				display_error_and_exit("Error in $filename: '$tree->{auth}->{no_tilde}' is not a valid setting for auth->no_tilde (must be 0 or 1)");
+			}
 			push(@auth,$tree->{auth}->{no_tilde});
 		} else {
 			push(@auth,undef);
@@ -848,6 +859,10 @@ sub load_xml_configuration_file {
 			display_error_and_exit("Error in $filename: operserv element can't have more than one use element");
 		}
 		if($tree->{operserv}->{use} ne undef){
+			# Sanity check for operserv->use; it should either be 1 or 0, and nothing else
+			if(($tree->{operserv}->{use} eq '0')||($tree->{operserv}->{use} eq '1')){}else{
+				display_error_and_exit("Error in $filename: '$tree->{operserv}->{use}' is not a valid setting for operserv->use (must be 0 or 1)");
+			}
 			$OPERSERV = $tree->{operserv}->{use};
 		}
 
@@ -864,6 +879,10 @@ sub load_xml_configuration_file {
 			display_error_and_exit("Error in $filename: operserv element can't have more than one control element");
 		}
 		if($tree->{operserv}->{control} ne undef){
+			# Sanity check for operserv->control; it should either be 1 or 0, and nothing else
+			if(($tree->{operserv}->{control} eq '0')||($tree->{operserv}->{control} eq '1')){}else{
+				display_error_and_exit("Error in $filename: '$tree->{operserv}->{control}' is not a valid setting for operserv->control (must be 0 or 1)");
+			}
 			$OPERSERV_CHANNEL_CONTROL = $tree->{operserv}->{control};
 		}
 	}
@@ -891,15 +910,27 @@ sub load_xml_configuration_file {
 	if(ref($tree->{config}->{verbose}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one verbose element");
 	} elsif($tree->{config}->{verbose} ne undef){
+		# Sanity check for config->verbose; it should either be 1 or 0, and nothing else
+		if(($tree->{config}->{verbose} eq '0')||($tree->{config}->{verbose} eq '1')){}else{
+			display_error_and_exit("Error in $filename: '$tree->{config}->{verbose}' is not a valid setting for config->verbose (must be 0 or 1)");
+		}
 		$VERBOSE = $tree->{config}->{verbose};
 	}
 
 	# config->port element
 	if(ref($tree->{config}->{port}) eq 'ARRAY'){
 		foreach my $p (@{$tree->{config}->{port}}) {
+			# Sanity check for config->port; must be numeric
+			if (looks_like_number($p)) {}else{
+				display_error_and_exit("Error in $filename: '$p' is not a valid setting for config->port (must be numeric)");
+			}
 			push(@LISTENER_PORTS,$p);
 		}
 	} elsif($tree->{config}->{port} ne undef){
+		# Sanity check for config->port; must be numeric
+		if (looks_like_number($tree->{config}->{port})) {}else{
+			display_error_and_exit("Error in $filename: '$tree->{config}->{port}' is not a valid setting for config->port (must be numeric)");
+		}
 		push(@LISTENER_PORTS,$tree->{config}->{port});
 	}
 
@@ -914,6 +945,10 @@ sub load_xml_configuration_file {
 	if(ref($tree->{config}->{nicklength}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one nicklength element");
 	} elsif($tree->{config}->{nicklength} ne undef){
+		# Sanity check for config->nicklength; must be numeric
+		if (looks_like_number($tree->{config}->{nicklength})) {}else{
+			display_error_and_exit("Error in $filename: '$tree->{config}->{nicklength}' is not a valid setting for config->nicklength (must be numeric)");
+		}
 		$NICKNAME_LENGTH = $tree->{config}->{nicklength};
 	}
 
@@ -928,6 +963,10 @@ sub load_xml_configuration_file {
 	if(ref($tree->{config}->{max_targets}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one max_targets element");
 	} elsif($tree->{config}->{max_targets} ne undef){
+		# Sanity check for config->max_targets; must be numeric
+		if (looks_like_number($tree->{config}->{max_targets})) {}else{
+			display_error_and_exit("Error in $filename: '$tree->{config}->{max_targets}' is not a valid setting for config->max_targets (must be numeric)");
+		}
 		$MAX_TARGETS = $tree->{config}->{max_targets};
 	}
 
@@ -935,6 +974,10 @@ sub load_xml_configuration_file {
 	if(ref($tree->{config}->{max_channels}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one max_channels element");
 	} elsif($tree->{config}->{max_channels} ne undef){
+		# Sanity check for config->max_channels; must be numeric
+		if (looks_like_number($tree->{config}->{max_channels})) {}else{
+			display_error_and_exit("Error in $filename: '$tree->{config}->{max_channels}' is not a valid setting for config->max_channels (must be numeric)");
+		}
 		$MAX_CHANNELS = $tree->{config}->{max_channels};
 	}
 
@@ -949,6 +992,10 @@ sub load_xml_configuration_file {
 	if(ref($tree->{config}->{banner}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one banner element");
 	} elsif($tree->{config}->{banner} ne undef){
+		# Sanity check for config->banner; it should either be 1 or 0, and nothing else
+		if(($tree->{config}->{banner} eq '0')||($tree->{config}->{banner} eq '1')){}else{
+			display_error_and_exit("Error in $filename: '$tree->{config}->{banner}' is not a valid setting for config->banner (must be 0 or 1)");
+		}
 		$BANNER = $tree->{config}->{banner};
 	}
 
@@ -956,6 +1003,10 @@ sub load_xml_configuration_file {
 	if(ref($tree->{config}->{warn}) eq 'ARRAY'){
 		display_error_and_exit("Error in $filename: config element can't have more than one warn element");
 	} elsif($tree->{config}->{warn} ne undef){
+		# Sanity check for config->warn; it should either be 1 or 0, and nothing else
+		if(($tree->{config}->{warn} eq '0')||($tree->{config}->{warn} eq '1')){}else{
+			display_error_and_exit("Error in $filename: '$tree->{config}->{warn}' is not a valid setting for config->warn (must be 0 or 1)");
+		}
 		$WARNING = $tree->{config}->{warn};
 	}
 
