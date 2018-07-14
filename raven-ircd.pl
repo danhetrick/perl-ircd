@@ -114,7 +114,7 @@ my $CONFIGURATION_DIRECTORY_NAME	= "settings";
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # These are used by generate_banner(), and nowhere else.
 my $APPLICATION_NAME		= "Raven IRCd";
-my $VERSION					= "0.025";
+my $VERSION					= "0.0252";
 my $APPLICATION_DESCRIPTION	= "Raven IRCd is an IRC server written in Perl and POE";
 my $APPLICATION_URL			= "https://github.com/danhetrick/raven-ircd";
 
@@ -458,7 +458,7 @@ sub timestamp {
 # |  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
 # | | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
 # |_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
-# ----------------------------------------Raven IRCd 0.025
+# ---------------------------------------Raven IRCd 0.0252
 # ------Raven IRCd is an IRC server written in Perl and POE
 # ----------------https://github.com/danhetrick/raven-ircd
 sub generate_banner {

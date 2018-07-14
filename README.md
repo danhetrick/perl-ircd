@@ -8,7 +8,7 @@
 
 The source code for `raven-ircd.pl` is *heavily* commented. I try to explain everything the program is doing in detail, so if you want to use it as a base for your own IRCd, the **Raven IRCd** source is a good place to start.  The most complicated part of the source is the code for loading and applying configuration file settings, and thus has the most comments; it's written in pure Perl, and doesn't require POE or anything outside of the standard library (besides XML::TreePP, included with the **Raven IRCd** distribution).  If you do use **Raven IRCd** as the base for your own IRC server, remember the [license](#license), and make sure to share your additions/changes.
 
-The latest version of **Raven IRCd** is 0.025.
+The latest version of **Raven IRCd** is 0.0252.
 
 # A new IRCd? Aren't there already [a](http://www.ircd-hybrid.org/) [bunch](https://www.unrealircd.org/) [of](http://www.inspircd.org/) [those](https://www.ratbox.org/) [available](http://pure-ircd.sourceforge.net/)? [You're reinventing the wheel!](https://en.wikipedia.org/wiki/Reinventing_the_wheel)
 
@@ -40,7 +40,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 * settings
 	* default.xml
 	* operators.xml
-	* auth.xml
+	* authorized.xml
 	
 ------------
 # Table of Contents
@@ -120,25 +120,19 @@ All configuration elements can be set in *any* configuration file loaded by **Ra
 * `config`->`warn`
 	* 1
 * `config`->`admin`
-	* Raven IRCd 0.025
+	* Raven IRCd 0.0252
 	* The operator of this server didn't set up the admin option.
 	* Sorry!
 * `config`->`description`
-	* Raven IRCd 0.025
+	* Raven IRCd 0.0252
 * `config`->`motd`
 	* motd.txt
 
-In the default configuration, **Raven IRCd** ships with three configuration files:  `default.xml`, `auth.xml`, and `operators.xml`.  `default.xml` contains basic server settings, and `import`s (see [`import` element](#import-element)) `auth.xml` and `operators.xml`. `auth.xml` contains any auth entries (see [`auth` element](#auth-element)); by default, it contains only one, allowing anyone to connect.  `operators.xml` contains any operator account entries (see [`operator` element](#operator-element)); by default, it doesn't contain *any* functional operator accounts, only a commented-out one that you can uncomment and edit.
+In the default configuration, **Raven IRCd** ships with three configuration files:  `default.xml`, `authorized.xml`, and `operators.xml`.  `default.xml` contains basic server settings, and `import`s (see [`import` element](#import-element)) `authorized.xml` and `operators.xml`. `authorized.xml` contains any auth entries (see [`auth` element](#auth-element)); by default, it contains only one, allowing anyone to connect.  `operators.xml` contains any operator account entries (see [`operator` element](#operator-element)); by default, it doesn't contain *any* functional operator accounts, only a commented-out one that you can uncomment and edit.
 
 ## Configuration File Format
 
 **Raven IRCd** configuration files are written in an XML-like language. The main difference between the XML format and the format used for **Raven IRCd** configuration files is that, unlike XML, **Raven IRCd** configuration files can have multiple root elements.  There are five root elements in a **Raven IRCd** configuration file: [`config`](#config-element), [`import`](#import-element), [`auth`](#auth-element), [`operator`](#operator-element), and [`operserv`](#operserv-element).  All root elements have mandatory and/or optional child elements (with the exception of `import`, which has no child elements): `config` has _no_ manditory child elements, `auth` elements have _one_ mandatory child element ([`mask`](#mask)), `operator` has *two* mandatory child elements ([`username`](#username) and [`password`](#password-operator)), and `operserv` has *one* mandatory child elements ([`use`](#use)).  See [Restrictions](#configuration-file-restrictions) for more information.
-
-The first line in a **Raven IRCd** configuration file should be this:
-
-	<?xml version="1.0" encoding="UTF-8"?>
-
-This is not enforced by **Raven IRCd** (that is, it will still read and parse configuration files that *do not* start with this encoding declaration). The reason why it is included in the default configuration files is because if you open a configuration file in most decent text editors, it will be identified by the editor as an XML document, and it will display the file's contents with syntax highlighting, making it easier to read and edit.  Personally, I used [Sublime Text](https://www.sublimetext.com/) to edit this file, edit the configuration files, and write `raven-ircd.pl` . The syntax highlighting for XML (and for Perl) in Sublime looks pretty good.
 
 ### Configuration File Restrictions
 
@@ -173,10 +167,10 @@ The `config` element is where all the main server settings are.  They are all op
 		<max_targets>4</max_targets>
 		<max_channels>15</max_channels>
 		<info>Raven IRCd</info>
-		<admin>Raven IRCd 0.025</admin>
+		<admin>Raven IRCd 0.0252</admin>
 		<admin>The operator of this server didn't set up the admin option.</admin>
 		<admin>Sorry!</admin>
-		<description>Raven IRCd 0.025</description>
+		<description>Raven IRCd 0.0252</description>
 		<motd>motd.txt</motd>
 	</config>
 
@@ -225,12 +219,12 @@ Elements marked with an asterix (**\***) are optional.
 ------------
 ##### `verbose`
 
-Set this element to 1 if you want to turn on verbosity;  set it to 0 to turn it off.  If `verbose` is turned on, various data will be printed to the console during runtime.  Warnings will *always* be displayed if `verbose` is turned on.
+Set this element to 1 if you want to turn on verbosity;  set it to 0 to turn it off.  If `verbose` is turned on, various data will be printed to the console during runtime.  Warnings will *always* be displayed if `verbose` is turned on. If `verbose` is set to something other than 0 or 1, `raven-ircd.pl` will display an error and exit. 
 
 ------------
 ##### `port`
 
-Sets the [port](https://en.wikipedia.org/wiki/Port_(computer_networking)) that **Raven IRCd** will listen on.  Multiple `port` elements can exist; each one will spawn a listener on the given port.
+Sets the [port](https://en.wikipedia.org/wiki/Port_(computer_networking)) that **Raven IRCd** will listen on.  Multiple `port` elements can exist; each one will spawn a listener on the given port. If `port` is set to something non-numeric, `raven-ircd.pl` will display an error and exit. 
 
 ------------
 ##### `name`
@@ -240,7 +234,7 @@ Sets the server's name.
 ------------
 ##### `nicklength`
 
-Sets the maximum number of characters that can be used in a client's nick.
+Sets the maximum number of characters that can be used in a client's nick. If `nicklength` is set to something non-numeric, `raven-ircd.pl` will display an error and exit.  
 
 ------------
 ##### `network`
@@ -250,12 +244,12 @@ Sets the name of the network **Raven IRCd** will use.
 ------------
 ##### `max_targets`
 
-Sets the maximum number of clients a user can send a private message to in one operation.
+Sets the maximum number of clients a user can send a private message to in one operation. If `max_targets` is set to something non-numeric, `raven-ircd.pl` will display an error and exit. 
 
 ------------
 ##### `max_channels`
 
-Sets the maximum number of channels a client can join.
+Sets the maximum number of channels a client can join. If `max_channels` is set to something non-numeric, `raven-ircd.pl` will display an error and exit. 
 
 ------------
 ##### `info`
@@ -265,12 +259,12 @@ Sets the text displayed with the `info` IRC command.
 ------------
 ##### `banner`
 
-Turns banner display on start up on (1) or off (0).
+Turns banner display on start up on (1) or off (0). If `banner` is set to something other than 0 or 1, `raven-ircd.pl` will display an error and exit. 
 
 ------------
 ##### `warn`
 
-Turns warnings on (1) or off (0). If `warn` us turned on, warnings will *always* be displayed, even if `verbose` is turned off.
+Turns warnings on (1) or off (0). If `warn` us turned on, warnings will *always* be displayed, even if `verbose` is turned off. If `warn` is set to something other than 0 or 1, `raven-ircd.pl` will display an error and exit. 
 
 ------------
 ##### `admin`
@@ -330,7 +324,7 @@ All users connected with the given `mask` will have their host spoofed with the 
 ------------
 ##### `no_tilde`
 
-Removes the tilde (~) from reported hostmaks.  Set to 1 to remove the tilde, and set to 0 to leave the tilde in place.  Not a required child element.
+Removes the tilde (~) from reported hostmaks.  Set to 1 to remove the tilde, and set to 0 to leave the tilde in place.  If `no_tilde` is set to something other than 0 or 1, `raven-ircd.pl` will display an error and exit.   Not a required child element.
 
 ------------
 ### `operator` element
@@ -391,7 +385,7 @@ Elements marked with an asterix (**\***) are optional.
 ------------
 ##### `use`
 
-Activates the OperServ bot if set to 1, leaves it turned off if set to 0.
+Activates the OperServ bot if set to 1, leaves it turned off if set to 0.  If `use` is set to something other than 0 or 1, `raven-ircd.pl` will display an error and exit. 
 
 ------------
 ##### `nick`
@@ -401,7 +395,7 @@ Sets the OperServ's IRC nick.
 ------------
 ##### `control`
 
-Set to 1 to turn on channel control mode, and 0 to turn it off. In channel control mode, OperServ will join any channel a user joins, claiming ops for itself (denying the joining user ops).
+Set to 1 to turn on channel control mode, and 0 to turn it off. In channel control mode, OperServ will join any channel a user joins, claiming ops for itself (denying the joining user ops). If `control` is set to something other than 0 or 1, `raven-ircd.pl` will display an error and exit. 
 
 ------------
 ## Example Configuration File
@@ -439,7 +433,7 @@ If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configurati
 	|  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
 	| | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
 	|_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
-	----------------------------------------Raven IRCd 0.025
+	---------------------------------------Raven IRCd 0.0252
 	-----Raven IRCd is an IRC server written in Perl and POE
 	----------------https://github.com/danhetrick/raven-ircd
 
