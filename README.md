@@ -12,9 +12,9 @@ The latest version of **Raven IRCd** is 0.0252.
 
 # Features
 * _**Fast Setup**_ - **Raven IRCd** can be setup and ran in less than a minute!
-* _**Configurable**_ - Run **Raven IRCd** with the default settings, or configure to your heart's content!  Configuration files are written in easy-to-read XML.
+* _**Configurable**_ - Run **Raven IRCd** with the [default settings](#default-settings), or [configure](#configuration) to your heart's content!  Configuration files are written in [easy-to-read XML](#configuration-file-format).
 * _**Open-Source**_ - Licensed under [GPL v3](#license). Free to use for both commercial and non-commercial purposes. Base your own IRCd on **Raven IRCd**!
-* _**Built-in Administration**_ - An OperServ is built into the IRC server, and is easy to configure!
+* _**Built-in Administration**_ - An [OperServ](#operserv) is built into the IRC server, and is easy to configure!
 * _**Cross-Platform**_ - Run it under your favorite flavor of Windows, Linux, or BSD!
 
 # A new IRCd? Aren't there already [a](http://www.ircd-hybrid.org/) [bunch](https://www.unrealircd.org/) [of](http://www.inspircd.org/) [those](https://www.ratbox.org/) [available](http://pure-ircd.sourceforge.net/)? [You're reinventing the wheel!](https://en.wikipedia.org/wiki/Reinventing_the_wheel)
@@ -56,7 +56,6 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 * [Configuration](#configuration)
 	* [Default Settings](#default-settings)
 	* [Configuration File Format](#configuration-file-format)
-		* [Default Settings](#default-settings)
 		* [Configuration File Restrictions](#configuration-file-restrictions)
 		* [`import` element](#import-element)
 		* [`config` element](#config-element)
