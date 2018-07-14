@@ -110,8 +110,6 @@ If no filename is passed, **Raven IRCd** will load the default configuration fil
 
 If passed a filename as an argument, and **Raven IRCd** finds it, **Raven IRCd** will load that file as a configuration file (see [Configuration](#configuration)), and if it can't be found, will look for it first in the **home** directory, and then in the **settings** directory.  Any settings that the configuration file does *not* contain will use the default values (see [Default settings](#default-settings)).  If the file can't be found, the server will simply start with all default values; if `--warn` is turned on, the user will be notified of this.
 
-If ran with `default` as an argument, **Raven IRCd** will start *without* any configuration file; it will just use the default settings (see [Default settings](#default-settings)).
-
 # Configuration
 
 All server configuration is done through one or more [XML](https://en.wikipedia.org/wiki/XML)-like configuration files; the default configuration file is named `default.xml`, and is located in the **settings** directory.
