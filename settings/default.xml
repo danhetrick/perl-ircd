@@ -72,6 +72,15 @@ default server settings, and can be edited.
 	<use>0</use>
 
 	<!--
+		===========
+		| control |
+		===========
+		Multiple control elements are not allowed.
+		Turns channel control mode on (1) or off (0).  Set to 0 by default.
+	-->
+	<control>0</control>
+
+	<!--
 		========
 		| nick |
 		========
@@ -81,13 +90,13 @@ default server settings, and can be edited.
 	<nick>OperServ</nick>
 
 	<!--
-		===========
-		| control |
-		===========
-		Multiple control elements are not allowed.
-		Turns channel control mode on (1) or off (0).  Set to 0 by default.
+		============
+		| username |
+		============
+		Multiple username elements are not allowed.
+		Sets OperServ's username.
 	-->
-	<control>0</control>
+	<username>The OperServ bot</username>
 
 </operserv>
 

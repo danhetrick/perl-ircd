@@ -28,9 +28,14 @@ use POE::Component::Server::IRC::Plugin qw(:ALL);
 use base qw(POE::Component::Server::IRC::Plugin::OperServ);
 
 my $OPERSERV_NAME = "OperServ";
+my $OPERSERV_IRCNAME = 'The OperServ bot';
 
 sub set_opserv_name {
 	$OPERSERV_NAME = shift;
+}
+
+sub set_opserv_ircname {
+	$OPERSERV_IRCNAME = shift;
 }
 
 sub PCSI_register {
@@ -42,7 +47,7 @@ sub PCSI_register {
         {
             nick    => $OPERSERV_NAME,
             umode   => 'Doi',
-            ircname => 'The OperServ bot',
+            ircname => $OPERSERV_IRCNAME,
         },
     );
     return 1;

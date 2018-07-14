@@ -385,6 +385,7 @@ The `operserv` element activates and configures an OperServ bot for your server.
 * [use](#use)
 * [nick](#nick)**\***
 * [control](#control)**\***
+* [username](#username-operserv)
 
 Elements marked with an asterix (**\***) are optional.
 
@@ -402,6 +403,11 @@ Sets the OperServ's IRC nick.
 ##### `control`
 
 Set to 1 to turn on channel control mode, and 0 to turn it off. In channel control mode, OperServ will join any channel a user joins, claiming ops for itself (denying the joining user ops). If `control` is set to something other than 0 or 1, `raven-ircd.pl` will display an error and exit. 
+
+------------
+##### `username` (operserv)
+
+Sets the OperServ's username.
 
 ------------
 ## Example Configuration File

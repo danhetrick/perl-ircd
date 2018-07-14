@@ -142,6 +142,7 @@ my $MOTD_FILE					= "motd.txt";
 my $OPERSERV					= 0;
 my $OPERSERV_NAME 				= "OperServ";
 my $OPERSERV_CHANNEL_CONTROL	= 0;
+my $OPERSERV_IRCNAME			= 'The OperServ bot';
 
 # ----------
 # | ARRAYS |
@@ -276,6 +277,7 @@ if($OPERSERV==1){
 
 	# Make sure OperSev knows its own name :-)
 	OperServ::set_opserv_name($OPERSERV_NAME);
+	OperServ::set_opserv_ircname($OPERSERV_IRCNAME);
 
 	# Add it!
 	$pocosi->plugin_add(
@@ -872,6 +874,14 @@ sub load_xml_configuration_file {
 		}
 		if($tree->{operserv}->{nick} ne undef){
 			$OPERSERV_NAME = $tree->{operserv}->{nick};
+		}
+
+		# operserv->nick
+		if(ref($tree->{operserv}->{username}) eq 'ARRAY'){
+			display_error_and_exit("Error in $filename: operserv element can't have more than one username element");
+		}
+		if($tree->{operserv}->{username} ne undef){
+			$OPERSERV_IRCNAME = $tree->{operserv}->{username};
 		}
 
 		# operserv->control
