@@ -134,35 +134,6 @@ default server settings, and can be edited.
 	<admin>Sorry!</admin>
 
 	<!--
-		===========
-		| verbose |
-		===========
-		Multiple verbose elements are not allowed.
-		Turns verbosity on (1) or off (0).  Set to 1 by default.
-	-->
-	<verbose>1</verbose>
-
-	<!--
-		==========
-		| banner |
-		==========
-		Multiple banner elements are not allowed.
-		Turns banner display on (1) or off (0). Set to 1 by default.
-	-->
-	<banner>1</banner>
-
-	<!--
-		========
-		| warn |
-		========
-		Multiple warn elements are not allowed.
-		Turns warnings on (1) or off (0). Set to 1 by default.
-		If turned on, warnings are always displayed, even if
-		verbosity is turned off.
-	-->
-	<warn>1</warn>
-
-	<!--
 		========
 		| port |
 		========

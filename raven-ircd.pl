@@ -42,6 +42,9 @@ use File::Spec;
 # Scalar::Util -- A selection of general-utility scalar subroutines
 use Scalar::Util qw(looks_like_number);
 
+# Getopt::Long - Extended processing of command line options
+use Getopt::Long;
+
 # lib -- Manipulate @INC at compile time
 # Looks for additional modules in /lib, in the same directory
 # as the script. Done in a platform agnostic fashion, so environments
@@ -89,6 +92,7 @@ use constant AUTH_MASK			=> 0;
 use constant AUTH_PASSWORD		=> 1;
 use constant AUTH_SPOOF			=> 2;
 use constant AUTH_TILDE			=> 3;
+use constant AUTH_FILE			=> 4;
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # { OPERATOR LIST STRUCTURE }
@@ -96,6 +100,7 @@ use constant AUTH_TILDE			=> 3;
 use constant OPERATOR_USERNAME	=> 0;
 use constant OPERATOR_PASSWORD	=> 1;
 use constant OPERATOR_IPMASK	=> 2;
+use constant OPERATOR_FILE		=> 3;
 
 # -----------
 # | SCALARS |
@@ -117,6 +122,7 @@ my $APPLICATION_NAME		= "Raven IRCd";
 my $VERSION					= "0.0252";
 my $APPLICATION_DESCRIPTION	= "Raven IRCd is an IRC server written in Perl and POE";
 my $APPLICATION_URL			= "https://github.com/danhetrick/raven-ircd";
+my $PROGRAM_NAME			= 'raven-ircd.pl';
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # { SERVER DEFAULT SETTINGS }
@@ -131,9 +137,6 @@ my $MAX_CHANNELS				= 15;
 my $SERVER_INFO					= $APPLICATION_DESCRIPTION;
 my $DEFAULT_PORT				= 6667;
 my $DEFAULT_AUTH				= '*@*';
-my $VERBOSE						= 1;
-my $BANNER						= 1;
-my $WARNING						= 1;
 my $DEFAULT_ADMIN_LINE_1		= "$APPLICATION_NAME $VERSION";
 my $DEFAULT_ADMIN_LINE_2		= "The operator of this server didn't set up the admin option.";
 my $DEFAULT_ADMIN_LINE_3		= "Sorry!";
@@ -143,6 +146,9 @@ my $OPERSERV					= 0;
 my $OPERSERV_NAME 				= "OperServ";
 my $OPERSERV_CHANNEL_CONTROL	= 0;
 my $OPERSERV_IRCNAME			= 'The OperServ bot';
+my $VERBOSE						= 0;
+my $BANNER						= 1;
+my $WARNING						= 0;
 
 # ----------
 # | ARRAYS |
@@ -164,12 +170,13 @@ my $OPERSERV_IRCNAME			= 'The OperServ bot';
 # checked by check_admin_info(), which makes sure that the array only
 # contains 3 items and sets them to default values if they are missing.
 # @MOTD contains the message of the day.
-my @LISTENER_PORTS	= ();	# List of server listening ports to use
-my @AUTHS			= ();	# List of auth entries
-my @OPERATORS		= ();	# List of operator entries
-my @IMPORTED_FILES	= ();	# List of imported files
-my @ADMIN			= ();	# Text returned by the /admin command
-my @MOTD			= ();	# Message of the Day
+my @LISTENER_PORTS			= ();	# List of server listening ports to use
+my @AUTHS					= ();	# List of auth entries
+my @OPERATORS				= ();	# List of operator entries
+my @IMPORTED_FILES			= ();	# List of imported files
+my @ADMIN					= ();	# Text returned by the /admin command
+my @MOTD					= ();	# Message of the Day
+my @CONFIG_ELEMENT_FILES	= (); 	# A list of files with config elements
 
 # ===============
 # | GLOBALS END |
@@ -179,12 +186,23 @@ my @MOTD			= ();	# Message of the Day
 # | MAIN PROGRAM BEGIN |
 # ======================
 
+# Handle any commandline options
+GetOptions ('warn|w'		=> sub { $WARNING = 1; },
+			'verbose|v'		=> sub { $VERBOSE = 1; },
+			'nobanner|b'	=> sub { $BANNER = 0; },
+	        'quiet|q'		=> sub { $VERBOSE = 0; $BANNER = 0; $WARNING = 0; },
+	        'default|d'   	=> sub { $ARGV[0] = 'default' },
+			'usage|help|h'	=> sub { usage(); exit; }
+			 );
+
+# Now it's time to load configuration files!
+
 if((scalar @ARGV>=1)&&(lc($ARGV[0]) eq 'default')){
 	# Display banner unless configured otherwise
 	if($BANNER==1){ print generate_banner(); }
 	# User wants to start with all default settings, no configuration
 	# files, so we won't even bother trying to look for or load any.
-	display_warning("Starting server with default settings");
+	verbose("Starting server with default settings");
 } else {
 	# See if a config file is passed to the program in an argument.
 	if($#ARGV>=0){ $CONFIGURATION_FILE=$ARGV[0]; }
@@ -213,8 +231,13 @@ if((scalar @ARGV>=1)&&(lc($ARGV[0]) eq 'default')){
 	# Display any files imported by any configuration files
 	if(scalar @IMPORTED_FILES>=1){
 		foreach my $i (@IMPORTED_FILES){
-			verbose("Loaded configuration file '$i'");
+			verbose("Imported configuration file '$i'");
 		}
+	}
+
+	# Display the number of operator accounts created
+	if(scalar @OPERATORS>=1){} else {
+		display_warning('No operator accounts found! Server will start without operators');
 	}
 
 	# Do a sanity check for the config->admin element
@@ -236,7 +259,7 @@ if((scalar @ARGV>=1)&&(lc($ARGV[0]) eq 'default')){
 # and the settings directory.
 my $motd = find_configuration_file($MOTD_FILE);
 if($motd){
-	verbose("Reading in MOTD from '$motd'");
+	verbose("Added MOTD from '$motd'");
 	open(FILE,"<$motd") or display_error_and_exit("Error opening MOTD file '$motd'");
 	while ( my $line = <FILE> ) {
         chomp $line;
@@ -325,6 +348,8 @@ $poe_kernel->run();
 # | User Interaction |
 # --------------------
 
+#	usage()
+#	uniq()
 #	timestamp()
 #	verbose()
 #	generate_banner()
@@ -367,9 +392,10 @@ sub _start {
     # Add authorized connections
     if(scalar @AUTHS >=1){
     	# Add authorized connections from the list in @AUTHS
+    	my @aus = ();
 	    foreach my $a (@AUTHS){
 	    	my @entry = @{$a};
-	    	verbose("Adding auth entry for '$entry[AUTH_MASK]'");
+	    	push(@aus,$entry[AUTH_FILE]);
 	    	$heap->{ircd}->add_auth(
 		        mask		=> $entry[AUTH_MASK],
 		        password	=> $entry[AUTH_PASSWORD],
@@ -377,6 +403,12 @@ sub _start {
 		        no_tilde	=> $entry[AUTH_TILDE],
     		); 
     	}
+
+    	# Give user a list of filenames containing auth data
+    	# with the duplicates consolidated
+    	foreach my $f (uniq(@aus)) {
+			verbose("Adding authorized connection(s) from '$f'");
+		}
     } else {
     		# @AUTHS is empty, so let the user know and use the default auth entry.
     		display_warning("No authorized connections found! Using $DEFAULT_AUTH as the auth");
@@ -385,25 +417,14 @@ sub _start {
     		); 
     }
  
-    # Add listening port(s)
-    if(scalar @LISTENER_PORTS >=1){
-    	# Add ports from the list in @LISTENER_PORTS
-	    foreach my $p (@LISTENER_PORTS){
-	    	verbose("Adding a listener on port '$p'");
-	    	$heap->{ircd}->add_listener(port => $p);
-	    }
-	} else {
-		# @LISTENER_PORTS is empty, so let the user know and use the default port.
-		$heap->{ircd}->add_listener(port => $DEFAULT_PORT);
-		display_warning("No listening ports found! Using $DEFAULT_PORT as the listening port");
-	}
- 
     # Add IRC operators
     if(scalar @OPERATORS>=1){
     	# Add operators from the list in @OPERATORS
-    	verbose("Adding operator account(s)");
+    	# verbose("Adding operator account(s)");
+    	my @files = ();
 	    foreach my $o (@OPERATORS){
 			my @entry = @{$o};
+			push(@files,$entry[OPERATOR_FILE]);
 			$heap->{ircd}->add_operator(
 		        {
 		            username	=> $entry[OPERATOR_USERNAME],
@@ -412,15 +433,58 @@ sub _start {
 		        }
 		    );
 		}
+		# Give user a list of filenames containing auth data
+    	# with the duplicates consolidated
+		foreach my $f (uniq(@files)) {
+			verbose("Added operator account(s) from '$f'");
+		}
 	} else {
 		# @OPERATORS is empty, so let the user know and start with no operators.
 		display_warning('No operator accounts found! Server will start without operators');
+	}
+
+	# Add listening port(s)
+    if(scalar @LISTENER_PORTS >=1){
+    	# Add ports from the list in @LISTENER_PORTS
+	    foreach my $p (@LISTENER_PORTS){
+	    	verbose("Added a listener on port '$p'");
+	    	$heap->{ircd}->add_listener(port => $p);
+	    }
+	} else {
+		# @LISTENER_PORTS is empty, so let the user know and use the default port.
+		$heap->{ircd}->add_listener(port => $DEFAULT_PORT);
+		display_warning("No listening ports found! Using $DEFAULT_PORT as the listening port");
 	}
 }
 
 # --------------------
 # | User Interaction |
 # --------------------
+
+# uniq()
+# Arguments: 1 (array)
+# Returns:  Array
+# Description:  Removes all duplicates from an array, and returns the clean version.
+sub uniq {
+    my %seen;
+    grep !$seen{$_}++, @_;
+}
+
+# usage()
+# Arguments: None
+# Returns:  Nothing
+# Description:  Displays usage information
+sub usage {
+	print generate_banner();
+	print "perl $PROGRAM_NAME [OPTIONS] FILENAME\n\n";
+	print "Options:\n";
+	print "--(h)elp or usage	Displays usage information\n";
+	print "--(d)efault		Runs $APPLICATION_NAME with default settings\n";
+	print "--(w)arn		Turns warnings on\n";
+	print "--(v)erbose		Turns verbose on\n";
+	print "--(q)uiet		Turn on verbose mode\n";
+	print "--(n)obanner		Don't display $APPLICATION_NAME banner\n";
+}
 
 # timestamp()
 # Arguments: None
@@ -443,6 +507,20 @@ sub timestamp {
 	my $time = timestamp();
 	if($VERBOSE==1){
 		print "$time $txt\n";
+	}
+}
+
+# display_warning()
+# Arguments: 1 (scalar, warning text)
+# Returns: Nothing
+# Description: Displays a timestamped warning to the user; only displayed
+#              if verbosity is turned on. Warnings will *always* display
+#              if warnings are turned on, even if verbosity is turned off.
+sub display_warning {
+	my $msg = shift;
+	my $time = timestamp();
+	if($WARNING==1){
+		print "$time WARNING: $msg\n";
 	}
 }
 
@@ -497,23 +575,6 @@ sub display_error_and_exit {
 	my $msg = shift;
 	print "ERROR: $msg\n";
 	exit 1;
-}
-
-# display_warning()
-# Arguments: 1 (scalar, warning text)
-# Returns: Nothing
-# Description: Displays a timestamped warning to the user; only displayed
-#              if verbosity is turned on. Warnings will *always* display
-#              if warnings are turned on, even if verbosity is turned off.
-sub display_warning {
-	my $msg = shift;
-	my $time = timestamp();
-	if($VERBOSE==1){
-		print "$time WARNING: $msg\n";
-	}
-	if(($VERBOSE==0)&&($WARNING==1)){
-		print "$time WARNING: $msg\n";
-	}
 }
 
 # -------------------------------
@@ -684,6 +745,9 @@ sub load_xml_configuration_file {
 				push(@op,undef);
 			}
 
+			# Add filename to the operator entry
+			push(@op, $filename);
+
 			# Add operator entry to the operator list
 			push(@OPERATORS,\@op);
 		}
@@ -720,6 +784,9 @@ sub load_xml_configuration_file {
 		} else {
 			push(@op,undef);
 		}
+
+		# Add filename to the operator entry
+		push(@op, $filename);
 
 		# Add operator entry to the operator list
 		push(@OPERATORS,\@op);
@@ -785,6 +852,9 @@ sub load_xml_configuration_file {
 				push(@auth,undef);
 			}
 
+			# Add filename to the auth entry
+			push(@auth, $filename);
+
 			# Add auth entry to the auth list
 			push(@AUTHS,\@auth);
 		}
@@ -835,6 +905,9 @@ sub load_xml_configuration_file {
 		} else {
 			push(@auth,undef);
 		}
+
+		# Add filename to the auth entry
+			-push(@auth, $filename);
 
 		# Add auth entry to the auth list
 		push(@AUTHS,\@auth);
@@ -917,15 +990,15 @@ sub load_xml_configuration_file {
 	# default settings will be used for all missing elements.
 
 	# config->verbose element
-	if(ref($tree->{config}->{verbose}) eq 'ARRAY'){
-		display_error_and_exit("Error in $filename: config element can't have more than one verbose element");
-	} elsif($tree->{config}->{verbose} ne undef){
-		# Sanity check for config->verbose; it should either be 1 or 0, and nothing else
-		if(($tree->{config}->{verbose} eq '0')||($tree->{config}->{verbose} eq '1')){}else{
-			display_error_and_exit("Error in $filename: '$tree->{config}->{verbose}' is not a valid setting for config->verbose (must be 0 or 1)");
-		}
-		$VERBOSE = $tree->{config}->{verbose};
-	}
+	# if(ref($tree->{config}->{verbose}) eq 'ARRAY'){
+	# 	display_error_and_exit("Error in $filename: config element can't have more than one verbose element");
+	# } elsif($tree->{config}->{verbose} ne undef){
+	# 	# Sanity check for config->verbose; it should either be 1 or 0, and nothing else
+	# 	if(($tree->{config}->{verbose} eq '0')||($tree->{config}->{verbose} eq '1')){}else{
+	# 		display_error_and_exit("Error in $filename: '$tree->{config}->{verbose}' is not a valid setting for config->verbose (must be 0 or 1)");
+	# 	}
+	# 	$VERBOSE = $tree->{config}->{verbose};
+	# }
 
 	# config->port element
 	if(ref($tree->{config}->{port}) eq 'ARRAY'){
@@ -998,28 +1071,6 @@ sub load_xml_configuration_file {
 		$SERVER_INFO = $tree->{config}->{info};
 	}
 
-	# config->banner element
-	if(ref($tree->{config}->{banner}) eq 'ARRAY'){
-		display_error_and_exit("Error in $filename: config element can't have more than one banner element");
-	} elsif($tree->{config}->{banner} ne undef){
-		# Sanity check for config->banner; it should either be 1 or 0, and nothing else
-		if(($tree->{config}->{banner} eq '0')||($tree->{config}->{banner} eq '1')){}else{
-			display_error_and_exit("Error in $filename: '$tree->{config}->{banner}' is not a valid setting for config->banner (must be 0 or 1)");
-		}
-		$BANNER = $tree->{config}->{banner};
-	}
-
-	# config->warn element
-	if(ref($tree->{config}->{warn}) eq 'ARRAY'){
-		display_error_and_exit("Error in $filename: config element can't have more than one warn element");
-	} elsif($tree->{config}->{warn} ne undef){
-		# Sanity check for config->warn; it should either be 1 or 0, and nothing else
-		if(($tree->{config}->{warn} eq '0')||($tree->{config}->{warn} eq '1')){}else{
-			display_error_and_exit("Error in $filename: '$tree->{config}->{warn}' is not a valid setting for config->warn (must be 0 or 1)");
-		}
-		$WARNING = $tree->{config}->{warn};
-	}
-
 	# config->admin element
 	if(ref($tree->{config}->{admin}) eq 'ARRAY'){
 		my @a = @{$tree->{config}->{admin}};
@@ -1043,6 +1094,7 @@ sub load_xml_configuration_file {
 	} elsif($tree->{config}->{motd} ne undef){
 		$MOTD_FILE = $tree->{config}->{motd};
 	}
+
 }
 
 # ===========================

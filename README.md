@@ -79,11 +79,36 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 # Usage
 
-	perl raven-ircd.pl <CONFIGURATION FILE> -or- default
+	perl raven-ircd.pl OPTIONS FILENAME
 
-If ran with no arguments, **Raven IRCd** will load a file named `default.xml` located either in the directory where `raven-ircd.pl` is located, or in the `/settings` directory, in the same directory as `raven-ircd.pl`.  The directory where `raven-ircd.pl` is located will be called the **home directory** in the rest of this document;  the `/settings` directory located in the home directory will be called the **settings directory**.
+	Options:\n
+	--(h)elp or usage	Displays usage information
+	--(d)efault		Runs $APPLICATION_NAME with default settings
+	--(w)arn		Turns warnings on
+	--(v)erbose		Turns verbose on
+	--(q)uiet		Turn on verbose mode
+	--(n)obanner		Don't display $APPLICATION_NAME banner
 
-If ran with a single filename as an argument, **Raven IRCd** will load that file as a configuration file (see [Configuration](#configuration)), and if it can't be found, will look for it first in the **home** directory, and then in the **settings** directory.  Any settings that the configuration file does *not* contain will use the default values (see [Default settings](#default-settings)).  If the file can't be found, the server will alert the user of this, but still start with all default values.
+## Options
+
+* `--(h)elp` or `usage`
+	* Displays usage information.
+* `--(v)erbose`
+	* Turns on verbose mode.  **Raven IRCd** will print text to the console to tell the user what it's doing.
+* `--(w)arn`
+	* Turns on warnings. **Raven IRCd** will print text to the console, warning users of non-fatal errors. If warnings are turned on, they will still print to the console if `--verbose` is not turned on.
+* `--(q)uiet`
+	* **Raven IRCd** will not print *anything* to the console except fatal errors.
+* `--nobanner`
+	* Turns off the **Raven IRCd** banner that `raven-ircd.pl` prints on startup.
+* `--(d)efault`
+	* Starts up **Raven IRCd** with all default settings.
+
+**Raven IRCd** will look for the filename passed as an argument in the same directory that `raven-ircd.pl` in the same directory `raven-ircd.pl` is located in (called the **home directory**) first, then in a directory named `settings/` in the same directory that `raven-ircd.pl` is located in (called the **settings directory**). Once **Raven IRCd** finds the file, it will be loaded into memory and parsed for [configuration data](#configuration).
+
+If no filename is passed, **Raven IRCd** will load the default configuration file, `default.xml`, as if the user ran `perl raven-ircd.pl --default`.
+
+If passed a filename as an argument, and **Raven IRCd** finds it, **Raven IRCd** will load that file as a configuration file (see [Configuration](#configuration)), and if it can't be found, will look for it first in the **home** directory, and then in the **settings** directory.  Any settings that the configuration file does *not* contain will use the default values (see [Default settings](#default-settings)).  If the file can't be found, the server will simply start with all default values; if `--warn` is turned on, the user will be notified of this.
 
 If ran with `default` as an argument, **Raven IRCd** will start *without* any configuration file; it will just use the default settings (see [Default settings](#default-settings)).
 
