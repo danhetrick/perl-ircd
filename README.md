@@ -343,7 +343,7 @@ The `operator` element is where clients can be granted IRC operator status.  The
 		<ipmask>192.168.0.*</ipmask>
 	</operator>
 
-In this example, only clients connecting from an IP address that starts with "192.168.0." would be allowed to log in to this operator account.  Multiple `operator` elements can be set.
+In this example, only clients connecting from an IP address that starts with "192.168.0." would be allowed to log in to this operator account.  `operator`  is optional (server will start with no operators set). Multiple `operator` elements can be set.
 
 #### `operator` child elements
 
@@ -372,7 +372,7 @@ Sets what IP addresses are allowed to use this operator account.  Not a required
 
 ### `operserv` element
 
-The `operserv` element activates and configures an OperServ bot for your server.
+The `operserv` element activates and configures an OperServ bot for your server.  `operserv` is optional.
 
 	<operserv>
 		<use>0</use>
@@ -385,7 +385,7 @@ The `operserv` element activates and configures an OperServ bot for your server.
 * [use](#use)
 * [nick](#nick)**\***
 * [control](#control)**\***
-* [username](#username-operserv)
+* [username](#username-operserv)**\***
 
 Elements marked with an asterix (**\***) are optional.
 
