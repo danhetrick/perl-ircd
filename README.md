@@ -25,9 +25,11 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 **Raven IRCd** was born when I had a need for a IRCd that was *really* easy to set up and configure quickly. At the time, I was writing an [IRC bot](https://en.wikipedia.org/wiki/IRC_bot) ([IRC-patch](https://github.com/danhetrick/ircpatch)) and I needed a server I could test the bot with.  I didn't really care how the server ran, as long as it ran like a basic IRC server.  I fought with the configuration files of [Unreal IRCd](https://www.unrealircd.org/), and after 45 minutes or so or reading and tweaking, had the server up and running. That was time that I could have spent writing and testing [my bot](https://github.com/danhetrick/ircpatch), and it was more than a little frustrating.  **Raven IRCd** was written to address this frustration; it's easy to configure and run, but if you want to delve into more custom configuration, you can do that, too.  Fast, easy, and configurable: this is an IRCd you can start using with less than 1 minute spent on configuration!
 
-* :thumbsdown: **Raven IRCd** __*is not*__ recommended for use with the big networks or with a large user base. If you want to run an IRCd that will host a lot of clients, or connect to an established IRC network, don't use **Raven IRCd**; use one of the more robust IRCds, and spend the time to configure it properly and securely. I recommend [Unreal IRCd](https://www.unrealircd.org/) or [Hybrid IRCd](http://www.ircd-hybrid.org/).
+# What is **Raven IRCd** recommended for?
 
 * :thumbsup: **Raven IRCd** __*is*__ recommended for testing IRC software, and small user bases.  Suggested uses would be for a LAN party, small development groups, your roommates, classmates, friends, or family.
+
+* :thumbsdown: **Raven IRCd** __*is not*__ recommended for use with the big networks or with a large user base. If you want to run an IRCd that will host a lot of clients, or connect to an established IRC network, don't use **Raven IRCd**; use one of the more robust IRCds, and spend the time to configure it properly and securely. I recommend [Unreal IRCd](https://www.unrealircd.org/) or [Hybrid IRCd](http://www.ircd-hybrid.org/).
 
 # Requirements
 
@@ -35,19 +37,19 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 # Files
 
-* raven-ircd.pl
-* raven-ircd.png
-* LICENCE
-* README.md
-* lib
-	* XML
+* :page_facing_up: raven-ircd.pl
+* :page_facing_up: raven-ircd.png
+* :page_facing_up: LICENCE
+* :page_facing_up: README.md
+* :file_folder: lib
+	* :file_folder: XML
 		* TreePP.pm
-	* RavenIRCd.pm
-	* OperServ.pm
-* settings
-	* default.xml
-	* operators.xml
-	* authorized.xml
+	* :page_facing_up: RavenIRCd.pm
+	* :page_facing_up: OperServ.pm
+* :file_folder: settings
+	* :page_facing_up: default.xml
+	* :page_facing_up: operators.xml
+	* :page_facing_up: authorized.xml
 	
 ------------
 # Table of Contents
