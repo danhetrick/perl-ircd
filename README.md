@@ -81,7 +81,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 	perl raven-ircd.pl OPTIONS FILENAME
 
-	Options:\n
+	Options:
 	--(h)elp or usage	Displays usage information
 	--(d)efault		Runs $APPLICATION_NAME with default settings
 	--(w)arn		Turns warnings on
