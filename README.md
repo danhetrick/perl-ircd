@@ -153,9 +153,9 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 * `config`->`info`
 	* Raven IRCd is an IRC server written in Perl and POE
 * `config`->`admin`
-	* \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
-	* Raven IRCd 0.0352
-	* \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+	* `-----------------`
+	* `Raven IRCd 0.0352`
+	* `-----------------`
 * `config`->`description`
 	* Raven IRCd 0.0352
 * `config`->`motd`
