@@ -109,6 +109,8 @@ use constant OPERATOR_FILE		=> 3;
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # { CONFIGURATION FILE SETTINGS }
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# The declaration ID for a Raven IRCd config file
+my $RAVEN_CONFIG_FILE_DECLARATION = "raven-xml";
 # Default config filename.
 my $CONFIGURATION_FILE				= "default.xml";
 # Where the server will look for config files besides the local directory.
@@ -119,7 +121,7 @@ my $CONFIGURATION_DIRECTORY_NAME	= "settings";
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # These are used by generate_banner(), and nowhere else.
 my $APPLICATION_NAME		= "Raven IRCd";
-my $VERSION					= "0.0271";
+my $VERSION					= "0.0352";
 my $APPLICATION_DESCRIPTION	= "Raven IRCd is an IRC server written in Perl and POE";
 my $APPLICATION_URL			= "https://github.com/danhetrick/raven-ircd";
 my $PROGRAM_NAME			= 'raven-ircd.pl';
@@ -137,18 +139,80 @@ my $MAX_CHANNELS				= 15;
 my $SERVER_INFO					= $APPLICATION_DESCRIPTION;
 my $DEFAULT_PORT				= 6667;
 my $DEFAULT_AUTH				= '*@*';
-my $DEFAULT_ADMIN_LINE_1		= "$APPLICATION_NAME $VERSION";
-my $DEFAULT_ADMIN_LINE_2		= "The operator of this server didn't set up the admin option.";
-my $DEFAULT_ADMIN_LINE_3		= "Sorry!";
+my $DEFAULT_ADMIN_LINE_1		= '-' x length("$APPLICATION_NAME $VERSION");
+my $DEFAULT_ADMIN_LINE_2		= "$APPLICATION_NAME $VERSION";
+my $DEFAULT_ADMIN_LINE_3		= '-' x length("$APPLICATION_NAME $VERSION");
 my $DESCRIPTION					= "$APPLICATION_NAME $VERSION";
 my $MOTD_FILE					= "motd.txt";
 my $OPERSERV					= 0;
 my $OPERSERV_NAME 				= "OperServ";
 my $OPERSERV_CHANNEL_CONTROL	= 0;
 my $OPERSERV_IRCNAME			= 'The OperServ bot';
-my $VERBOSE						= 0;
-my $BANNER						= 1;
-my $WARNING						= 0;
+my $DISPLAY_VERBOSE_TEXT		= 0;
+my $DISPLAY_BANNER				= 1;
+my $DISPLAY_WARNINGS			= 0;
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# { CONFIGURATION FILE ELEMENTS }
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# These are the names of all root and child elements
+# used in Raven IRCd configuration files.
+
+# ------------------
+# ( IMPORT ELEMENT )
+# ------------------
+# Root element
+my $IMPORT_ROOT_ELEMENT			= "import";
+
+# ------------------
+# ( CONFIG ELEMENT )
+# ------------------
+# Root element
+my $CONFIG_ROOT_ELEMENT			= "config";
+# Child elements
+my $CONFIG_CHILD_PORT			= "port";
+my $CONFIG_CHILD_NAME			= "name";
+my $CONFIG_CHILD_NICKLENGTH		= "nicklength";
+my $CONFIG_CHILD_NETWORK		= "network";
+my $CONFIG_CHILD_MAXTARGETS		= "max_targets";
+my $CONFIG_CHILD_MAXCHANNELS	= "max_channels";
+my $CONFIG_CHILD_INFO			= "info";
+my $CONFIG_CHILD_ADMIN			= "admin";
+my $CONFIG_CHILD_DESCRIPTION	= "description";
+my $CONFIG_CHILD_MOTD			= "motd";
+
+# ----------------
+# ( AUTH ELEMENT )
+# ----------------
+# Root element
+my $AUTH_ROOT_ELEMENT			= "auth";
+# Child elements
+my $AUTH_CHILD_MASK				= "mask";
+my $AUTH_CHILD_PASSWORD			= "password";
+my $AUTH_CHILD_SPOOF			= "spoof";
+my $AUTH_CHILD_NOTILDE			= "no_tilde";
+
+# --------------------
+# ( OPERATOR ELEMENT )
+# --------------------
+# Root element
+my $OPERATOR_ROOT_ELEMENT		= "operator";
+# Child elements
+my $OPERATOR_CHILD_USERNAME		= "username";
+my $OPERATOR_CHILD_PASSWORD		= "password";
+my $OPERATOR_CHILD_IPMASK		= "ipmask";
+
+# --------------------
+# ( OPERSERV ELEMENT )
+# --------------------
+# Root element
+my $OPERSERV_ROOT_ELEMENT		= "operserv";
+# Child elements
+my $OPERSERV_CHILD_USE			= "use";
+my $OPERSERV_CHILD_NICK			= "nick";
+my $OPERSERV_CHILD_CONTROL		= "control";
+my $OPERSERV_CHILD_USERNAME		= "username";
 
 # ----------
 # | ARRAYS |
@@ -157,7 +221,7 @@ my $WARNING						= 0;
 # These arrays are used in _start() to set the listening ports, 
 # the list of authorized connections, and the list of operator accounts
 # the server will use. They are populated by the data supplied in
-# configuration files, loaded into memory by load_xml_configuration_file().
+# configuration files, loaded into memory by load_settings_from_xml_config_file().
 # @LISTENER_PORTS is an array of scalars, each containing a port number.
 # @AUTHS is an array of arrays, each mapped using AUTH LIST STRUCTURE
 # set in the CONSTANTS. @OPERATORS is an array of arrays, each mapped using
@@ -166,8 +230,8 @@ my $WARNING						= 0;
 # files, so we can display them to the user with verbose() after we've
 # loaded them.
 # @ADMIN contains the three lines returned by the IRC command /admin.
-# It's also populated by load_xml_configuration_file(), and then sanity
-# checked by check_admin_info(), which makes sure that the array only
+# It's also populated by load_settings_from_xml_config_file(), and then sanity
+# checked by admin_setting_sanity_check(), which makes sure that the array only
 # contains 3 items and sets them to default values if they are missing.
 # @MOTD contains the message of the day.
 my @LISTENER_PORTS			= ();	# List of server listening ports to use
@@ -190,11 +254,11 @@ my @CONFIG_ELEMENT_FILES	= (); 	# A list of files with config elements
 my $cmdline_config_file = '';
 Getopt::Long::Configure ("bundling");
 GetOptions ('config|c=s'   	=> \$cmdline_config_file,
-			'warn|w'		=> sub { $WARNING = 1; },
-			'verbose|v'		=> sub { $VERBOSE = 1; },
-			'nobanner|n'	=> sub { $BANNER = 0; },
-	        'quiet|q'		=> sub { $VERBOSE = 0; $BANNER = 0; $WARNING = 0; },
-			'help|h'	=> sub { usage(); exit; }
+			'warn|w'		=> sub { $DISPLAY_WARNINGS = 1; },
+			'verbose|v'		=> sub { $DISPLAY_VERBOSE_TEXT = 1; },
+			'nobanner|n'	=> sub { $DISPLAY_BANNER = 0; },
+	        'quiet|q'		=> sub { $DISPLAY_VERBOSE_TEXT = 0; $DISPLAY_BANNER = 0; $DISPLAY_WARNINGS = 0; },
+			'help|h'	=> sub { display_program_usage(); exit; }
 			 );
 
 # Now it's time to load configuration files!
@@ -204,16 +268,16 @@ GetOptions ('config|c=s'   	=> \$cmdline_config_file,
 if($cmdline_config_file){ $CONFIGURATION_FILE=$cmdline_config_file; }
 
 # Look for the configuration file in the local directory or the config/ directory.
-my $found_configuration_file = find_local_settings_file($CONFIGURATION_FILE);
+my $found_configuration_file = find_file_in_home_or_settings_directory($CONFIGURATION_FILE);
 
 # If configuration file is found, load it. If the configure file is *not* found,
 # use default settings and warn the user.  No matter what, print the banner to
 # the console if verbosity is turned on.
 if($found_configuration_file){
 	# Configuration file found, load it into memory.
-	load_xml_configuration_file($found_configuration_file);
+	load_settings_from_xml_config_file($found_configuration_file);
 	# Display banner unless configured otherwise
-	if($BANNER==1){ print generate_banner(); }
+	if($DISPLAY_BANNER==1){ print generate_banner(); }
 	# Let the user know what configuration file was loaded.
 	verbose("Loaded configuration file '$found_configuration_file'");
 } else {
@@ -234,7 +298,7 @@ if(scalar @IMPORTED_FILES>=1){
 # setting, we'll only warn the user if there's too many, rather
 # than error and exit, and we'll only use the first three
 # entries.
-check_admin_info();
+admin_setting_sanity_check();
 
 # Set up the Message of the Day! $MOTD_FILE (default: motd.txt) has
 # its value set by the config file, in config->motd. Here, we look
@@ -243,7 +307,7 @@ check_admin_info();
 # first checks to see if $MOTD_FILE contains a complete path,
 # and if not, looks for it in the same directory as this program
 # and the settings directory.
-my $motd = find_local_settings_file($MOTD_FILE);
+my $motd = find_file_in_home_or_settings_directory($MOTD_FILE);
 if($motd){
 	verbose("Added MOTD from '$motd'");
 	open(FILE,"<$motd") or display_error_and_exit("Error opening MOTD file '$motd'");
@@ -255,7 +319,7 @@ if($motd){
 } else {
 	# MOTD fine wasn't found, so warn the user and populate @MOTD
 	# with an error message (of sorts).
-	display_warning("MOTD file not found! MOTD set to 'No MOTD set'");
+	warning("MOTD file not found! MOTD set to 'No MOTD set'");
 	push(@MOTD, "No MOTD set");
 }
 
@@ -334,22 +398,22 @@ $poe_kernel->run();
 # | User Interaction |
 # --------------------
 
-#	usage()
-#	uniq()
+#	display_program_usage()
+#	remove_duplicates_from_array()
 #	timestamp()
 #	verbose()
 #	generate_banner()
 #	logo()
 #	display_error_and_exit()
-#	display_warning()
+#	warning()
 
 # -------------------------------
 # | Configuration File Handling |
 # -------------------------------
 
-#	check_admin_info()
-#	find_local_settings_file()
-#	load_xml_configuration_file()
+#	admin_setting_sanity_check()
+#	find_file_in_home_or_settings_directory()
+#	load_settings_from_xml_config_file()
 
 # ----------------------
 # | POE Event Handlers |
@@ -367,7 +431,7 @@ $poe_kernel->run();
 #               port setting is 6667 (the "standard" IRC port). Default operators
 #               are non-existant, so no operator accounts are loaded into the server.
 #               @AUTHS, @LISTENER_PORTS, and @OPERATORS are populated by
-#               load_xml_configuration_file() with data supplied in the configuration
+#               load_settings_from_xml_config_file() with data supplied in the configuration
 #               files.
 sub _start {
     my ($kernel, $heap) = @_[KERNEL, HEAP];
@@ -392,7 +456,7 @@ sub _start {
 
     	# Give user a list of filenames containing auth data
     	# with the duplicates consolidated
-    	foreach my $f (uniq(@aus)) {
+    	foreach my $f (remove_duplicates_from_array(@aus)) {
 			verbose("Adding authorized entries from '$f'");
 		}
 		# Display how many auth entries were loaded
@@ -404,7 +468,7 @@ sub _start {
 		}
     } else {
     		# @AUTHS is empty, so let the user know and use the default auth entry.
-    		display_warning("No authorized entries found! Using $DEFAULT_AUTH as the auth");
+    		warning("No authorized entries found! Using $DEFAULT_AUTH as the auth");
     		$heap->{ircd}->add_auth(
 	        	mask		=> $DEFAULT_AUTH,
     		); 
@@ -428,7 +492,7 @@ sub _start {
 		}
 		# Give user a list of filenames containing auth data
     	# with the duplicates consolidated
-		foreach my $f (uniq(@files)) {
+		foreach my $f (remove_duplicates_from_array(@files)) {
 			verbose("Added operator entries from '$f'");
 		}
 		# Display how many operator accounts were loaded
@@ -440,7 +504,7 @@ sub _start {
 		}
 	} else {
 		# @OPERATORS is empty, so let the user know and start with no operators.
-		display_warning('No operator entries found! Server will start without operators');
+		warning('No operator entries found! Server will start without operators');
 	}
 
 	# Add listening port(s)
@@ -453,7 +517,7 @@ sub _start {
 	} else {
 		# @LISTENER_PORTS is empty, so let the user know and use the default port.
 		$heap->{ircd}->add_listener(port => $DEFAULT_PORT);
-		display_warning("No listening ports found! Using $DEFAULT_PORT as the listening port");
+		warning("No listening ports found! Using $DEFAULT_PORT as the listening port");
 	}
 }
 
@@ -461,20 +525,20 @@ sub _start {
 # | User Interaction |
 # --------------------
 
-# uniq()
+# remove_duplicates_from_array()
 # Arguments: 1 (array)
 # Returns:  Array
 # Description:  Removes all duplicates from an array, and returns the clean version.
-sub uniq {
+sub remove_duplicates_from_array {
     my %seen;
     grep !$seen{$_}++, @_;
 }
 
-# usage()
+# display_program_usage()
 # Arguments: None
 # Returns:  Nothing
 # Description:  Displays usage information
-sub usage {
+sub display_program_usage {
 	print generate_banner();
 	print "perl $PROGRAM_NAME [OPTIONS] FILENAME\n\n";
 	print "Options:\n";
@@ -492,7 +556,7 @@ sub usage {
 # Returns:  Scalar (timestamp)
 # Description:  Generates a timestamp for the current time/date,
 #               and returns it. This subroutine is used to generate the
-#               timestamps for display_warning() and verbose().
+#               timestamps for warning() and verbose().
 sub timestamp {
 	my ($second, $minute, $hour, $dayOfMonth, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = gmtime();
 	my $year = 1900 + $yearOffset;
@@ -506,21 +570,21 @@ sub timestamp {
  sub verbose {
 	my $txt = shift;
 	my $time = timestamp();
-	if($VERBOSE==1){
+	if($DISPLAY_VERBOSE_TEXT==1){
 		print "$time $txt\n";
 	}
 }
 
-# display_warning()
+# warning()
 # Arguments: 1 (scalar, warning text)
 # Returns: Nothing
 # Description: Displays a timestamped warning to the user; only displayed
 #              if verbosity is turned on. Warnings will *always* display
 #              if warnings are turned on, even if verbosity is turned off.
-sub display_warning {
+sub warning {
 	my $msg = shift;
 	my $time = timestamp();
-	if($WARNING==1){
+	if($DISPLAY_WARNINGS==1){
 		print "$time WARNING: $msg\n";
 	}
 }
@@ -539,17 +603,17 @@ sub display_warning {
 # |  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
 # | | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
 # |_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
-# ---------------------------------------Raven IRCd 0.0271
+# ---------------------------------------Raven IRCd 0.0352
 # ------Raven IRCd is an IRC server written in Perl and POE
 # ----------------https://github.com/danhetrick/raven-ircd
 sub generate_banner {
-	my $BANNER_PADDING = "-";	# What the spaces to the left of the text is filled with
+	my $DISPLAY_BANNER_PADDING = "-";	# What the spaces to the left of the text is filled with
 	my $LOGO_WIDTH	= 56;		# The width (give or take) of the text banner generated with logo()
 
-	my $b = logo().($BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_NAME $VERSION")))."$APPLICATION_NAME $VERSION\n";
-	$b .= $BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_DESCRIPTION"))."$APPLICATION_DESCRIPTION\n";
-	$b .= $BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_URL"))."$APPLICATION_URL\n";
-	$b .= $BANNER_PADDING x $LOGO_WIDTH."\n";
+	my $b = logo().($DISPLAY_BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_NAME $VERSION")))."$APPLICATION_NAME $VERSION\n";
+	$b .= $DISPLAY_BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_DESCRIPTION"))."$APPLICATION_DESCRIPTION\n";
+	$b .= $DISPLAY_BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_URL"))."$APPLICATION_URL\n";
+	$b .= $DISPLAY_BANNER_PADDING x $LOGO_WIDTH."\n";
 	return $b;
 }
 
@@ -583,7 +647,7 @@ sub display_error_and_exit {
 # | Configuration File Handling |
 # -------------------------------
 
-# check_admin_info()
+# admin_setting_sanity_check()
 # Arguments: 0
 # Returns: Nothing
 # Description: Makes sure that the @ADMIN array is populated correctly; it should
@@ -594,10 +658,10 @@ sub display_error_and_exit {
 #              blank entries. If the array isn't populated at *all*, the default
 #              server values are entered (which are in the scalars $DEFAULT_ADMIN_LINE_1,
 #              $DEFAULT_ADMIN_LINE_2, and $DEFAULT_ADMIN_LINE_3).
-sub check_admin_info {
+sub admin_setting_sanity_check {
 	if(scalar @ADMIN==3) { return; }
 	if(scalar @ADMIN>3){
-		display_warning("Too many admin elements set; using only the first three");
+		warning("Too many admin elements set; using only the first three");
 		my @ac;
 		push(@ac,shift @ADMIN);
 		push(@ac,shift @ADMIN);
@@ -622,7 +686,7 @@ sub check_admin_info {
 	}
 }
 
-# find_local_settings_file()
+# find_file_in_home_or_settings_directory()
 # Arguments: 1 (scalar, filename)
 # Returns: Scalar (filename)
 # Description: Looks for a given configuration file in the several directories.
@@ -630,7 +694,7 @@ sub check_admin_info {
 #              mind; in theory, this should work on any platform that can run
 #              Perl (so, OSX, *NIX, Linux, Windows, etc). Not "expensive" to
 #              run, as it doesn't do directory searches.
-sub find_local_settings_file {
+sub find_file_in_home_or_settings_directory {
 	my $filename = shift;
 
 	# If the filename is found, return it
@@ -651,16 +715,25 @@ sub find_local_settings_file {
 	return undef;
 }
 
-# load_xml_configuration_file()
+# load_settings_from_xml_config_file()
 # Arguments: 1 (scalar, filename)
 # Returns: Nothing
 # Description: Opens up an XML config file and reads settings from it.
 #              Recursive, so that config files can </import> other
 #              config files.
-sub load_xml_configuration_file {
+sub load_settings_from_xml_config_file {
 	my $filename = shift;
 
+	# Create XML::TreePP object
 	my $tpp = XML::TreePP->new();
+
+	# Set declaration ID
+	$tpp->set_declaration_id($RAVEN_CONFIG_FILE_DECLARATION);
+
+	# XML declaration must be the first line of the file
+	$tpp->set( require_xml_decl => 1 );
+
+	# Load our configuration file
 	my $tree = $tpp->parsefile( $filename );
 
 	# If the parsed tree is empty, there's nothing to parse; exit subroutine
@@ -671,33 +744,33 @@ sub load_xml_configuration_file {
 	# ------------------
 	# | IMPORT ELEMENT |
 	# ------------------
-	# <import>filename</import>
-	#
+
 	# Allows importing of config files.
-	if(ref($tree->{import}) eq 'ARRAY'){
-		foreach my $i (@{$tree->{import}}) {
+
+	if(ref($tree->{$IMPORT_ROOT_ELEMENT}) eq 'ARRAY'){
+		foreach my $i (@{$tree->{$IMPORT_ROOT_ELEMENT}}) {
 			# Multiple import elements
-			$i = find_local_settings_file($i);
+			$i = find_file_in_home_or_settings_directory($i);
 			if(!$i){
 				# Imported file not found; alert user and exit
 				display_error_and_exit("Configuration file '$filename' not found");
 			}
-			# Recursively call load_xml_configuration_file() to load in the settings
+			# Recursively call load_settings_from_xml_config_file() to load in the settings
 			# from the imported file
-			load_xml_configuration_file($i);
+			load_settings_from_xml_config_file($i);
 			# Add imported file to the imported file list
 			push(@IMPORTED_FILES,$i);
 		}
-	} elsif($tree->{import} ne undef){
+	} elsif($tree->{$IMPORT_ROOT_ELEMENT} ne undef){
 		# Single import element
-		my $f = find_local_settings_file($tree->{import});
+		my $f = find_file_in_home_or_settings_directory($tree->{$IMPORT_ROOT_ELEMENT});
 		if(!$f){
 			# Imported file not found; alert user and exit
 			display_error_and_exit("Configuration file '$filename' not found");
 		}
-		# Recursively call load_xml_configuration_file() to load in the settings
+		# Recursively call load_settings_from_xml_config_file() to load in the settings
 		# from the imported file
-		load_xml_configuration_file($f);
+		load_settings_from_xml_config_file($f);
 		# Add imported file to the imported file list
 		push(@IMPORTED_FILES,$f);
 	}
@@ -705,44 +778,40 @@ sub load_xml_configuration_file {
 	# --------------------
 	# | OPERATOR ELEMENT |
 	# --------------------
-	# <operator>
-	# 	<username>BOB</username>
-	# 	<password>CHANGEME</password>
-	#	<ipmask>*@*</ipmask>
-	# </operator>
-	#
+	
 	# Adds an operator to the IRC server.  Ipmask is optional.
-	if(ref($tree->{operator}) eq 'ARRAY'){
-		foreach my $a (@{$tree->{operator}}) {
+
+	if(ref($tree->{$OPERATOR_ROOT_ELEMENT}) eq 'ARRAY'){
+		foreach my $a (@{$tree->{$OPERATOR_ROOT_ELEMENT}}) {
 			# Multiple operator elements
 			my @op = ();
 
 			# operator->username
-			if(ref($a->{username}) eq 'ARRAY'){
-				display_error_and_exit("Error in $filename: operator element can't have more than one username element");
+			if(ref($a->{$OPERATOR_CHILD_USERNAME}) eq 'ARRAY'){
+				display_error_and_exit("Error in $filename: $OPERATOR_ROOT_ELEMENT element can't have more than one $OPERATOR_CHILD_USERNAME element");
 			}
-			if($a->{username} ne undef){
-				push(@op,$a->{username});
+			if($a->{$OPERATOR_CHILD_USERNAME} ne undef){
+				push(@op,$a->{$OPERATOR_CHILD_USERNAME});
 			} else {
-				display_error_and_exit("Error in $filename: operator element missing a username element");
+				display_error_and_exit("Error in $filename: $OPERATOR_ROOT_ELEMENT element missing a $OPERATOR_CHILD_USERNAME element");
 			}
 
 			# operator->password
-			if(ref($a->{password}) eq 'ARRAY'){
-				display_error_and_exit("Error in $filename: operator element can't have more than one password element");
+			if(ref($a->{$OPERATOR_CHILD_PASSWORD}) eq 'ARRAY'){
+				display_error_and_exit("Error in $filename: $OPERATOR_ROOT_ELEMENT element can't have more than one $OPERATOR_CHILD_PASSWORD element");
 			}
-			if($a->{password} ne undef){
-				push(@op,$a->{password});
+			if($a->{$OPERATOR_CHILD_PASSWORD} ne undef){
+				push(@op,$a->{$OPERATOR_CHILD_PASSWORD});
 			} else {
-				display_error_and_exit("Error in $filename: operator element missing a password element");
+				display_error_and_exit("Error in $filename: $OPERATOR_ROOT_ELEMENT element missing a $OPERATOR_CHILD_PASSWORD element");
 			}
 			
 			# operator->ipmask
-			if(ref($a->{ipmask}) eq 'ARRAY'){
-				display_error_and_exit("Error in $filename: operator element can't have more than one ipmask element");
+			if(ref($a->{$OPERATOR_CHILD_IPMASK}) eq 'ARRAY'){
+				display_error_and_exit("Error in $filename: $OPERATOR_ROOT_ELEMENT element can't have more than one $OPERATOR_CHILD_IPMASK element");
 			}
-			if($a->{ipmask} ne undef){
-				push(@op,$a->{ipmask});
+			if($a->{$OPERATOR_CHILD_IPMASK} ne undef){
+				push(@op,$a->{$OPERATOR_CHILD_IPMASK});
 			} else {
 				push(@op,undef);
 			}
@@ -753,36 +822,36 @@ sub load_xml_configuration_file {
 			# Add operator entry to the operator list
 			push(@OPERATORS,\@op);
 		}
-	} elsif($tree->{operator} ne undef){
+	} elsif($tree->{$OPERATOR_ROOT_ELEMENT} ne undef){
 		# Single operator element
 		my @op = ();
 
 		# operator->username
-		if($tree->{operator}->{username} ne undef){
-			if(ref($tree->{operator}->{username}) eq 'ARRAY'){
-				display_error_and_exit("Error in $filename: operator element can't have more than one username element");
+		if($tree->{$OPERATOR_ROOT_ELEMENT}->{$OPERATOR_CHILD_USERNAME} ne undef){
+			if(ref($tree->{$OPERATOR_ROOT_ELEMENT}->{$OPERATOR_CHILD_USERNAME}) eq 'ARRAY'){
+				display_error_and_exit("Error in $filename: $OPERATOR_ROOT_ELEMENT element can't have more than one $OPERATOR_CHILD_USERNAME element");
 			}
-			push (@op,$tree->{operator}->{username});
+			push (@op,$tree->{$OPERATOR_ROOT_ELEMENT}->{$OPERATOR_CHILD_USERNAME});
 		} else {
-			display_error_and_exit("Error in $filename: operator element missing a username element");
+			display_error_and_exit("Error in $filename: $OPERATOR_ROOT_ELEMENT element missing a $OPERATOR_CHILD_USERNAME element");
 		}
 
 		# operator->password
-		if($tree->{operator}->{password} ne undef){
-			if(ref($tree->{operator}->{password}) eq 'ARRAY'){
-				display_error_and_exit("Error in $filename: operator element can't have more than one password element");
+		if($tree->{$OPERATOR_ROOT_ELEMENT}->{$OPERATOR_CHILD_PASSWORD} ne undef){
+			if(ref($tree->{$OPERATOR_ROOT_ELEMENT}->{$OPERATOR_CHILD_PASSWORD}) eq 'ARRAY'){
+				display_error_and_exit("Error in $filename: $OPERATOR_ROOT_ELEMENT element can't have more than one $OPERATOR_CHILD_PASSWORD element");
 			}
-			push(@op,$tree->{operator}->{password});
+			push(@op,$tree->{$OPERATOR_ROOT_ELEMENT}->{$OPERATOR_CHILD_PASSWORD});
 		} else {
-			display_error_and_exit("Error in $filename: operator element missing a password element");
+			display_error_and_exit("Error in $filename: $OPERATOR_ROOT_ELEMENT element missing a $OPERATOR_CHILD_PASSWORD element");
 		}
 
 		# operator->ipmask
-		if($tree->{operator}->{ipmask} ne undef){
-			if(ref($tree->{operator}->{ipmask}) eq 'ARRAY'){
-				display_error_and_exit("Error in $filename: operator element can't have more than one ipmask element");
+		if($tree->{$OPERATOR_ROOT_ELEMENT}->{$OPERATOR_CHILD_IPMASK} ne undef){
+			if(ref($tree->{$OPERATOR_ROOT_ELEMENT}->{$OPERATOR_CHILD_IPMASK}) eq 'ARRAY'){
+				display_error_and_exit("Error in $filename: $OPERATOR_ROOT_ELEMENT element can't have more than one $OPERATOR_CHILD_IPMASK element");
 			}
-			push(@op,$tree->{operator}->{ipmask});
+			push(@op,$tree->{$OPERATOR_ROOT_ELEMENT}->{$OPERATOR_CHILD_IPMASK});
 		} else {
 			push(@op,undef);
 		}
@@ -797,59 +866,54 @@ sub load_xml_configuration_file {
 	# ----------------
 	# | AUTH ELEMENT |
 	# ----------------
-	# <auth>
-	# 	<mask>*@*</mask>
-	# 	<password>CHANGEME</password>
-	# 	<spoof>google.com</spoof>
-	# 	<no_tilde>1</no_tilde>
-	# </auth>
-	#
-	# Adds an authorized connection.  Password, spoof, and tilde elements are optional.
-	if(ref($tree->{auth}) eq 'ARRAY'){
-		foreach my $a (@{$tree->{auth}}) {
+
+	# Configures authorized connections.
+
+	if(ref($tree->{$AUTH_ROOT_ELEMENT}) eq 'ARRAY'){
+		foreach my $a (@{$tree->{$AUTH_ROOT_ELEMENT}}) {
 			# Multiple auth elements
 			my @auth = ();
 
 			# auth->mask
-			if(ref($a->{mask}) eq 'ARRAY'){
-				display_error_and_exit("Error in $filename: auth element can't have more than one mask element");
+			if(ref($a->{$AUTH_CHILD_MASK}) eq 'ARRAY'){
+				display_error_and_exit("Error in $filename: $AUTH_ROOT_ELEMENT element can't have more than one $AUTH_CHILD_MASK element");
 			}
-			if($a->{mask} ne undef){
-				push(@auth,$a->{mask});
+			if($a->{$AUTH_CHILD_MASK} ne undef){
+				push(@auth,$a->{$AUTH_CHILD_MASK});
 			} else {
-				display_error_and_exit("Error in $filename: auth element missing a mask element");
+				display_error_and_exit("Error in $filename: $AUTH_ROOT_ELEMENT element missing a $AUTH_CHILD_MASK element");
 			}
 
 			# auth->password
-			if(ref($a->{password}) eq 'ARRAY'){
-				display_error_and_exit("Error in $filename: auth element can't have more than one password element");
+			if(ref($a->{$AUTH_CHILD_PASSWORD}) eq 'ARRAY'){
+				display_error_and_exit("Error in $filename: $AUTH_ROOT_ELEMENT element can't have more than one $AUTH_CHILD_PASSWORD element");
 			}
-			if($a->{password} ne undef){
-				push(@auth,$a->{password});
+			if($a->{$AUTH_CHILD_PASSWORD} ne undef){
+				push(@auth,$a->{$AUTH_CHILD_PASSWORD});
 			} else {
 				push(@auth,undef);
 			}
 
 			# auth->spoof
-			if(ref($a->{spoof}) eq 'ARRAY'){
-				display_error_and_exit("Error in $filename: auth element can't have more than one spoof element");
+			if(ref($a->{$AUTH_CHILD_SPOOF}) eq 'ARRAY'){
+				display_error_and_exit("Error in $filename: $AUTH_ROOT_ELEMENT element can't have more than one $AUTH_CHILD_SPOOF element");
 			}
-			if($a->{spoof} ne undef){
-				push(@auth,$a->{spoof});
+			if($a->{$AUTH_CHILD_SPOOF} ne undef){
+				push(@auth,$a->{$AUTH_CHILD_SPOOF});
 			} else {
 				push(@auth,undef);
 			}
 
 			# auth->no_tilde
-			if(ref($a->{no_tilde}) eq 'ARRAY'){
-				display_error_and_exit("Error in $filename: auth element can't have more than one no_tilde element");
+			if(ref($a->{$AUTH_CHILD_NOTILDE}) eq 'ARRAY'){
+				display_error_and_exit("Error in $filename: $AUTH_ROOT_ELEMENT element can't have more than one $AUTH_CHILD_NOTILDE element");
 			}
-			if($a->{no_tilde} ne undef){
+			if($a->{$AUTH_CHILD_NOTILDE} ne undef){
 				# Sanity check for no_tilde; it should either be 1 or 0, and nothing else
-				if(($a->{no_tilde} eq '0')||($a->{no_tilde} eq '1')){}else{
-					display_error_and_exit("Error in $filename: '$a->{no_tilde}' is not a valid setting for auth->no_tilde (must be 0 or 1)");
+				if(($a->{$AUTH_CHILD_NOTILDE} eq '0')||($a->{$AUTH_CHILD_NOTILDE} eq '1')){}else{
+					display_error_and_exit("Error in $filename: '$a->{no_tilde}' is not a valid setting for $AUTH_ROOT_ELEMENT->$AUTH_CHILD_NOTILDE (must be 0 or 1)");
 				}
-				push(@auth,$a->{no_tilde});
+				push(@auth,$a->{$AUTH_CHILD_NOTILDE});
 			} else {
 				push(@auth,undef);
 			}
@@ -860,56 +924,56 @@ sub load_xml_configuration_file {
 			# Add auth entry to the auth list
 			push(@AUTHS,\@auth);
 		}
-	} elsif($tree->{auth} ne undef){
+	} elsif($tree->{$AUTH_ROOT_ELEMENT} ne undef){
 		# Single auth element
 		my @auth = ();
 
 		# auth->mask
-		if(ref($tree->{auth}->{mask}) eq 'ARRAY'){
-			display_error_and_exit("Error in $filename: auth element can't have more than one mask element");
+		if(ref($tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_MASK}) eq 'ARRAY'){
+			display_error_and_exit("Error in $filename: $AUTH_ROOT_ELEMENT element can't have more than one $AUTH_CHILD_MASK element");
 		}
-		if($tree->{auth}->{mask} ne undef){
-			push (@auth,$tree->{auth}->{mask});
+		if($tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_MASK} ne undef){
+			push (@auth,$tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_MASK});
 		} else {
-			display_error_and_exit("Error in $filename: auth element missing a mask element");
+			display_error_and_exit("Error in $filename: $AUTH_ROOT_ELEMENT element missing a $AUTH_CHILD_MASK element");
 		}
 
 		# auth->password
-		if(ref($tree->{auth}->{password}) eq 'ARRAY'){
-			display_error_and_exit("Error in $filename: auth element can't have more than one password element");
+		if(ref($tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_PASSWORD}) eq 'ARRAY'){
+			display_error_and_exit("Error in $filename: $AUTH_ROOT_ELEMENT element can't have more than one $AUTH_CHILD_PASSWORD element");
 		}
-		if($tree->{auth}->{password} ne undef){
-			push(@auth,$tree->{auth}->{password});
+		if($tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_PASSWORD} ne undef){
+			push(@auth,$tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_PASSWORD});
 		} else {
 			push(@auth,undef);
 		}
 
 		# auth->spoof
-		if(ref($tree->{auth}->{spoof}) eq 'ARRAY'){
-			display_error_and_exit("Error in $filename: auth element can't have more than one spoof element");
+		if(ref($tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_SPOOF}) eq 'ARRAY'){
+			display_error_and_exit("Error in $filename: $AUTH_ROOT_ELEMENT element can't have more than one $AUTH_CHILD_SPOOF element");
 		}
-		if($tree->{auth}->{spoof} ne undef){
-			push(@auth,$tree->{auth}->{spoof});
+		if($tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_SPOOF} ne undef){
+			push(@auth,$tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_SPOOF});
 		} else {
 			push(@auth,undef);
 		}
 
 		# auth->no_tilde
-		if(ref($tree->{auth}->{no_tilde}) eq 'ARRAY'){
-			display_error_and_exit("Error in $filename: auth element can't have more than one no_tilde element");
+		if(ref($tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_NOTILDE}) eq 'ARRAY'){
+			display_error_and_exit("Error in $filename: $AUTH_ROOT_ELEMENT element can't have more than one $AUTH_CHILD_NOTILDE element");
 		}
-		if($tree->{auth}->{no_tilde} ne undef){
+		if($tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_NOTILDE} ne undef){
 			# Sanity check for auth->no_tilde; it should either be 1 or 0, and nothing else
-			if(($tree->{auth}->{no_tilde} eq '0')||($tree->{auth}->{no_tilde} eq '1')){}else{
-				display_error_and_exit("Error in $filename: '$tree->{auth}->{no_tilde}' is not a valid setting for auth->no_tilde (must be 0 or 1)");
+			if(($tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_NOTILDE} eq '0')||($tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_NOTILDE} eq '1')){}else{
+				display_error_and_exit("Error in $filename: '$tree->{$AUTH_ROOT_ELEMENT}->{no_tilde}' is not a valid setting for $AUTH_ROOT_ELEMENT->$AUTH_CHILD_NOTILDE (must be 0 or 1)");
 			}
-			push(@auth,$tree->{auth}->{no_tilde});
+			push(@auth,$tree->{$AUTH_ROOT_ELEMENT}->{$AUTH_CHILD_NOTILDE});
 		} else {
 			push(@auth,undef);
 		}
 
 		# Add filename to the auth entry
-			-push(@auth, $filename);
+		push(@auth, $filename);
 
 		# Add auth entry to the auth list
 		push(@AUTHS,\@auth);
@@ -918,183 +982,156 @@ sub load_xml_configuration_file {
 	# --------------------
 	# | OPERSERV ELEMENT |
 	# --------------------
-	# <operserv>
-	# 	<use>0</use>
-	# 	<nick>OperServ</nick>
-	# 	<control>0</control>
-	# </operserv>
-	#
-	# Activates and configures an OperServ bot
-	if(ref($tree->{operserv}) eq 'ARRAY'){
+
+	# Activates and configures the OperServ bot
+
+	if(ref($tree->{$OPERSERV_ROOT_ELEMENT}) eq 'ARRAY'){
 		# Multiple operserv elements
-		display_error_and_exit("Error in $filename: multiple operserv elements are not allowed");
-	} elsif($tree->{operserv} ne undef){
+		display_error_and_exit("Error in $filename: multiple $OPERSERV_ROOT_ELEMENT elements are not allowed");
+	} elsif($tree->{$OPERSERV_ROOT_ELEMENT} ne undef){
 		# Single operserv element
 
-		# operserv->active
-		if(ref($tree->{operserv}->{use}) eq 'ARRAY'){
-			display_error_and_exit("Error in $filename: operserv element can't have more than one use element");
+		# operserv->use
+		if(ref($tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_USE}) eq 'ARRAY'){
+			display_error_and_exit("Error in $filename: $OPERSERV_ROOT_ELEMENT element can't have more than one $OPERSERV_CHILD_USE element");
 		}
-		if($tree->{operserv}->{use} ne undef){
+		if($tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_USE} ne undef){
 			# Sanity check for operserv->use; it should either be 1 or 0, and nothing else
-			if(($tree->{operserv}->{use} eq '0')||($tree->{operserv}->{use} eq '1')){}else{
-				display_error_and_exit("Error in $filename: '$tree->{operserv}->{use}' is not a valid setting for operserv->use (must be 0 or 1)");
+			if(($tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_USE} eq '0')||($tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_USE} eq '1')){}else{
+				display_error_and_exit("Error in $filename: '$tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_USE}' is not a valid setting for $OPERSERV_ROOT_ELEMENT->$OPERSERV_CHILD_USE (must be 0 or 1)");
 			}
-			$OPERSERV = $tree->{operserv}->{use};
+			$OPERSERV = $tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_USE};
 		}
 
 		# operserv->nick
-		if(ref($tree->{operserv}->{nick}) eq 'ARRAY'){
-			display_error_and_exit("Error in $filename: operserv element can't have more than one nick element");
+		if(ref($tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_NICK}) eq 'ARRAY'){
+			display_error_and_exit("Error in $filename: $OPERSERV_ROOT_ELEMENT element can't have more than one $OPERSERV_CHILD_NICK element");
 		}
-		if($tree->{operserv}->{nick} ne undef){
-			$OPERSERV_NAME = $tree->{operserv}->{nick};
+		if($tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_NICK} ne undef){
+			$OPERSERV_NAME = $tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_NICK};
 		}
 
 		# operserv->nick
-		if(ref($tree->{operserv}->{username}) eq 'ARRAY'){
-			display_error_and_exit("Error in $filename: operserv element can't have more than one username element");
+		if(ref($tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_USERNAME}) eq 'ARRAY'){
+			display_error_and_exit("Error in $filename: $OPERSERV_ROOT_ELEMENT element can't have more than one $OPERSERV_CHILD_USERNAME element");
 		}
-		if($tree->{operserv}->{username} ne undef){
-			$OPERSERV_IRCNAME = $tree->{operserv}->{username};
+		if($tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_USERNAME} ne undef){
+			$OPERSERV_IRCNAME = $tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_USERNAME};
 		}
 
 		# operserv->control
-		if(ref($tree->{operserv}->{control}) eq 'ARRAY'){
-			display_error_and_exit("Error in $filename: operserv element can't have more than one control element");
+		if(ref($tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_CONTROL}) eq 'ARRAY'){
+			display_error_and_exit("Error in $filename: $OPERSERV_ROOT_ELEMENT element can't have more than one $OPERSERV_CHILD_CONTROL element");
 		}
-		if($tree->{operserv}->{control} ne undef){
+		if($tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_CONTROL} ne undef){
 			# Sanity check for operserv->control; it should either be 1 or 0, and nothing else
-			if(($tree->{operserv}->{control} eq '0')||($tree->{operserv}->{control} eq '1')){}else{
-				display_error_and_exit("Error in $filename: '$tree->{operserv}->{control}' is not a valid setting for operserv->control (must be 0 or 1)");
+			if(($tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_CONTROL} eq '0')||($tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_CONTROL} eq '1')){}else{
+				display_error_and_exit("Error in $filename: '$tree->{$OPERSERV_ROOT_ELEMENT}->{control}' is not a valid setting for $OPERSERV_ROOT_ELEMENT->$OPERSERV_CHILD_CONTROL (must be 0 or 1)");
 			}
-			$OPERSERV_CHANNEL_CONTROL = $tree->{operserv}->{control};
+			$OPERSERV_CHANNEL_CONTROL = $tree->{$OPERSERV_ROOT_ELEMENT}->{$OPERSERV_CHILD_CONTROL};
 		}
 	}
 
 	# ------------------
 	# | CONFIG ELEMENT |
 	# ------------------
-	# <config>
-	# 	<verbose>1</verbose>
-	# 	<port>6667</port>
-	# 	<name>raven.irc.server</name>
-	# 	<nicklength>15</nicklength>
-	# 	<network>RavenNet</network>
-	# 	<max_targets>4</max_targets>
-	# 	<max_channels>15</max_channels>
-	#	<info>My server info here</info>
-	#	<banner>1</banner>
-	#	<warning>1</warning>
-	# </config>
-	#
+
 	# Allows for server configuration.  Multiple port elements are allowed. All elements are optional;
 	# default settings will be used for all missing elements.
 
-	# config->verbose element
-	# if(ref($tree->{config}->{verbose}) eq 'ARRAY'){
-	# 	display_error_and_exit("Error in $filename: config element can't have more than one verbose element");
-	# } elsif($tree->{config}->{verbose} ne undef){
-	# 	# Sanity check for config->verbose; it should either be 1 or 0, and nothing else
-	# 	if(($tree->{config}->{verbose} eq '0')||($tree->{config}->{verbose} eq '1')){}else{
-	# 		display_error_and_exit("Error in $filename: '$tree->{config}->{verbose}' is not a valid setting for config->verbose (must be 0 or 1)");
-	# 	}
-	# 	$VERBOSE = $tree->{config}->{verbose};
-	# }
-
-	# config->port element
-	if(ref($tree->{config}->{port}) eq 'ARRAY'){
-		foreach my $p (@{$tree->{config}->{port}}) {
+	# config->port
+	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{port}) eq 'ARRAY'){
+		foreach my $p (@{$tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_PORT}}) {
 			# Sanity check for config->port; must be numeric
 			if (looks_like_number($p)) {}else{
-				display_error_and_exit("Error in $filename: '$p' is not a valid setting for config->port (must be numeric)");
+				display_error_and_exit("Error in $filename: '$p' is not a valid setting for $CONFIG_ROOT_ELEMENT->$CONFIG_CHILD_PORT (must be numeric)");
 			}
 			push(@LISTENER_PORTS,$p);
 		}
-	} elsif($tree->{config}->{port} ne undef){
+	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_PORT} ne undef){
 		# Sanity check for config->port; must be numeric
-		if (looks_like_number($tree->{config}->{port})) {}else{
-			display_error_and_exit("Error in $filename: '$tree->{config}->{port}' is not a valid setting for config->port (must be numeric)");
+		if (looks_like_number($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_PORT})) {}else{
+			display_error_and_exit("Error in $filename: '$tree->{$CONFIG_ROOT_ELEMENT}->{port}' is not a valid setting for $CONFIG_ROOT_ELEMENT->$CONFIG_CHILD_PORT (must be numeric)");
 		}
-		push(@LISTENER_PORTS,$tree->{config}->{port});
+		push(@LISTENER_PORTS,$tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_PORT});
 	}
 
-	# config->name element
-	if(ref($tree->{config}->{name}) eq 'ARRAY'){
-		display_error_and_exit("Error in $filename: config element can't have more than one name element");
-	} elsif($tree->{config}->{name} ne undef){
-		$SERVER_NAME = $tree->{config}->{name};
+	# config->name
+	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_NAME}) eq 'ARRAY'){
+		display_error_and_exit("Error in $filename: $CONFIG_ROOT_ELEMENT element can't have more than one $CONFIG_CHILD_NAME element");
+	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_NAME} ne undef){
+		$SERVER_NAME = $tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_NAME};
 	}
 
-	# config->nicklength element
-	if(ref($tree->{config}->{nicklength}) eq 'ARRAY'){
-		display_error_and_exit("Error in $filename: config element can't have more than one nicklength element");
-	} elsif($tree->{config}->{nicklength} ne undef){
+	# config->nicklength
+	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_NICKLENGTH}) eq 'ARRAY'){
+		display_error_and_exit("Error in $filename: $CONFIG_ROOT_ELEMENT element can't have more than one $CONFIG_CHILD_NICKLENGTH element");
+	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_NICKLENGTH} ne undef){
 		# Sanity check for config->nicklength; must be numeric
-		if (looks_like_number($tree->{config}->{nicklength})) {}else{
-			display_error_and_exit("Error in $filename: '$tree->{config}->{nicklength}' is not a valid setting for config->nicklength (must be numeric)");
+		if (looks_like_number($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_NICKLENGTH})) {}else{
+			display_error_and_exit("Error in $filename: '$tree->{$CONFIG_ROOT_ELEMENT}->{nicklength}' is not a valid setting for $CONFIG_ROOT_ELEMENT->$CONFIG_CHILD_NICKLENGTH (must be numeric)");
 		}
-		$NICKNAME_LENGTH = $tree->{config}->{nicklength};
+		$NICKNAME_LENGTH = $tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_NICKLENGTH};
 	}
 
-	# config->network element
-	if(ref($tree->{config}->{network}) eq 'ARRAY'){
-		display_error_and_exit("Error in $filename: config element can't have more than one network element");
-	} elsif($tree->{config}->{network} ne undef){
-		$SERVER_NETWORK = $tree->{config}->{network};
+	# config->network
+	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_NETWORK}) eq 'ARRAY'){
+		display_error_and_exit("Error in $filename: $CONFIG_ROOT_ELEMENT element can't have more than one $CONFIG_CHILD_NETWORK element");
+	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_NETWORK} ne undef){
+		$SERVER_NETWORK = $tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_NETWORK};
 	}
 
-	# config->max_targets element
-	if(ref($tree->{config}->{max_targets}) eq 'ARRAY'){
-		display_error_and_exit("Error in $filename: config element can't have more than one max_targets element");
-	} elsif($tree->{config}->{max_targets} ne undef){
+	# config->max_targets
+	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MAXTARGETS}) eq 'ARRAY'){
+		display_error_and_exit("Error in $filename: $CONFIG_ROOT_ELEMENT element can't have more than one $CONFIG_CHILD_MAXTARGETS element");
+	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MAXTARGETS} ne undef){
 		# Sanity check for config->max_targets; must be numeric
-		if (looks_like_number($tree->{config}->{max_targets})) {}else{
-			display_error_and_exit("Error in $filename: '$tree->{config}->{max_targets}' is not a valid setting for config->max_targets (must be numeric)");
+		if (looks_like_number($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MAXTARGETS})) {}else{
+			display_error_and_exit("Error in $filename: '$tree->{$CONFIG_ROOT_ELEMENT}->{max_targets}' is not a valid setting for $CONFIG_ROOT_ELEMENT->$CONFIG_CHILD_MAXTARGETS (must be numeric)");
 		}
-		$MAX_TARGETS = $tree->{config}->{max_targets};
+		$MAX_TARGETS = $tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MAXTARGETS};
 	}
 
-	# config->max_channels element
-	if(ref($tree->{config}->{max_channels}) eq 'ARRAY'){
-		display_error_and_exit("Error in $filename: config element can't have more than one max_channels element");
-	} elsif($tree->{config}->{max_channels} ne undef){
+	# config->max_channels
+	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MAXCHANNELS}) eq 'ARRAY'){
+		display_error_and_exit("Error in $filename: $CONFIG_ROOT_ELEMENT element can't have more than one $CONFIG_CHILD_MAXCHANNELS element");
+	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MAXCHANNELS} ne undef){
 		# Sanity check for config->max_channels; must be numeric
-		if (looks_like_number($tree->{config}->{max_channels})) {}else{
-			display_error_and_exit("Error in $filename: '$tree->{config}->{max_channels}' is not a valid setting for config->max_channels (must be numeric)");
+		if (looks_like_number($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MAXCHANNELS})) {}else{
+			display_error_and_exit("Error in $filename: '$tree->{$CONFIG_ROOT_ELEMENT}->{max_channels}' is not a valid setting for $CONFIG_ROOT_ELEMENT->$CONFIG_CHILD_MAXCHANNELS (must be numeric)");
 		}
-		$MAX_CHANNELS = $tree->{config}->{max_channels};
+		$MAX_CHANNELS = $tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MAXCHANNELS};
 	}
 
-	# config->info element
-	if(ref($tree->{config}->{info}) eq 'ARRAY'){
-		display_error_and_exit("Error in $filename: config element can't have more than one info element");
-	} elsif($tree->{config}->{info} ne undef){
-		$SERVER_INFO = $tree->{config}->{info};
+	# config->info
+	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO}) eq 'ARRAY'){
+		display_error_and_exit("Error in $filename: $CONFIG_ROOT_ELEMENT element can't have more than one $CONFIG_CHILD_INFO element");
+	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO} ne undef){
+		$SERVER_INFO = $tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO};
 	}
 
-	# config->admin element
-	if(ref($tree->{config}->{admin}) eq 'ARRAY'){
-		my @a = @{$tree->{config}->{admin}};
+	# config->admin
+	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_ADMIN}) eq 'ARRAY'){
+		my @a = @{$tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_ADMIN}};
 		foreach my $ae (@a){
 			push(@ADMIN,$ae);
 		}
-	} elsif($tree->{config}->{admin} ne undef){
-		push(@ADMIN,$tree->{config}->{admin});
+	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_ADMIN} ne undef){
+		push(@ADMIN,$tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_ADMIN});
 	}
 
-	# config->description element
-	if(ref($tree->{config}->{description}) eq 'ARRAY'){
-		display_error_and_exit("Error in $filename: config element can't have more than one description element");
-	} elsif($tree->{config}->{description} ne undef){
-		$DESCRIPTION = $tree->{config}->{description};
+	# config->description
+	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_DESCRIPTION}) eq 'ARRAY'){
+		display_error_and_exit("Error in $filename: $CONFIG_ROOT_ELEMENT element can't have more than one $CONFIG_CHILD_DESCRIPTION element");
+	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_DESCRIPTION} ne undef){
+		$DESCRIPTION = $tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_DESCRIPTION};
 	}
 
-	# config->motd element
-	if(ref($tree->{config}->{motd}) eq 'ARRAY'){
-		display_error_and_exit("Error in $filename: config element can't have more than one motd element");
-	} elsif($tree->{config}->{motd} ne undef){
-		$MOTD_FILE = $tree->{config}->{motd};
+	# config->motd
+	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MOTD}) eq 'ARRAY'){
+		display_error_and_exit("Error in $filename: $CONFIG_ROOT_ELEMENT element can't have more than one $CONFIG_CHILD_MOTD element");
+	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MOTD} ne undef){
+		$MOTD_FILE = $tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MOTD};
 	}
 
 }

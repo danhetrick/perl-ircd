@@ -456,6 +456,19 @@ my $ALLOW_UTF8_FLAG   = ( $] >= 5.008001 );
 
 my $EMPTY_ELEMENT_TAG_END = ' />';
 
+# RAVENIRCD BEGIN
+my $CONFIG_FILE_ID = "xml";
+
+sub set_declaration_id {
+    my $self = shift;
+    my $id = shift;
+    $CONFIG_FILE_ID = $id;
+}
+
+# RAVENIRCD END
+
+
+
 sub new {
     my $package = shift;
     my $self    = {@_};
@@ -702,12 +715,12 @@ sub parsefile {
     my $file = shift;
     return $self->die( 'Invalid filename' ) unless defined $file;
     my $text = $self->read_raw_xml($file);
-    $self->parse( \$text );
-}
+    $self->parse( \$text );}
 
 sub parse {
     my $self = shift;
     my $text = ref $_[0] ? ${$_[0]} : $_[0];
+
     return $self->die( 'Null XML source' ) unless defined $text;
 
     my $from = &xml_decl_encoding(\$text) || $XML_ENCODING;
@@ -749,7 +762,8 @@ sub parse {
 
     # Avoid segfaults when receving random input (RT #42441)
     if ( exists $self->{require_xml_decl} && $self->{require_xml_decl} ) {
-        return $self->die( "XML declaration not found" ) unless looks_like_xml(\$text);
+        #return $self->die( "XML declaration not found" ) unless looks_like_xml(\$text);
+        return $self->die( "Raven configuration file declaration ('raven-xml') not found" ) unless looks_like_xml(\$text,$CONFIG_FILE_ID);
     }
 
     my $flat  = $self->xml_to_flat(\$text);
@@ -1136,9 +1150,19 @@ sub read_raw_xml {
     $text;
 }
 
+# sub looks_like_xml {
+#     my $textref = shift;
+#     my $args = ( $$textref =~ /^(?:\s*\xEF\xBB\xBF)?\s*<\?xml(\s+\S.*)\?>/s )[0];
+#     if ( ! $args ) {
+#         return;
+#     }
+#     return $args;
+# }
+
 sub looks_like_xml {
     my $textref = shift;
-    my $args = ( $$textref =~ /^(?:\s*\xEF\xBB\xBF)?\s*<\?xml(\s+\S.*)\?>/s )[0];
+    my $id = shift;
+    my $args = ( $$textref =~ /^(?:\s*\xEF\xBB\xBF)?\s*<\?$id(\s+\S.*)\?>/s )[0];
     if ( ! $args ) {
         return;
     }
@@ -1148,7 +1172,8 @@ sub looks_like_xml {
 sub xml_decl_encoding {
     my $textref = shift;
     return unless defined $$textref;
-    my $args    = looks_like_xml($textref) or return;
+    #my $args    = looks_like_xml($textref) or return;
+    my $args    = looks_like_xml($textref,$CONFIG_FILE_ID) or return;
     my $getcode = ( $args =~ /\s+encoding=(".*?"|'.*?')/ )[0] or return;
     $getcode =~ s/^['"]//;
     $getcode =~ s/['"]$//;
