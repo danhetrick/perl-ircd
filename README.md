@@ -42,10 +42,10 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 * :page_facing_up: LICENCE
 * :page_facing_up: README.md
 * :file_folder: lib
-	* :file_folder: XML
-		* :page_facing_up: TreePP.pm
 	* :page_facing_up: RavenIRCd.pm
 	* :page_facing_up: OperServ.pm
+	* :file_folder: XML
+		* :page_facing_up: TreePP.pm
 * :file_folder: settings
 	* :page_facing_up: default.xml
 	* :page_facing_up: operators.xml
