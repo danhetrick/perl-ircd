@@ -82,13 +82,13 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 	perl raven-ircd.pl OPTIONS FILENAME
 
 	Options:
-	--(h)elp or usage	Displays usage information
+	--(h)elp		Displays usage information
 	--(d)efault		Runs $APPLICATION_NAME with default settings
 	--(w)arn		Turns warnings on
 	--(v)erbose		Turns verbose on
 	--(q)uiet		Turn on verbose mode
 	--(n)obanner		Don't display $APPLICATION_NAME banner
-	 
+
 	Options can be bundled; so, to turn on verbose and warning, use -vw
 
 ## Options

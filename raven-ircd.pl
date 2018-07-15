@@ -193,7 +193,7 @@ GetOptions ('warn|w'		=> sub { $WARNING = 1; },
 			'nobanner|n'	=> sub { $BANNER = 0; },
 	        'quiet|q'		=> sub { $VERBOSE = 0; $BANNER = 0; $WARNING = 0; },
 	        'default|d'   	=> sub { $ARGV[0] = 'default' },
-			'usage|help|h'	=> sub { usage(); exit; }
+			'help|h'	=> sub { usage(); exit; }
 			 );
 
 # Now it's time to load configuration files!
@@ -479,7 +479,7 @@ sub usage {
 	print generate_banner();
 	print "perl $PROGRAM_NAME [OPTIONS] FILENAME\n\n";
 	print "Options:\n";
-	print "--(h)elp or usage	Displays usage information\n";
+	print "--(h)elp		Displays usage information\n";
 	print "--(d)efault		Runs $APPLICATION_NAME with default settings\n";
 	print "--(w)arn		Turns warnings on\n";
 	print "--(v)erbose		Turns verbose on\n";
