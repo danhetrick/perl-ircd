@@ -8,7 +8,7 @@
 
 The source code for `raven-ircd.pl` is *heavily* commented. I try to explain everything the program is doing in detail, so if you want to use it as a base for your own IRCd, the **Raven IRCd** source is a good place to start.  The most complicated part of the source is the code for loading and applying configuration file settings, and thus has the most comments; it's written in pure Perl, and doesn't require POE or anything outside of the standard library (besides XML::TreePP, included with the **Raven IRCd** distribution).  If you do use **Raven IRCd** as the base for your own IRC server, remember the [license](#license), and make sure to share your additions/changes.
 
-The latest version of **Raven IRCd** is 0.0252.
+The latest version of **Raven IRCd** is 0.0271.
 
 # Features
 * _**Fast Setup**_ - **Raven IRCd** can be setup and ran in less than a minute!
@@ -82,12 +82,13 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 	perl raven-ircd.pl OPTIONS FILENAME
 
 	Options:
-	--(h)elp		Displays usage information
-	--(d)efault		Runs $APPLICATION_NAME with default settings
-	--(w)arn		Turns warnings on
-	--(v)erbose		Turns verbose on
-	--(q)uiet		Turn on verbose mode
-	--(n)obanner		Don't display $APPLICATION_NAME banner
+	Options:
+	--help or -h			Displays usage information
+	--config FILE or -c FILE	Runs $APPLICATION_NAME with default settings
+	--warn or -w			Turns warnings on
+	--verbose or -v			Turns verbose on
+	--quiet or -q			Run silently
+	--nobanner or -n		Don't display $APPLICATION_NAME banner
 
 	Options can be bundled; so, to turn on verbose and warning, use -vw
 
@@ -95,6 +96,8 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 * `--help` or `-h`
 	* Displays usage information.
+* `--config FILE` or `-c FILE`
+	* Starts up **Raven IRCd** with `FILE` as the configuration file.
 * `--verbose` or `-v`
 	* Turns on verbose mode.  **Raven IRCd** will print text to the console to tell the user what it's doing.
 * `--warn` or `-w`
@@ -103,20 +106,24 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 	* **Raven IRCd** will not print *anything* to the console except fatal errors.
 * `--nobanner` or `-n`
 	* Turns off the **Raven IRCd** banner that `raven-ircd.pl` prints on startup.
-* `--default` or `-d`
-	* Starts up **Raven IRCd** with all default settings.
 
-**Raven IRCd** will look for the filename passed as an argument in the same directory that `raven-ircd.pl` in the same directory `raven-ircd.pl` is located in (called the **home directory**) first, then in a directory named `settings/` in the same directory that `raven-ircd.pl` is located in (called the **settings directory**). Once **Raven IRCd** finds the file, it will be loaded into memory and parsed for [configuration data](#configuration).
+Configuration files will be looked for in two places:  first, the same directory that `raven-ircd.pl` is located in (called the **home directory**), and second, the `settings/` directory in the same directory as `raven-ircd.pl` (called the **settings directory**).
 
-If no filename is passed, **Raven IRCd** will load the default configuration file, `default.xml`, in the **settings** directory.
+If ran with no options, or without the `--config` option, **Raven IRCd** will load the default set of configuration files, `default.xml` (which also loads `operators.xml` and `authorized.xml`), located in the **settings directory**.
 
-If passed a filename as an argument, and **Raven IRCd** finds it, **Raven IRCd** will load that file as a configuration file (see [Configuration](#configuration)), and if it can't be found, will look for it first in the **home** directory, and then in the **settings** directory.  Any settings that the configuration file does *not* contain will use the default values (see [Default settings](#default-settings)).  If the file can't be found, the server will simply start with all default values; if `--warn` is turned on, the user will be notified of this.
+If ran with the `--config` option, **Raven IRCd** will load the specified file instead of `default.xml`.
+
+Any settings that are missing or not set in any configuration file(s) loaded will be set to default values (see [Default settings](#default-settings)).
+
+By default, **Raven IRCd** will print the banner to the console on start up, and nothing else.  To print information about what file and settings are loaded, use the `--verbose` option. To print possible non-fatal errors, use the `--warn` option. To print *nothing* to the console while running, use the `--quiet` option.  To prevent the banner from being printed, use the `--nobanner` option.
+
+Options can be shortened to one dash and one letter, the first letter of the command.  For example, the `--verbose` option can be shortened to `-v`.  Options can also be bundled, allowing more than one option to be set at a time;  for example, to turn on verbose mode and warnings, you could use `-vw`.
 
 # Configuration
 
 All server configuration is done through one or more [XML](https://en.wikipedia.org/wiki/XML)-like configuration files; the default configuration file is named `default.xml`, and is located in the **settings** directory.
 
-All configuration elements can be set in *any* configuration file loaded by **Raven IRCd**, and do not have to be in `default.xml`; passing the filename of a configuration file as the first argument to `raven-ircd.pl` will cause the program to load that file instead of `default.xml`. **Raven IRCd** can also start without a configuration file; if the configuration file does not exist or can't be found, **Raven IRCd** will use the default server settings, opening a listening port on 6667 and allowing clients from any host to connect. To "force" **Raven IRCd** to start up without any configuration files, pass `default` as the first argument to `raven-ircd.pl`; the server won't load any configuration files, and will use the default server settings:
+All configuration elements can be set in *any* configuration file loaded by **Raven IRCd**, and do not have to be in `default.xml`.
 
 ## Default Settings
 
@@ -151,11 +158,11 @@ All configuration elements can be set in *any* configuration file loaded by **Ra
 * `config`->`warn`
 	* 1
 * `config`->`admin`
-	* Raven IRCd 0.0252
+	* Raven IRCd 0.0271
 	* The operator of this server didn't set up the admin option.
 	* Sorry!
 * `config`->`description`
-	* Raven IRCd 0.0252
+	* Raven IRCd 0.0271
 * `config`->`motd`
 	* motd.txt
 
@@ -198,17 +205,16 @@ The `config` element is where all the main server settings are.  They are all op
 		<max_targets>4</max_targets>
 		<max_channels>15</max_channels>
 		<info>Raven IRCd</info>
-		<admin>Raven IRCd 0.0252</admin>
+		<admin>Raven IRCd 0.0271</admin>
 		<admin>The operator of this server didn't set up the admin option.</admin>
 		<admin>Sorry!</admin>
-		<description>Raven IRCd 0.0252</description>
+		<description>Raven IRCd 0.0271</description>
 		<motd>motd.txt</motd>
 	</config>
 
 Multiple `config` elements can be set (although they must be in separate files; see [Restrictions](#configuration-file-restrictions)), though it may confuse the server (and you!). Configuration files are processed in order;  for example, if a file is imported with the `import` element, it will be loaded before any other elements following the `import` element are loaded.  As an example, let's say that you have two configuration files that you want to use, `mysettings.xml` and `othersettings.xml`.
 
 	<!-- mysettings.xml -->
-	<?xml version="1.0" encoding="UTF-8"?>
 	<config>
 		<port>6667</port>
 		<nicklength>1000000</nicklength>
@@ -220,7 +226,6 @@ Multiple `config` elements can be set (although they must be in separate files; 
 As you can see, this file sets the listening port to 6667, the nick length to a generous 1,000,000 characters, the network name to "ScoobyDooNet", and `import`s another configuration file, "othersettings.xml":
 
 	<!-- othersettings.xml -->
-	<?xml version="1.0" encoding="UTF-8"?>
 	<config>
 		<nicklength>2</nicklength>
 	</config>
@@ -439,8 +444,6 @@ Sets the OperServ's username.
 
 Here's an example configuration file.  It'll set up listening ports on ports 6667-6669, allow anyone to connect (spoofing their host to appear as if they are connecting from `facebook.com`), and create an operator with the username `oracle` and the password `thematrix`.  The server's name with be "example.raven.setup" on the "OscarNet" network, and will allow clients to connect to 50 channels and a time, and let them use only 8 characters in their nick:
 
-	<?xml version="1.0" encoding="UTF-8"?>
-
 	<config>
 		<port>6667</port>
 		<port>6668</port>
@@ -470,7 +473,7 @@ If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configurati
 	|  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
 	| | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
 	|_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
-	---------------------------------------Raven IRCd 0.0252
+	---------------------------------------Raven IRCd 0.0271
 	-----Raven IRCd is an IRC server written in Perl and POE
 	----------------https://github.com/danhetrick/raven-ircd
 

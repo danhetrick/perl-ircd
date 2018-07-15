@@ -119,7 +119,7 @@ my $CONFIGURATION_DIRECTORY_NAME	= "settings";
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # These are used by generate_banner(), and nowhere else.
 my $APPLICATION_NAME		= "Raven IRCd";
-my $VERSION					= "0.0252";
+my $VERSION					= "0.0271";
 my $APPLICATION_DESCRIPTION	= "Raven IRCd is an IRC server written in Perl and POE";
 my $APPLICATION_URL			= "https://github.com/danhetrick/raven-ircd";
 my $PROGRAM_NAME			= 'raven-ircd.pl';
@@ -187,10 +187,11 @@ my @CONFIG_ELEMENT_FILES	= (); 	# A list of files with config elements
 # ======================
 
 # Handle any commandline options
+my $cmdline_config_file = '';
 Getopt::Long::Configure ("bundling");
-GetOptions ('default|d'   	=> sub { $ARGV[0] = 'default' },
+GetOptions ('config|c=s'   	=> \$cmdline_config_file,
 			'warn|w'		=> sub { $WARNING = 1; },
-			'verbose|v'		=> sub { $VERBOSE = 1; $cmdVERBOSE = 1; },
+			'verbose|v'		=> sub { $VERBOSE = 1; },
 			'nobanner|n'	=> sub { $BANNER = 0; },
 	        'quiet|q'		=> sub { $VERBOSE = 0; $BANNER = 0; $WARNING = 0; },
 			'help|h'	=> sub { usage(); exit; }
@@ -198,58 +199,42 @@ GetOptions ('default|d'   	=> sub { $ARGV[0] = 'default' },
 
 # Now it's time to load configuration files!
 
-if((scalar @ARGV>=1)&&(lc($ARGV[0]) eq 'default')){
+# If a config file is set with commandline options, select that
+# file to load (rather than default.xml).
+if($cmdline_config_file){ $CONFIGURATION_FILE=$cmdline_config_file; }
+
+# Look for the configuration file in the local directory or the config/ directory.
+my $found_configuration_file = find_local_settings_file($CONFIGURATION_FILE);
+
+# If configuration file is found, load it. If the configure file is *not* found,
+# use default settings and warn the user.  No matter what, print the banner to
+# the console if verbosity is turned on.
+if($found_configuration_file){
+	# Configuration file found, load it into memory.
+	load_xml_configuration_file($found_configuration_file);
 	# Display banner unless configured otherwise
 	if($BANNER==1){ print generate_banner(); }
-	# User wants to start with all default settings, no configuration
-	# files, so we won't even bother trying to look for or load any.
-	verbose("Starting server with default settings");
+	# Let the user know what configuration file was loaded.
+	verbose("Loaded configuration file '$found_configuration_file'");
 } else {
-	# See if a config file is passed to the program in an argument.
-	if($#ARGV>=0){ $CONFIGURATION_FILE=$ARGV[0]; }
-
-	# Look for the configuration file in the local directory or the config/ directory.
-	my $found_configuration_file = find_configuration_file($CONFIGURATION_FILE);
-
-	# If configuration file is found, load it. If the configure file is *not* found,
-	# use default settings and warn the user.  No matter what, print the banner to
-	# the console if verbosity is turned on.
-	if($found_configuration_file){
-		# Configuration file found, load it into memory.
-		load_xml_configuration_file($found_configuration_file);
-		# Display banner unless configured otherwise
-		if($BANNER==1){ print generate_banner(); }
-		# Let the user know what configuration file was loaded.
-		verbose("Loaded configuration file '$found_configuration_file'");
-	} else {
-		# Display banner unless configured otherwise
-		if($BANNER==1){ print generate_banner(); }
-		# Configuration file *not* found; defaults will be used.
-		# Warn the user that no file was found.
-		display_warning("Configuration file '$CONFIGURATION_FILE' not found!");
-		display_warning("Starting server with default settings");
-	}
-	# Display any files imported by any configuration files
-	if(scalar @IMPORTED_FILES>=1){
-		foreach my $i (@IMPORTED_FILES){
-			verbose("Imported configuration file '$i'");
-		}
-	}
-
-	# Display the number of operator accounts created
-	if(scalar @OPERATORS>=1){} else {
-		display_warning('No operator accounts found! Server will start without operators');
-	}
-
-	# Do a sanity check for the config->admin element
-	# No more than three entries are allowed, so make sure that
-	# @ADMIN (the array that contains the entries) has no more
-	# or no less than 3 entries. Since it's not really a critical
-	# setting, we'll only warn the user if there's too many, rather
-	# than error and exit, and we'll only use the first three
-	# entries.
-	check_admin_info();
+	# Configuration file not found, error and exit
+	display_error_and_exit("Configuration file '$CONFIGURATION_FILE' not found")
 }
+# Display any files imported by any configuration files
+if(scalar @IMPORTED_FILES>=1){
+	foreach my $i (@IMPORTED_FILES){
+		verbose("Imported configuration file '$i'");
+	}
+}
+
+# Do a sanity check for the config->admin element
+# No more than three entries are allowed, so make sure that
+# @ADMIN (the array that contains the entries) has no more
+# or no less than 3 entries. Since it's not really a critical
+# setting, we'll only warn the user if there's too many, rather
+# than error and exit, and we'll only use the first three
+# entries.
+check_admin_info();
 
 # Set up the Message of the Day! $MOTD_FILE (default: motd.txt) has
 # its value set by the config file, in config->motd. Here, we look
@@ -258,7 +243,7 @@ if((scalar @ARGV>=1)&&(lc($ARGV[0]) eq 'default')){
 # first checks to see if $MOTD_FILE contains a complete path,
 # and if not, looks for it in the same directory as this program
 # and the settings directory.
-my $motd = find_configuration_file($MOTD_FILE);
+my $motd = find_local_settings_file($MOTD_FILE);
 if($motd){
 	verbose("Added MOTD from '$motd'");
 	open(FILE,"<$motd") or display_error_and_exit("Error opening MOTD file '$motd'");
@@ -363,7 +348,7 @@ $poe_kernel->run();
 # -------------------------------
 
 #	check_admin_info()
-#	find_configuration_file()
+#	find_local_settings_file()
 #	load_xml_configuration_file()
 
 # ----------------------
@@ -408,11 +393,18 @@ sub _start {
     	# Give user a list of filenames containing auth data
     	# with the duplicates consolidated
     	foreach my $f (uniq(@aus)) {
-			verbose("Adding authorized connection(s) from '$f'");
+			verbose("Adding authorized entries from '$f'");
+		}
+		# Display how many auth entries were loaded
+		my $count = scalar @AUTHS;
+		if($count==1){
+			verbose ("1 auth entry loaded");
+		} else {
+			verbose ("$count auth entries loaded");
 		}
     } else {
     		# @AUTHS is empty, so let the user know and use the default auth entry.
-    		display_warning("No authorized connections found! Using $DEFAULT_AUTH as the auth");
+    		display_warning("No authorized entries found! Using $DEFAULT_AUTH as the auth");
     		$heap->{ircd}->add_auth(
 	        	mask		=> $DEFAULT_AUTH,
     		); 
@@ -437,11 +429,18 @@ sub _start {
 		# Give user a list of filenames containing auth data
     	# with the duplicates consolidated
 		foreach my $f (uniq(@files)) {
-			verbose("Added operator account(s) from '$f'");
+			verbose("Added operator entries from '$f'");
+		}
+		# Display how many operator accounts were loaded
+		my $count = scalar @OPERATORS;
+		if($count==1){
+			verbose ("1 operator entry loaded");
+		} else {
+			verbose ("$count operator entries loaded");
 		}
 	} else {
 		# @OPERATORS is empty, so let the user know and start with no operators.
-		display_warning('No operator accounts found! Server will start without operators');
+		display_warning('No operator entries found! Server will start without operators');
 	}
 
 	# Add listening port(s)
@@ -479,12 +478,12 @@ sub usage {
 	print generate_banner();
 	print "perl $PROGRAM_NAME [OPTIONS] FILENAME\n\n";
 	print "Options:\n";
-	print "--(h)elp		Displays usage information\n";
-	print "--(d)efault		Runs $APPLICATION_NAME with default settings\n";
-	print "--(w)arn		Turns warnings on\n";
-	print "--(v)erbose		Turns verbose on\n";
-	print "--(q)uiet		Turn on verbose mode\n";
-	print "--(n)obanner		Don't display $APPLICATION_NAME banner\n\n";
+	print "--help or -h			Displays usage information\n";
+	print "--config FILE or -c FILE	Runs $APPLICATION_NAME with default settings\n";
+	print "--warn or -w			Turns warnings on\n";
+	print "--verbose or -v			Turns verbose on\n";
+	print "--quiet or -q			Run silently\n";
+	print "--nobanner or -n		Don't display $APPLICATION_NAME banner\n\n";
 	print "Options can be bundled; so, to turn on verbose and warning, use -vw\n";
 }
 
@@ -540,7 +539,7 @@ sub display_warning {
 # |  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
 # | | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
 # |_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
-# ---------------------------------------Raven IRCd 0.0252
+# ---------------------------------------Raven IRCd 0.0271
 # ------Raven IRCd is an IRC server written in Perl and POE
 # ----------------https://github.com/danhetrick/raven-ircd
 sub generate_banner {
@@ -549,7 +548,8 @@ sub generate_banner {
 
 	my $b = logo().($BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_NAME $VERSION")))."$APPLICATION_NAME $VERSION\n";
 	$b .= $BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_DESCRIPTION"))."$APPLICATION_DESCRIPTION\n";
-	$b .= $BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_URL"))."$APPLICATION_URL\n\n";
+	$b .= $BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_URL"))."$APPLICATION_URL\n";
+	$b .= $BANNER_PADDING x $LOGO_WIDTH."\n";
 	return $b;
 }
 
@@ -622,7 +622,7 @@ sub check_admin_info {
 	}
 }
 
-# find_configuration_file()
+# find_local_settings_file()
 # Arguments: 1 (scalar, filename)
 # Returns: Scalar (filename)
 # Description: Looks for a given configuration file in the several directories.
@@ -630,7 +630,7 @@ sub check_admin_info {
 #              mind; in theory, this should work on any platform that can run
 #              Perl (so, OSX, *NIX, Linux, Windows, etc). Not "expensive" to
 #              run, as it doesn't do directory searches.
-sub find_configuration_file {
+sub find_local_settings_file {
 	my $filename = shift;
 
 	# If the filename is found, return it
@@ -677,7 +677,7 @@ sub load_xml_configuration_file {
 	if(ref($tree->{import}) eq 'ARRAY'){
 		foreach my $i (@{$tree->{import}}) {
 			# Multiple import elements
-			$i = find_configuration_file($i);
+			$i = find_local_settings_file($i);
 			if(!$i){
 				# Imported file not found; alert user and exit
 				display_error_and_exit("Configuration file '$filename' not found");
@@ -690,7 +690,7 @@ sub load_xml_configuration_file {
 		}
 	} elsif($tree->{import} ne undef){
 		# Single import element
-		my $f = find_configuration_file($tree->{import});
+		my $f = find_local_settings_file($tree->{import});
 		if(!$f){
 			# Imported file not found; alert user and exit
 			display_error_and_exit("Configuration file '$filename' not found");
