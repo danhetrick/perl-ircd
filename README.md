@@ -43,7 +43,7 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 * :page_facing_up: README.md
 * :file_folder: lib
 	* :file_folder: XML
-		* TreePP.pm
+		* :page_facing_up: TreePP.pm
 	* :page_facing_up: RavenIRCd.pm
 	* :page_facing_up: OperServ.pm
 * :file_folder: settings
