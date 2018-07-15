@@ -110,7 +110,7 @@ use constant OPERATOR_FILE		=> 3;
 # { CONFIGURATION FILE SETTINGS }
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The declaration ID for a Raven IRCd config file
-my $RAVEN_CONFIG_FILE_DECLARATION = "raven-xml";
+my $RAVEN_CONFIG_FILE_DECLARATION	= "raven-xml";
 # Default config filename.
 my $CONFIGURATION_FILE				= "default.xml";
 # Where the server will look for config files besides the local directory.
