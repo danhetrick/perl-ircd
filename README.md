@@ -93,17 +93,17 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 ## Options
 
-* `--(h)elp` or `usage`
+* `--help` or `-h`
 	* Displays usage information.
-* `--(v)erbose`
+* `--verbose` or `-v`
 	* Turns on verbose mode.  **Raven IRCd** will print text to the console to tell the user what it's doing.
-* `--(w)arn`
+* `--warn` or `-w`
 	* Turns on warnings. **Raven IRCd** will print text to the console, warning users of non-fatal errors. If warnings are turned on, they will still print to the console if `--verbose` is not turned on.
-* `--(q)uiet`
+* `--quiet` or `-q`
 	* **Raven IRCd** will not print *anything* to the console except fatal errors.
-* `--nobanner`
+* `--nobanner` or `-n`
 	* Turns off the **Raven IRCd** banner that `raven-ircd.pl` prints on startup.
-* `--(d)efault`
+* `--default` or `-d`
 	* Starts up **Raven IRCd** with all default settings.
 
 **Raven IRCd** will look for the filename passed as an argument in the same directory that `raven-ircd.pl` in the same directory `raven-ircd.pl` is located in (called the **home directory**) first, then in a directory named `settings/` in the same directory that `raven-ircd.pl` is located in (called the **settings directory**). Once **Raven IRCd** finds the file, it will be loaded into memory and parsed for [configuration data](#configuration).
