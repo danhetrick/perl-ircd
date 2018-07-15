@@ -88,6 +88,8 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 	--(v)erbose		Turns verbose on
 	--(q)uiet		Turn on verbose mode
 	--(n)obanner		Don't display $APPLICATION_NAME banner
+	 
+	Options can be bundled; so, to turn on verbose and warning, use -vw
 
 ## Options
 
