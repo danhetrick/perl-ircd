@@ -188,11 +188,11 @@ my @CONFIG_ELEMENT_FILES	= (); 	# A list of files with config elements
 
 # Handle any commandline options
 Getopt::Long::Configure ("bundling");
-GetOptions ('warn|w'		=> sub { $WARNING = 1; },
-			'verbose|v'		=> sub { $VERBOSE = 1; },
+GetOptions ('default|d'   	=> sub { $ARGV[0] = 'default' },
+			'warn|w'		=> sub { $WARNING = 1; },
+			'verbose|v'		=> sub { $VERBOSE = 1; $cmdVERBOSE = 1; },
 			'nobanner|n'	=> sub { $BANNER = 0; },
 	        'quiet|q'		=> sub { $VERBOSE = 0; $BANNER = 0; $WARNING = 0; },
-	        'default|d'   	=> sub { $ARGV[0] = 'default' },
 			'help|h'	=> sub { usage(); exit; }
 			 );
 
