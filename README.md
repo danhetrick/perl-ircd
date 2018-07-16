@@ -86,9 +86,8 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 # Usage
 
-	perl raven-ircd.pl OPTIONS FILENAME
+	perl raven-ircd.pl OPTIONS
 
-	Options:
 	Options:
 	--help or -h			Displays usage information
 	--config FILE or -c FILE	Runs $APPLICATION_NAME with default settings
