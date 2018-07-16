@@ -90,11 +90,11 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 
 	Options:
 	--help or -h			Displays usage information
-	--config FILE or -c FILE	Runs $APPLICATION_NAME with default settings
+	--config FILE or -c FILE	Runs Raven IRCd with default settings
 	--warn or -w			Turns warnings on
 	--verbose or -v			Turns verbose on
 	--quiet or -q			Run silently
-	--nobanner or -n		Don't display $APPLICATION_NAME banner
+	--nobanner or -n		Don't display Raven IRCd banner
 
 	Options can be bundled; so, to turn on verbose and warning, use -vw
 
