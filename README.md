@@ -185,7 +185,7 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 
 ## Configuration File Format
 
-**Raven IRCd** configuration files are written in an XML-like language called _Raven XML_;  the first line in a _Raven XML_ must be a declaration (`<?raven-xml version="1.0"?>`), and it uses the file extension `.xml`. The main difference between the XML format and the format used for **Raven IRCd** configuration files is that, unlike XML, **Raven IRCd** configuration files can have multiple root elements.  There are five root elements in a **Raven IRCd** configuration file: [`config`](#config-element), [`import`](#import-element), [`auth`](#auth-element), [`operator`](#operator-element), and [`operserv`](#operserv-element).  All root elements have mandatory and/or optional child elements (with the exception of `import`, which has no child elements): `config` has _no_ manditory child elements, `auth` elements have _one_ mandatory child element ([`mask`](#mask)), `operator` has *two* mandatory child elements ([`username`](#username) and [`password`](#password-operator)), and `operserv` has *one* mandatory child elements ([`use`](#use)).  See [Restrictions](#configuration-file-restrictions) for more information.
+**Raven IRCd** configuration files are written in an XML-like language called _Raven XML_;  the first line in a _Raven XML_ must be a declaration (`<?raven-xml version="1.0"?>`), and it uses the file extension `.xml`. The main difference between the XML format and the format used for **Raven IRCd** configuration files is that, unlike XML, **Raven IRCd** configuration files can have multiple root elements.  There are five root elements in a **Raven IRCd** configuration file: [`config`](#config-element), [`import`](#import-element), [`auth`](#auth-element), [`operator`](#operator-element), and [`operserv`](#operserv-element).  All root elements have mandatory and/or optional child elements (with the exception of `import`, which has no child elements): `config` has _no_ manditory child elements, `auth` elements have _one_ mandatory child element ([`mask`](#mask)), `operator` has *two* mandatory child elements ([`username`](#username) and [`password`](#password-operator)), and `operserv` has *one* mandatory child element ([`use`](#use)).  See [Restrictions](#configuration-file-restrictions) for more information.
 
 ### Configuration File Restrictions
 
@@ -467,7 +467,7 @@ Here's an example configuration file.  It'll set up listening ports on ports 666
 
 If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configuration file and run it like so:
 
-	user@localhost:$ perl raven-ircd.pl oscarnet.xml
+	user@localhost:$ perl raven-ircd.pl --config oscarnet.xml --verbose
 	 _____                         _____ _____   _____    _
 	|  __ \                       |_   _|  __ \ / ____|  | |
 	| |__) |__ ___   _____ _ __     | | | |__) | |     __| |
