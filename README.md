@@ -8,7 +8,7 @@
 
 The source code for `raven-ircd.pl` is *heavily* commented. I try to explain everything the program is doing in detail, so if you want to use it as a base for your own IRCd, the **Raven IRCd** source is a good place to start.  The most complicated part of the source is the code for loading and applying configuration file settings, and thus has the most comments; it's written in pure Perl, and doesn't require POE or anything outside of the standard library (besides XML::TreePP, included with the **Raven IRCd** distribution).  If you do use **Raven IRCd** as the base for your own IRC server, remember the [license](#license), and make sure to share your additions/changes.
 
-The latest version of **Raven IRCd** is 0.0352.
+The latest version of **Raven IRCd** is 0.0361.
 
 # Features
 * _**Fast Setup**_ - **Raven IRCd** can be setup and ran in less than a minute!
@@ -156,10 +156,10 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 	* Raven IRCd is an IRC server written in Perl and POE
 * `config`->`admin`
 	* `-----------------`
-	* `Raven IRCd 0.0352`
+	* `Raven IRCd 0.0361`
 	* `-----------------`
 * `config`->`description`
-	* Raven IRCd 0.0352
+	* Raven IRCd 0.0361
 * `config`->`motd`
 	* motd.txt
 
@@ -221,10 +221,10 @@ The `config` element is where all the main server settings are.  They are all op
 		<max_targets>4</max_targets>
 		<max_channels>15</max_channels>
 		<info>Raven IRCd</info>
-		<admin>Raven IRCd 0.0352</admin>
+		<admin>Raven IRCd 0.0361</admin>
 		<admin>The operator of this server didn't set up the admin option.</admin>
 		<admin>Sorry!</admin>
-		<description>Raven IRCd 0.0352</description>
+		<description>Raven IRCd 0.0361</description>
 		<motd>motd.txt</motd>
 	</config>
 
@@ -476,7 +476,7 @@ If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configurati
 	██╔══██╗██╔══██║╚██╗ ██╔╝██╔══╝  ██║╚██╗██║     d
 	██║  ██║██║  ██║ ╚████╔╝ ███████╗██║ ╚████║     *
 	╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝     *
-	                                   VERSION 0.0352
+	                                   VERSION 0.0361
 	                                   
 	[3:59:53 6/17/2018] Loaded configuration file 'oscar.xml'
 	[3:59:53 6/17/2018] Added MOTD from 'settings/motd.txt'

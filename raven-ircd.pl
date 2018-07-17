@@ -66,9 +66,9 @@ use POE;
 # { LOCAL MODULES }
 # ~~~~~~~~~~~~~~~~~
 
-# XML::TreePP -- Pure Perl implementation for parsing/writing XML documents
-# By Yusuke Kawasaki
-#use XML::TreePP;
+# RavenConfigFile - Raven XML Configuration File
+# Inherits from XML::TreePP -- Pure Perl implementation for parsing/writing XML documents
+#                              By Yusuke Kawasaki
 use RavenConfigFile;
 
 # RavenIRCd -- IRC server functionality
