@@ -24,7 +24,21 @@
 package RavenConfigFile;
 
 use strict;
+use XML::TreePP;
 use base qw(XML::TreePP);
+
+use vars qw( $VERSION );
+$VERSION = '0.43';
+
+my $XML_ENCODING      = 'UTF-8';
+my $INTERNAL_ENCODING = 'UTF-8';
+my $USER_AGENT        = 'Raven-XML/'.$VERSION.' ';
+my $ATTR_PREFIX       = '-';
+my $TEXT_NODE_KEY     = '#text';
+my $USE_ENCODE_PM     = ( $] >= 5.008 );
+my $ALLOW_UTF8_FLAG   = ( $] >= 5.008001 );
+
+my $EMPTY_ELEMENT_TAG_END = ' />';
 
 my $CONFIG_FILE_ID = "raven-xml";
 my $NO_RAVEN_ID_ERROR = "Raven configuration file declaration ('raven-xml') not found";

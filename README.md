@@ -478,8 +478,16 @@ If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configurati
 	---------------------------------------Raven IRCd 0.0352
 	-----Raven IRCd is an IRC server written in Perl and POE
 	----------------https://github.com/danhetrick/raven-ircd
-
-	[4:23:40 6/11/2018] Loaded configuration file 'oscarnet.xml'
+	--------------------------------------------------------
+	[3:59:53 6/17/2018] Loaded configuration file 'oscar.xml'
+	[3:59:53 6/17/2018] Added MOTD from 'settings/motd.txt'
+	[3:59:53 6/17/2018] Adding authorized entries from 'oscar.xml'
+	[3:59:53 6/17/2018] 1 auth entry loaded
+	[3:59:53 6/17/2018] Added operator entries from 'oscar.xml'
+	[3:59:53 6/17/2018] 1 operator entry loaded
+	[3:59:53 6/17/2018] Added a listener on port '6667'
+	[3:59:53 6/17/2018] Added a listener on port '6668'
+	[3:59:53 6/17/2018] Added a listener on port '6669'
 
 **Raven IRCd** is up and running!  Connect to it on port 6667, 6668, or 6669 and chat away!
 
