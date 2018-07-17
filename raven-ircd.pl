@@ -67,7 +67,8 @@ use POE;
 
 # XML::TreePP -- Pure Perl implementation for parsing/writing XML documents
 # By Yusuke Kawasaki
-use XML::TreePP;
+#use XML::TreePP;
+use RavenConfigFile;
 
 # RavenIRCd -- IRC server functionality
 # Inherits from POE::Component::Server::IRC
@@ -111,6 +112,8 @@ use constant OPERATOR_FILE		=> 3;
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # The declaration ID for a Raven IRCd config file
 my $RAVEN_CONFIG_FILE_DECLARATION	= "raven-xml";
+# Error displayed if Raven config file doesn't have proper ID
+my $RAVEN_CONFIG_NO_DECLARATION		= "Raven configuration file declaration ('$RAVEN_CONFIG_FILE_DECLARATION') not found";
 # Default config filename.
 my $CONFIGURATION_FILE				= "default.xml";
 # Where the server will look for config files besides the local directory.
@@ -724,17 +727,20 @@ sub find_file_in_home_or_settings_directory {
 sub load_settings_from_xml_config_file {
 	my $filename = shift;
 
-	# Create XML::TreePP object
-	my $tpp = XML::TreePP->new();
+	# Create RavenConfigFile object
+	my $rcf = RavenConfigFile->new();
 
 	# Set declaration ID
-	$tpp->set_declaration_id($RAVEN_CONFIG_FILE_DECLARATION);
+	$rcf->set_declaration_id($RAVEN_CONFIG_FILE_DECLARATION);
+
+	# Set no declaration error text
+	$rcf->set_id_error($RAVEN_CONFIG_NO_DECLARATION);
 
 	# XML declaration must be the first line of the file
-	$tpp->set( require_xml_decl => 1 );
+	$rcf->set( require_xml_decl => 1 );
 
 	# Load our configuration file
-	my $tree = $tpp->parsefile( $filename );
+	my $tree = $rcf->parsefile( $filename );
 
 	# If the parsed tree is empty, there's nothing to parse; exit subroutine
 	# This may occur because all the elements in the configuration file are
