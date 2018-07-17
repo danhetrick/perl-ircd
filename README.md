@@ -302,7 +302,7 @@ Sets the maximum number of channels a client can join. If `max_channels` is set 
 ------------
 ##### `info`
 
-Sets the text displayed with the `info` IRC command; multiple `info` elements are allowed.  Each `info` element adds one line to the `/info` output.
+Sets the text displayed with the `/info` IRC command; multiple `info` elements are allowed.  Each `info` element adds one line to the `/info` output.
 
 ------------
 ##### `admin`
