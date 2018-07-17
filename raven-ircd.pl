@@ -125,7 +125,7 @@ my $CONFIGURATION_DIRECTORY_NAME	= "settings";
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # These are used by generate_banner(), and nowhere else.
 my $APPLICATION_NAME		= "Raven IRCd";
-my $VERSION					= "0.0352";
+my $VERSION					= "0.0361";
 my $APPLICATION_DESCRIPTION	= "Raven IRCd is an IRC server written in Perl and POE";
 my $APPLICATION_URL			= "https://github.com/danhetrick/raven-ircd";
 my $PROGRAM_NAME			= 'raven-ircd.pl';
@@ -238,6 +238,7 @@ my $OPERSERV_CHILD_USERNAME		= "username";
 # checked by admin_setting_sanity_check(), which makes sure that the array only
 # contains 3 items and sets them to default values if they are missing.
 # @MOTD contains the message of the day.
+# @INFO contains server information returned by the /info command.
 my @LISTENER_PORTS			= ();	# List of server listening ports to use
 my @AUTHS					= ();	# List of auth entries
 my @OPERATORS				= ();	# List of operator entries
@@ -245,6 +246,7 @@ my @IMPORTED_FILES			= ();	# List of imported files
 my @ADMIN					= ();	# Text returned by the /admin command
 my @MOTD					= ();	# Message of the Day
 my @CONFIG_ELEMENT_FILES	= (); 	# A list of files with config elements
+my @INFO					= ();	# Server info
 
 # ===============
 # | GLOBALS END |
@@ -327,6 +329,11 @@ if($motd){
 	push(@MOTD, "No MOTD set");
 }
 
+# If @INFO is empty, fill it with default values
+if(scalar @INFO >=1){}else{
+	@INFO = ( "$APPLICATION_NAME $VERSION", "$APPLICATION_DESCRIPTION" );
+}
+
 # Set up our server configuration.
 my %config = (
     servername	=> $SERVER_NAME, 
@@ -334,7 +341,7 @@ my %config = (
     network		=> $SERVER_NETWORK,
     maxtargets	=> $MAX_TARGETS,
     maxchannels	=> $MAX_CHANNELS,
-    info		=> $SERVER_INFO,
+    info		=> \@INFO,
     admin		=> \@ADMIN,
     serverdesc	=> $DESCRIPTION,
     motd 		=> \@MOTD,
@@ -608,7 +615,7 @@ sub warning {
 # ██╔══██╗██╔══██║╚██╗ ██╔╝██╔══╝  ██║╚██╗██║	d
 # ██║  ██║██║  ██║ ╚████╔╝ ███████╗██║ ╚████║	*
 # ╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝	*
-#                                  VERSION 0.0352
+#                                  VERSION 0.0361
 sub generate_banner {
 	my $DISPLAY_BANNER_PADDING = "-";	# What the spaces to the left of the text is filled with
 	my $LOGO_WIDTH	= 49;		# The width (give or take) of the text banner generated with logo()
@@ -1107,11 +1114,11 @@ sub load_settings_from_xml_config_file {
 	}
 
 	# config->info
-	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO}) eq 'ARRAY'){
-		display_error_and_exit("Error in $filename: $CONFIG_ROOT_ELEMENT element can't have more than one $CONFIG_CHILD_INFO element");
-	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO} ne undef){
-		$SERVER_INFO = $tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO};
-	}
+	# if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO}) eq 'ARRAY'){
+	# 	display_error_and_exit("Error in $filename: $CONFIG_ROOT_ELEMENT element can't have more than one $CONFIG_CHILD_INFO element");
+	# } elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO} ne undef){
+	# 	$SERVER_INFO = $tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO};
+	# }
 
 	# config->admin
 	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_ADMIN}) eq 'ARRAY'){
@@ -1135,6 +1142,16 @@ sub load_settings_from_xml_config_file {
 		display_error_and_exit("Error in $filename: $CONFIG_ROOT_ELEMENT element can't have more than one $CONFIG_CHILD_MOTD element");
 	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MOTD} ne undef){
 		$MOTD_FILE = $tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_MOTD};
+	}
+
+	# config->info
+	if(ref($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO}) eq 'ARRAY'){
+		my @a = @{$tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO}};
+		foreach my $ae (@a){
+			push(@INFO,$ae);
+		}
+	} elsif($tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO} ne undef){
+		push(@INFO,$tree->{$CONFIG_ROOT_ELEMENT}->{$CONFIG_CHILD_INFO});
 	}
 
 }

@@ -153,6 +153,7 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 * `config`->`max_channels`
 	* 15
 * `config`->`info`
+	* Raven IRCd 0.0361
 	* Raven IRCd is an IRC server written in Perl and POE
 * `config`->`admin`
 	* `-----------------`
@@ -192,7 +193,7 @@ In the default configuration, **Raven IRCd** ships with three configuration file
 
 * Configuration files _**must**_ begin with `<?raven-xml version="1.0"?>`.  It must be the first line in the configuration file, with no comments,content, or whitespace preceeding it. 
 
-* Configuration files are only allowed to have **_one_ [`config`](#config-element) _element in each file_**; each `config` element is only allowed to have **one** of the following child elements: [`verbose`](#verbose), [`banner`](#banner), [`warn`](#warn), [`name`](#name), [`nicklength`](#nicklength), [`network`](#network), [`max_targets`](#max_targets),[`max_channels`](#max_channels), [`info`](#info), [`description`](#description), [`motd`](#motd).  Each `config` element is allowed to have three (3) [`admin`](#admin) child elements. Each `config` element is allowed to have multiple [`port`](#port) child elements.  All `config` child elements are optional.
+* Configuration files are only allowed to have **_one_ [`config`](#config-element) _element in each file_**; each `config` element is only allowed to have **one** of the following child elements: [`verbose`](#verbose), [`banner`](#banner), [`warn`](#warn), [`name`](#name), [`nicklength`](#nicklength), [`network`](#network), [`max_targets`](#max_targets),[`max_channels`](#max_channels), [`description`](#description), [`motd`](#motd).  Each `config` element is allowed to have three (3) [`admin`](#admin) child elements. Each `config` element is allowed to have multiple  [`info`](#info) child elements. Each `config` element is allowed to have multiple [`port`](#port) child elements.  All `config` child elements are optional.
 
 * Configuration files are only allowed to have **_one_ [`operserv`](#operserv-element) _element in each file_**; each `operserv` element is only allowed to have **one** of the following child elements: [`use`](#use) (which is mandatory), and [`nick`](#nick) (which is optional).
 
@@ -220,7 +221,8 @@ The `config` element is where all the main server settings are.  They are all op
 		<network>RavenNet</network>
 		<max_targets>4</max_targets>
 		<max_channels>15</max_channels>
-		<info>Raven IRCd</info>
+		<info>Raven IRCd 0.0361</info>
+		<info>Raven IRCd is an IRC server written in Perl and POE</info>
 		<admin>Raven IRCd 0.0361</admin>
 		<admin>The operator of this server didn't set up the admin option.</admin>
 		<admin>Sorry!</admin>
@@ -300,7 +302,7 @@ Sets the maximum number of channels a client can join. If `max_channels` is set 
 ------------
 ##### `info`
 
-Sets the text displayed with the `info` IRC command.
+Sets the text displayed with the `info` IRC command; multiple `info` elements are allowed.  Each `info` element adds one line to the `/info` output.
 
 ------------
 ##### `admin`
@@ -477,7 +479,7 @@ If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configurati
 	██║  ██║██║  ██║ ╚████╔╝ ███████╗██║ ╚████║     *
 	╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝     *
 	                                   VERSION 0.0361
-	                                   
+
 	[3:59:53 6/17/2018] Loaded configuration file 'oscar.xml'
 	[3:59:53 6/17/2018] Added MOTD from 'settings/motd.txt'
 	[3:59:53 6/17/2018] Adding authorized entries from 'oscar.xml'
