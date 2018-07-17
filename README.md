@@ -469,16 +469,15 @@ Here's an example configuration file.  It'll set up listening ports on ports 666
 If saved to a file named `oscarnet.xml`, **Raven IRCd** can load the configuration file and run it like so:
 
 	user@localhost:$ perl raven-ircd.pl --config oscarnet.xml --verbose
-	 _____                         _____ _____   _____    _
-	|  __ \                       |_   _|  __ \ / ____|  | |
-	| |__) |__ ___   _____ _ __     | | | |__) | |     __| |
-	|  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
-	| | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
-	|_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
-	---------------------------------------Raven IRCd 0.0352
-	-----Raven IRCd is an IRC server written in Perl and POE
-	----------------https://github.com/danhetrick/raven-ircd
-	--------------------------------------------------------
+
+	██████╗  █████╗ ██╗   ██╗███████╗███╗   ██╗     I
+	██╔══██╗██╔══██╗██║   ██║██╔════╝████╗  ██║     R
+	██████╔╝███████║██║   ██║█████╗  ██╔██╗ ██║     C
+	██╔══██╗██╔══██║╚██╗ ██╔╝██╔══╝  ██║╚██╗██║     d
+	██║  ██║██║  ██║ ╚████╔╝ ███████╗██║ ╚████║     *
+	╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝     *
+	                                   VERSION 0.0352
+	                                   
 	[3:59:53 6/17/2018] Loaded configuration file 'oscar.xml'
 	[3:59:53 6/17/2018] Added MOTD from 'settings/motd.txt'
 	[3:59:53 6/17/2018] Adding authorized entries from 'oscar.xml'

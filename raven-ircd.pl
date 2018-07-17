@@ -1,10 +1,11 @@
 #!/usr/bin/perl
-#   _____                         _____ _____   _____    _ 
-#  |  __ \                       |_   _|  __ \ / ____|  | |
-#  | |__) |__ ___   _____ _ __     | | | |__) | |     __| |
-#  |  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
-#  | | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
-#  |_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
+#
+# ██████╗  █████╗ ██╗   ██╗███████╗███╗   ██╗	I
+# ██╔══██╗██╔══██╗██║   ██║██╔════╝████╗  ██║	R
+# ██████╔╝███████║██║   ██║█████╗  ██╔██╗ ██║	C
+# ██╔══██╗██╔══██║╚██╗ ██╔╝██╔══╝  ██║╚██╗██║	d
+# ██║  ██║██║  ██║ ╚████╔╝ ███████╗██║ ╚████║	*
+# ╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝	*
 #
 #  Raven IRCd - An open-source IRC server written in Perl
 #  Copyright (C) 2018  Daniel Hetrick
@@ -600,23 +601,19 @@ sub warning {
 #              banner will look all neat and spiffy, even if we make changes to the text.
 #              Can be turned on or off with the config->banner element.
 #              Looks like this:
-#  _____                         _____ _____   _____    _
-# |  __ \                       |_   _|  __ \ / ____|  | |
-# | |__) |__ ___   _____ _ __     | | | |__) | |     __| |
-# |  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
-# | | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
-# |_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
-# ---------------------------------------Raven IRCd 0.0352
-# ------Raven IRCd is an IRC server written in Perl and POE
-# ----------------https://github.com/danhetrick/raven-ircd
+#
+# ██████╗  █████╗ ██╗   ██╗███████╗███╗   ██╗	I
+# ██╔══██╗██╔══██╗██║   ██║██╔════╝████╗  ██║	R
+# ██████╔╝███████║██║   ██║█████╗  ██╔██╗ ██║	C
+# ██╔══██╗██╔══██║╚██╗ ██╔╝██╔══╝  ██║╚██╗██║	d
+# ██║  ██║██║  ██║ ╚████╔╝ ███████╗██║ ╚████║	*
+# ╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝	*
+#                                  VERSION 0.0352
 sub generate_banner {
 	my $DISPLAY_BANNER_PADDING = "-";	# What the spaces to the left of the text is filled with
-	my $LOGO_WIDTH	= 56;		# The width (give or take) of the text banner generated with logo()
+	my $LOGO_WIDTH	= 49;		# The width (give or take) of the text banner generated with logo()
 
-	my $b = logo().($DISPLAY_BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_NAME $VERSION")))."$APPLICATION_NAME $VERSION\n";
-	$b .= $DISPLAY_BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_DESCRIPTION"))."$APPLICATION_DESCRIPTION\n";
-	$b .= $DISPLAY_BANNER_PADDING x ($LOGO_WIDTH - length("$APPLICATION_URL"))."$APPLICATION_URL\n";
-	$b .= $DISPLAY_BANNER_PADDING x $LOGO_WIDTH."\n";
+	my $b = "\n".logo().(' ' x ($LOGO_WIDTH - length("VERSION $VERSION")))."VERSION $VERSION\n\n";
 	return $b;
 }
 
@@ -627,12 +624,12 @@ sub generate_banner {
 #              used for the startup banner.
  sub logo {
 	return << 'END';
- _____                         _____ _____   _____    _ 
-|  __ \                       |_   _|  __ \ / ____|  | |
-| |__) |__ ___   _____ _ __     | | | |__) | |     __| |
-|  _  // _` \ \ / / _ \ '_ \    | | |  _  /| |    / _` |
-| | \ \ (_| |\ V /  __/ | | |  _| |_| | \ \| |___| (_| |
-|_|  \_\__,_| \_/ \___|_| |_| |_____|_|  \_\\_____\__,_|
+██████╗  █████╗ ██╗   ██╗███████╗███╗   ██╗	I
+██╔══██╗██╔══██╗██║   ██║██╔════╝████╗  ██║	R
+██████╔╝███████║██║   ██║█████╗  ██╔██╗ ██║	C
+██╔══██╗██╔══██║╚██╗ ██╔╝██╔══╝  ██║╚██╗██║	d
+██║  ██║██║  ██║ ╚████╔╝ ███████╗██║ ╚████║	*
+╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝	*
 END
 }
 
