@@ -38,9 +38,10 @@ This is good, I suppose, if you're planning on running an IRC server with hundre
 # Files
 
 * :file_folder: lib
-	* :page_facing_up: OperServ.pm
-	* :page_facing_up: RavenConfigFile.pm
-	* :page_facing_up: RavenIRCd.pm
+	* :file_folder: Raven
+		* :page_facing_up: Config.pm
+		* :page_facing_up: IRCd.pm
+		* :page_facing_up: OperServ.pm
 	* :file_folder: XML
 		* :page_facing_up: TreePP.pm
 * :file_folder: settings

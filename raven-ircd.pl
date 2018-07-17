@@ -66,14 +66,14 @@ use POE;
 # { LOCAL MODULES }
 # ~~~~~~~~~~~~~~~~~
 
-# RavenConfigFile - Raven XML Configuration File
+# Raven::Config - Raven XML Configuration File
 # Inherits from XML::TreePP -- Pure Perl implementation for parsing/writing XML documents
 #                              By Yusuke Kawasaki
-use RavenConfigFile;
+use Raven::Config;
 
-# RavenIRCd -- IRC server functionality
+# Raven::IRCd -- IRC server functionality
 # Inherits from POE::Component::Server::IRC
-use RavenIRCd;
+use Raven::IRCd;
 
 # ===============
 # | MODULES END |
@@ -347,26 +347,26 @@ my %config = (
     motd 		=> \@MOTD,
 );
 
-# Spawn our RavenIRCd instance, and pass it our server configuration.
-my $pocosi = RavenIRCd->spawn( config => \%config );
+# Spawn our Raven::IRCd instance, and pass it our server configuration.
+my $pocosi = Raven::IRCd->spawn( config => \%config );
 
 # If the OperServ is turned on, add it and configure it.
 if($OPERSERV==1){
 	# Load libraries
 	use POE::Component::Server::IRC::Plugin::OperServ;
-	use OperServ;
+	use Raven::OperServ;
 
 	# Enable OperServ and set whether its in channel control more
-	RavenIRCd::enable_operserv($OPERSERV_NAME,$OPERSERV_CHANNEL_CONTROL);
+	Raven::IRCd::enable_operserv($OPERSERV_NAME,$OPERSERV_CHANNEL_CONTROL);
 
 	# Make sure OperSev knows its own name :-)
-	OperServ::set_opserv_name($OPERSERV_NAME);
-	OperServ::set_opserv_ircname($OPERSERV_IRCNAME);
+	Raven::OperServ::set_opserv_name($OPERSERV_NAME);
+	Raven::OperServ::set_opserv_ircname($OPERSERV_IRCNAME);
 
 	# Add it!
 	$pocosi->plugin_add(
 		"OperServ",
-		OperServ->new(),
+		Raven::OperServ->new(),
 	);
 
 	# Let the user know OperServ is turned on, and if it's in
@@ -433,7 +433,7 @@ $poe_kernel->run();
 # _start()
 # Arguments: See description
 # Returns:  Nothing
-# Description:  This subroutine is called as soon as the RavenIRCd object is ran
+# Description:  This subroutine is called as soon as the Raven::IRCd object is ran
 #               after creation; it is not called directly in the program.
 #               Here's where auth, port, and operator data is loaded into the
 #               server; if those settings are "missing" (due to a lack of a configuration
@@ -631,12 +631,12 @@ sub generate_banner {
 #              used for the startup banner.
  sub logo {
 	return << 'END';
-██████╗  █████╗ ██╗   ██╗███████╗███╗   ██╗	I
-██╔══██╗██╔══██╗██║   ██║██╔════╝████╗  ██║	R
-██████╔╝███████║██║   ██║█████╗  ██╔██╗ ██║	C
-██╔══██╗██╔══██║╚██╗ ██╔╝██╔══╝  ██║╚██╗██║	d
-██║  ██║██║  ██║ ╚████╔╝ ███████╗██║ ╚████║	*
-╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝	*
+   ██████╗  █████╗ ██╗   ██╗███████╗███╗   ██╗	I
+   ██╔══██╗██╔══██╗██║   ██║██╔════╝████╗  ██║	R
+   ██████╔╝███████║██║   ██║█████╗  ██╔██╗ ██║	C
+   ██╔══██╗██╔══██║╚██╗ ██╔╝██╔══╝  ██║╚██╗██║	d
+   ██║  ██║██║  ██║ ╚████╔╝ ███████╗██║ ╚████║	*
+   ╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝	*
 END
 }
 
@@ -731,8 +731,8 @@ sub find_file_in_home_or_settings_directory {
 sub load_settings_from_xml_config_file {
 	my $filename = shift;
 
-	# Create RavenConfigFile object
-	my $rcf = RavenConfigFile->new();
+	# Create Raven::Config object
+	my $rcf = Raven::Config->new();
 
 	# Set declaration ID
 	$rcf->set_declaration_id($RAVEN_CONFIG_FILE_DECLARATION);
