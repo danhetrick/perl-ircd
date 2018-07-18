@@ -530,6 +530,7 @@ sub _start {
 		$heap->{ircd}->add_listener(port => $DEFAULT_PORT);
 		warning("No listening ports found! Using $DEFAULT_PORT as the listening port");
 	}
+
 }
 
 # --------------------
